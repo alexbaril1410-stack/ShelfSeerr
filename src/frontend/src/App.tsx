@@ -2491,6 +2491,11 @@ function App() {
             setActiveQueryTarget('general');
             setActiveResultsSort('');
           }}
+          onHomeClick={() => {
+            handleResetSearch(config);
+            setActiveQueryTarget('general');
+            setActiveResultsSort('');
+          }}
           authRequired={authRequired}
           isAuthenticated={isAuthenticated}
           onLogout={() => {
