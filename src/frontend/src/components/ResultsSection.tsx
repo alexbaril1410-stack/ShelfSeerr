@@ -71,9 +71,9 @@ export const ResultsSection = ({
 
     try {
       const saved = window.localStorage.getItem('bookViewMode');
-      return saved === 'card' || saved === 'compact' || saved === 'list' ? saved : 'compact';
+      return saved === 'card' || saved === 'compact' || saved === 'list' ? saved : 'card';
     } catch {
-      return 'compact';
+      return 'card';
     }
   });
   const isDesktop = useMediaQuery('(min-width: 640px)');
