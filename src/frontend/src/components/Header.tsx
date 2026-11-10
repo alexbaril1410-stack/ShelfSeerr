@@ -762,7 +762,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
 
           <nav
             aria-label="Navigation principale"
-            className="mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
+            className="shelfseerr-primary-nav mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
             style={{ borderColor: 'var(--border-muted)' }}
           >
             <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label="Accueil">
