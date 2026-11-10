@@ -697,7 +697,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   ) : (
                     <img
                       src={logoUrl}
-                      alt="Shelfmark logo"
+                      alt="ShelfSeerr logo"
                       className="h-10 w-10 shrink-0 lg:hidden"
                     />
                   ))}
@@ -721,7 +721,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   ) : (
                     <img
                       src={logoUrl}
-                      alt="Shelfmark logo"
+                      alt="ShelfSeerr logo"
                       className="hidden h-12 w-12 shrink-0 lg:block"
                     />
                   ))}
