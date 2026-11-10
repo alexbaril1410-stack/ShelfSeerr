@@ -110,7 +110,7 @@ export const SearchSection = ({
       className={`${isInitialState ? 'search-initial-state mb-8' : 'mb-3 sm:mb-4'} ${showAdvanced ? 'search-advanced-visible' : ''}`}
     >
       {isInitialState && (
-        <div className="relative isolate mb-8 overflow-hidden rounded-3xl border border-white/10 bg-slate-950 px-5 py-10 text-white shadow-2xl sm:mb-12 sm:px-10 sm:py-14 lg:px-14">
+        <div className="relative isolate mb-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 px-4 py-7 text-white shadow-2xl sm:mb-12 sm:rounded-3xl sm:px-10 sm:py-14 lg:px-14">
           <div className="pointer-events-none absolute -right-20 -top-28 -z-10 h-80 w-80 rounded-full bg-indigo-500/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 left-1/3 -z-10 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl" />
           <div className="mx-auto max-w-4xl text-center">
@@ -121,7 +121,7 @@ export const SearchSection = ({
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
               Votre prochaine lecture commence ici
             </p>
-            <h1 className="mx-auto max-w-3xl text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl">
+            <h1 className="mx-auto max-w-3xl text-[1.75rem] leading-tight font-bold tracking-tight sm:text-4xl lg:text-5xl">
               {contentType === 'audiobook' ? 'À écouter. À découvrir. À partager.' : 'Trouvez votre prochain livre préféré.'}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
@@ -129,7 +129,7 @@ export const SearchSection = ({
                 ? 'Explorez les livres audio, trouvez votre prochaine écoute et ajoutez-la à votre bibliothèque.'
                 : 'Explorez le catalogue, découvrez de nouveaux univers et retrouvez les livres que vous souhaitez lire.'}
             </p>
-            <div className="mx-auto mt-8 max-w-3xl rounded-2xl bg-white p-2 shadow-xl">
+            <div className="mx-auto mt-6 max-w-3xl rounded-xl bg-white p-1.5 shadow-xl sm:mt-8 sm:rounded-2xl sm:p-2">
               <SearchBar
                 value={queryValue}
                 valueLabel={queryValueLabel}
@@ -213,10 +213,10 @@ export const SearchSection = ({
                   <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} titres</span>
                 )}
               </div>
-              <div className="flex snap-x gap-3 overflow-x-auto pb-3 sm:gap-4">
+              <div className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
                 {isDiscoveryLoading && shelfBooks.length === 0
                   ? Array.from({ length: 6 }, (_, index) => (
-                      <div key={index} className="w-[112px] shrink-0 animate-pulse sm:w-[142px]">
+                      <div key={index} className="w-[124px] shrink-0 animate-pulse sm:w-[142px]">
                         <div className="aspect-[2/3] rounded-xl bg-gray-200 dark:bg-slate-800" />
                         <div className="mt-2 h-3 rounded bg-gray-200 dark:bg-slate-800" />
                         <div className="mt-1 h-2.5 w-2/3 rounded bg-gray-100 dark:bg-slate-800/70" />
@@ -227,7 +227,7 @@ export const SearchSection = ({
                         key={book.id}
                         type="button"
                         onClick={() => onDiscoveryBookSelect(book)}
-                        className="group w-[112px] shrink-0 snap-start text-left sm:w-[142px]"
+                        className="group w-[124px] shrink-0 snap-start text-left sm:w-[142px]"
                         title={`Rechercher ${book.title}`}
                       >
                         <div
