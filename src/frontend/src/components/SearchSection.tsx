@@ -6,12 +6,16 @@ import type {
   QueryTargetOption,
   SearchMode,
   MetadataProviderSummary,
+  Book,
 } from '../types';
 import { AdvancedFilters } from './AdvancedFilters';
 import { SearchBar } from './SearchBar';
 
 interface SearchSectionProps {
   onSearch: () => void;
+  discoveryShelves: { trending: Book[]; new_releases: Book[] };
+  isDiscoveryLoading: boolean;
+  onDiscoveryBookSelect: (book: Book) => void;
   isLoading: boolean;
   isInitialState: boolean;
   searchPageTitle: string;
@@ -65,6 +69,9 @@ const DISCOVERY_TOPICS = {
 export const SearchSection = ({
   onSearch,
   isLoading,
+  discoveryShelves,
+  isDiscoveryLoading,
+  onDiscoveryBookSelect,
   isInitialState,
   searchPageTitle,
   bookLanguages,
@@ -187,6 +194,72 @@ export const SearchSection = ({
             ))}
           </div>
         </div>
+
+        {([
+          { key: 'trending', title: contentType === 'audiobook' ? 'Les livres audio populaires' : 'Les livres du moment', eyebrow: 'Tendances' },
+          { key: 'new_releases', title: contentType === 'audiobook' ? 'Les dernières sorties audio' : 'Les nouveautés', eyebrow: 'À paraître et récemment publiés' },
+        ] as const).map((shelf) => {
+          const shelfBooks = discoveryShelves[shelf.key];
+          if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
+
+          return (
+            <section key={shelf.key} className="min-w-0">
+              <div className="mb-3 flex items-end justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-300">{shelf.eyebrow}</p>
+                  <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{shelf.title}</h2>
+                </div>
+                {shelfBooks.length > 0 && (
+                  <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} titres</span>
+                )}
+              </div>
+              <div className="flex snap-x gap-3 overflow-x-auto pb-3 sm:gap-4">
+                {isDiscoveryLoading && shelfBooks.length === 0
+                  ? Array.from({ length: 6 }, (_, index) => (
+                      <div key={index} className="w-[112px] shrink-0 animate-pulse sm:w-[142px]">
+                        <div className="aspect-[2/3] rounded-xl bg-gray-200 dark:bg-slate-800" />
+                        <div className="mt-2 h-3 rounded bg-gray-200 dark:bg-slate-800" />
+                        <div className="mt-1 h-2.5 w-2/3 rounded bg-gray-100 dark:bg-slate-800/70" />
+                      </div>
+                    ))
+                  : shelfBooks.map((book) => (
+                      <button
+                        key={book.id}
+                        type="button"
+                        onClick={() => onDiscoveryBookSelect(book)}
+                        className="group w-[112px] shrink-0 snap-start text-left sm:w-[142px]"
+                        title={`Rechercher ${book.title}`}
+                      >
+                        <div
+                          className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl dark:bg-slate-800 dark:ring-white/10"
+                          style={{ aspectRatio: book.cover_aspect === 'square' ? '1 / 1' : '2 / 3' }}
+                        >
+                          {book.preview ? (
+                            <img
+                              src={book.preview}
+                              alt={book.title}
+                              loading="lazy"
+                              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
+                              {book.title}
+                            </div>
+                          )}
+                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+                        </div>
+                        <span className="mt-2 block line-clamp-2 text-xs font-semibold leading-4 text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-300 sm:text-sm">
+                          {book.title}
+                        </span>
+                        <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:text-xs">
+                          {book.author || 'Auteur inconnu'}
+                        </span>
+                      </button>
+                    ))}
+              </div>
+            </section>
+          );
+        })}
 
         <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-cyan-50 p-5 dark:border-white/10 dark:from-indigo-950/50 dark:via-slate-900 dark:to-cyan-950/40 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
           <div>
