@@ -99,7 +99,8 @@ jobs:
   create-aliases:
     needs: build-and-push-images
     runs-on: ubuntu-latest
-    if: github.event_name != 'pull_request'
+    # Legacy aliases belong to the upstream repository; this fork publishes ShelfSeerr images only.
+    if: github.repository == 'calibrain/shelfmark' && github.event_name != 'pull_request'
     permissions:
       contents: read
       packages: write
