@@ -1,0 +1,17 @@
+services:
+  shelfseerr:
+    image: ghcr.io/alexbaril1410-stack/shelfseerr:dev
+    container_name: shelfseerr
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Paris
+    ports:
+      - "8084:8084"
+    restart: unless-stopped
+    volumes:
+      - ./config:/config
+      - ./books:/books
+      # Required for torrent / usenet downloads.
+      # Mount the exact same host path used by qBittorrent:
+      # - /path/to/downloads:/path/to/downloads
