@@ -41,6 +41,7 @@ interface HeaderProps {
   statusCounts?: ActivityStatusCounts;
   onLogoClick?: () => void;
   onHomeClick?: () => void;
+  onNavigateContentType?: (type: ContentType) => void;
   authRequired?: boolean;
   isAuthenticated?: boolean;
   username?: string | null;
@@ -112,6 +113,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
       statusCounts = DEFAULT_STATUS_COUNTS,
       onLogoClick,
       onHomeClick,
+      onNavigateContentType,
       authRequired = false,
       isAuthenticated = false,
       username,
@@ -767,12 +769,12 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               Accueil
             </button>
             {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
-              <button type="button" onClick={() => onContentTypeChange?.('ebook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>
+              <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>
                 Livres
               </button>
             )}
             {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && (
-              <button type="button" onClick={() => onContentTypeChange?.('audiobook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>
+              <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>
                 Livres audio
               </button>
             )}
