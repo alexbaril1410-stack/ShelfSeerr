@@ -40,6 +40,7 @@ interface HeaderProps {
   canAccessSettings?: boolean;
   statusCounts?: ActivityStatusCounts;
   onLogoClick?: () => void;
+  onHomeClick?: () => void;
   authRequired?: boolean;
   isAuthenticated?: boolean;
   username?: string | null;
@@ -110,6 +111,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
       canAccessSettings,
       statusCounts = DEFAULT_STATUS_COUNTS,
       onLogoClick,
+      onHomeClick,
       authRequired = false,
       isAuthenticated = false,
       username,
@@ -755,6 +757,32 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           {!showSearch && (
             <div className="flex min-h-[48px] items-center justify-end">{iconButtonsNode}</div>
           )}
+
+          <nav
+            aria-label="Navigation principale"
+            className="mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
+            style={{ borderColor: 'var(--border-muted)' }}
+          >
+            <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label="Accueil">
+              Accueil
+            </button>
+            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
+              <button type="button" onClick={() => onContentTypeChange?.('ebook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>
+                Livres
+              </button>
+            )}
+            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && (
+              <button type="button" onClick={() => onContentTypeChange?.('audiobook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>
+                Livres audio
+              </button>
+            )}
+            {onDownloadsClick && (
+              <button type="button" onClick={onDownloadsClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface">
+                Demandes et activité
+                {statusCounts.pendingRequests > 0 && <span className="ml-2 rounded-full bg-sky-600 px-1.5 py-0.5 text-xs text-white">{statusCounts.pendingRequests}</span>}
+              </button>
+            )}
+          </nav>
         </div>
       </header>
     );
