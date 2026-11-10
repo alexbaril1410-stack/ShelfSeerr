@@ -42,6 +42,7 @@ const API_BASE = getApiBase();
 // API endpoints
 const API = {
   metadataSearch: `${API_BASE}/metadata/search`,
+  metadataDiscover: `${API_BASE}/metadata/discover`,
   metadataConfig: `${API_BASE}/metadata/config`,
   metadataProviders: `${API_BASE}/metadata/providers`,
   status: `${API_BASE}/status`,
@@ -340,6 +341,22 @@ interface BookTargetStateResult {
 }
 
 // Search metadata providers and normalize to Book format
+export const discoverMetadata = async (
+  section: 'trending' | 'new_releases',
+  contentType: string,
+  limit: number = 18,
+): Promise<Book[]> => {
+  const params = new URLSearchParams({
+    section,
+    content_type: contentType,
+    limit: String(limit),
+  });
+  const response = await fetchJSON<{ books: MetadataBookData[] }>(
+    `${API.metadataDiscover}?${params.toString()}`,
+  );
+  return (response.books || []).map(transformMetadataToBook);
+};
+
 export const searchMetadata = async (
   query: string,
   limit: number = 40,
