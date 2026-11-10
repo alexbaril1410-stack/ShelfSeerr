@@ -2461,21 +2461,27 @@ function App() {
     updateAdvancedFilters,
   ]);
 
-  const handleDiscoveryBookSelect = useCallback(
-    (book: Book) => {
-      setSearchInput(book.title);
-      setActiveQueryTarget('general');
-      setActiveResultsSort('relevance');
-      runSearchWithPolicyRefresh({
-        query: book.title,
-        fieldValues: {},
-        searchModeOverride: 'universal',
-        providerOverride: book.provider,
-        sort: 'relevance',
+  const handleDiscoveryBookSelect = useCallback(async (book: Book) => {
+    if (!book.provider || !book.provider_id) {
+      setSelectedBook(book);
+      return;
+    }
+
+    try {
+      const fullBook = await getMetadataBookInfo(book.provider, book.provider_id);
+      setSelectedBook({
+        ...book,
+        description: fullBook.description || book.description,
+        series_id: fullBook.series_id || book.series_id,
+        series_name: fullBook.series_name || book.series_name,
+        series_position: fullBook.series_position ?? book.series_position,
+        series_count: fullBook.series_count ?? book.series_count,
       });
-    },
-    [runSearchWithPolicyRefresh, setSearchInput],
-  );
+    } catch (error) {
+      console.error('Failed to load discovery book details:', error);
+      setSelectedBook(book);
+    }
+  }, []);
 
   const isBrowseFulfilMode = fulfillingRequest !== null;
   const activeReleaseBook = fulfillingRequest?.book ?? releaseBook;
