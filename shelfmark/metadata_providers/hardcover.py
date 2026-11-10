@@ -2407,6 +2407,35 @@ class HardcoverProvider(MetadataProvider):
         msg = "Hardcover could not complete this action"
         raise RuntimeError(msg)
 
+    def discover(
+        self,
+        section: str,
+        *,
+        limit: int = 20,
+        user_id: int | None = None,
+    ) -> SearchResult:
+        """Browse Hardcover public catalogue for homepage discovery shelves.
+
+        Typesense accepts a wildcard query to browse all matching documents. The
+        existing search pipeline still applies Hardcover parsing, sorting and cache.
+        """
+        sort_by_section = {
+            "trending": SortOrder.POPULARITY,
+            "new_releases": SortOrder.NEWEST,
+        }
+        sort_order = sort_by_section.get(section)
+        if sort_order is None or not self.api_key:
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        options = MetadataSearchOptions(
+            query="*",
+            limit=max(1, min(limit, 40)),
+            page=1,
+            sort=sort_order,
+            user_id=user_id,
+        )
+        return self.search_paginated(options)
+
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         """Search for books using Hardcover's search API."""
         return self.search_paginated(options).books
