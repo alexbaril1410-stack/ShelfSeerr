@@ -770,3 +770,50 @@
     }
   }
 }
+
+
+/* ShelfSeerr mobile discovery and navigation refinements */
+@media (max-width: 639px) {
+  .search-initial-state {
+    /* The landing page now starts with a discovery hero, not a vertically
+       centered search box: keep the useful content above the fold. */
+    padding-top: max(env(safe-area-inset-top), 0.75rem);
+  }
+
+  .shelfseerr-primary-nav {
+    gap: 0.375rem;
+    margin-top: 0.75rem;
+    padding-top: 0.625rem;
+    padding-bottom: 0.125rem;
+    scrollbar-width: none;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .shelfseerr-primary-nav::-webkit-scrollbar,
+  .shelfseerr-discovery-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .shelfseerr-primary-nav button {
+    min-height: 2.75rem;
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+
+  .shelfseerr-discovery-rail {
+    margin-right: -1rem;
+    padding-right: 1rem;
+    scroll-padding-left: 0.25rem;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shelfseerr-discovery-rail {
+    scroll-behavior: auto;
+  }
+}
