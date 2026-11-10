@@ -109,7 +109,7 @@ export const SearchSection = ({
           <div className="mx-auto max-w-4xl text-center">
             <div className="mb-5 flex items-center justify-center gap-3">
               <img src={logoUrl} alt="ShelfSeerr" className="h-9 w-9 rounded-xl" />
-              <span className="text-sm font-semibold tracking-[0.22em] text-slate-300">SHELFSEERR</span>
+              <span className="text-sm font-semibold tracking-[0.22em] text-slate-300">{searchPageTitle || 'SHELFSEERR'}</span>
             </div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
               Votre prochaine lecture commence ici
