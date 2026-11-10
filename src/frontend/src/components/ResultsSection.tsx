@@ -66,7 +66,7 @@ export const ResultsSection = ({
       : 'bg-sky-700 text-white hover:bg-sky-800';
   const [viewMode, setViewMode] = useState<'card' | 'compact' | 'list'>(() => {
     if (typeof window === 'undefined') {
-      return 'compact';
+      return 'card';
     }
 
     try {
