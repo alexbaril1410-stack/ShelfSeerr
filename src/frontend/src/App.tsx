@@ -962,7 +962,13 @@ function App() {
     return () => {
       isCurrent = false;
     };
-  }, [isAuthenticated, isInitialState, effectiveCombinedMode, effectiveContentType]);
+  }, [
+    isAuthenticated,
+    isInitialState,
+    effectiveCombinedMode,
+    effectiveContentType,
+    defaultMetadataProviderForContentType,
+  ]);
 
   const metadataConfigSessionKey =
     isAuthenticated && effectiveSearchMode === 'universal'
