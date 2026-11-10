@@ -2496,6 +2496,12 @@ function App() {
             setActiveQueryTarget('general');
             setActiveResultsSort('');
           }}
+          onNavigateContentType={(type) => {
+            handleResetSearch(config);
+            setActiveQueryTarget('general');
+            setActiveResultsSort('');
+            setContentType(type);
+          }}
           authRequired={authRequired}
           isAuthenticated={isAuthenticated}
           onLogout={() => {
