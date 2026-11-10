@@ -2455,6 +2455,22 @@ function App() {
     updateAdvancedFilters,
   ]);
 
+  const handleDiscoveryBookSelect = useCallback(
+    (book: Book) => {
+      setSearchInput(book.title);
+      setActiveQueryTarget('general');
+      setActiveResultsSort('relevance');
+      runSearchWithPolicyRefresh({
+        query: book.title,
+        fieldValues: {},
+        searchModeOverride: 'universal',
+        providerOverride: book.provider,
+        sort: 'relevance',
+      });
+    },
+    [runSearchWithPolicyRefresh, setSearchInput],
+  );
+
   const isBrowseFulfilMode = fulfillingRequest !== null;
   const activeReleaseBook = fulfillingRequest?.book ?? releaseBook;
   const activeReleaseContentType =
@@ -2622,6 +2638,9 @@ function App() {
             onSearch={handleSearchDispatch}
             isLoading={isSearching}
             isInitialState={isInitialState}
+            discoveryShelves={discoveryShelves}
+            isDiscoveryLoading={isDiscoveryLoading}
+            onDiscoveryBookSelect={handleDiscoveryBookSelect}
             searchPageTitle={config?.search_page_title || 'ShelfSeerr'}
             bookLanguages={bookLanguages}
             defaultLanguage={defaultLanguageCodes}
