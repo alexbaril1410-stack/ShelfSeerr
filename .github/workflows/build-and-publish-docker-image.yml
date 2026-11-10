@@ -1,4 +1,5 @@
 name: Create and publish Docker images
+# Trigger build for ShelfSeerr development images on feature/seerr-ui pushes.
 on:
   push:
     branches:
