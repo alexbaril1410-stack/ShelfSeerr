@@ -78,15 +78,15 @@
     color-scheme: light;
 
     /* Light theme variables */
-    --primary-color: oklch(44.3% 0.11 240.79);
-    --primary-dark: oklch(39.1% 0.09 240.876);
-    --text-color: #333;
-    --background-color: #f8f8f8;
-    --border-color: #e5e5e5;
+    --primary-color: #5b8def;
+    --primary-dark: #4778d0;
+    --text-color: #1f2937;
+    --background-color: #f4f6fa;
+    --border-color: #e2e8f0;
     --loading-overlay: rgba(0, 0, 0, 0.5);
-    --card-background: #fff;
-    --input-background: #fff;
-    --heading-color: #333;
+    --card-background: #ffffff;
+    --input-background: #ffffff;
+    --heading-color: #172033;
 
     /* Modern UI alias tokens */
     --bg: var(--background-color);
@@ -104,12 +104,12 @@
     color-scheme: dark;
 
     /* Dark theme variables with improved contrast */
-    --background-color: #121212;
-    --text-color: #ffffff;
-    --heading-color: #ffffff;
-    --card-background: #1e1e1e;
-    --border-color: #404040;
-    --input-background: #2d2d2d;
+    --background-color: #111827;
+    --text-color: #f3f4f6;
+    --heading-color: #f9fafb;
+    --card-background: #1f2937;
+    --border-color: #374151;
+    --input-background: #293548;
     --hover-surface: rgba(255, 255, 255, 0.05);
     --hover-action: rgba(255, 255, 255, 0.12);
     --hover-row: rgba(255, 255, 255, 0.08);
