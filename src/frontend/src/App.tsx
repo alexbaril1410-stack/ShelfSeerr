@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { ActivitySidebar } from './components/activity';
@@ -55,6 +55,7 @@ import {
   getAdminUsers,
   getMetadataProviders,
   getMetadataSearchConfig,
+  discoverMetadata,
   createRequests,
   isApiResponseError,
   updateSelfUser,
@@ -626,6 +627,11 @@ function App() {
   const [combinedState, setCombinedState] = useState<CombinedSelectionState | null>(null);
 
   const [metadataProviders, setMetadataProviders] = useState<MetadataProviderSummary[]>([]);
+  const [discoveryShelves, setDiscoveryShelves] = useState<{
+    trending: Book[];
+    new_releases: Book[];
+  }>({ trending: [], new_releases: [] });
+  const [isDiscoveryLoading, setIsDiscoveryLoading] = useState(false);
   const [configuredMetadataProvider, setConfiguredMetadataProvider] = useState<string | null>(null);
   const [configuredAudiobookMetadataProvider, setConfiguredAudiobookMetadataProvider] = useState<
     string | null
@@ -923,6 +929,41 @@ function App() {
         });
   const effectiveMetadataProvider =
     effectiveSearchMode === 'universal' ? defaultMetadataProviderForContentType || null : null;
+  useEffect(() => {
+    if (!isAuthenticated || !isInitialState || effectiveCombinedMode) {
+      setDiscoveryShelves({ trending: [], new_releases: [] });
+      setIsDiscoveryLoading(false);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsDiscoveryLoading(true);
+    Promise.all([
+      discoverMetadata('trending', effectiveContentType),
+      discoverMetadata('new_releases', effectiveContentType),
+    ])
+      .then(([trending, newReleases]) => {
+        if (isCurrent) {
+          setDiscoveryShelves({ trending, new_releases: newReleases });
+        }
+      })
+      .catch((error: unknown) => {
+        console.warn('Unable to load homepage discovery shelves:', error);
+        if (isCurrent) {
+          setDiscoveryShelves({ trending: [], new_releases: [] });
+        }
+      })
+      .finally(() => {
+        if (isCurrent) {
+          setIsDiscoveryLoading(false);
+        }
+      });
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [isAuthenticated, isInitialState, effectiveCombinedMode, effectiveContentType]);
+
   const metadataConfigSessionKey =
     isAuthenticated && effectiveSearchMode === 'universal'
       ? `${effectiveContentType}:${effectiveMetadataProvider ?? ''}`
