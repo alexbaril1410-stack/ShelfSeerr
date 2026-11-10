@@ -87,7 +87,7 @@ export const SearchSection = ({
           isInitialState ? 'mb-6 opacity-100 sm:mb-8' : 'mb-0 h-0 overflow-hidden opacity-0'
         }`}
       >
-        <img src={logoUrl} alt="Logo" className="h-8 w-8" />
+        <img src={logoUrl} alt="ShelfSeerr logo" className="h-8 w-8" />
         <h1 className="text-2xl font-semibold">{searchPageTitle}</h1>
       </div>
       <div
