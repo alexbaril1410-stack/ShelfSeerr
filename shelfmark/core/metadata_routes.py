@@ -260,12 +260,17 @@ def register_metadata_routes(
             if content_type not in {"ebook", "audiobook"}:
                 return jsonify({"error": "Unsupported content type"}), 400
 
+            try:
+                limit = max(1, min(int(request.args.get("limit", 18)), 40))
+            except ValueError:
+                limit = 18
+
             db_user_id = get_session_db_user_id(session)
             provider = get_configured_provider(content_type=content_type, user_id=db_user_id)
             if not provider or not provider.is_available():
                 return jsonify({"books": [], "provider": None, "section": section}), 200
 
-            result = provider.discover(section, limit=18, user_id=db_user_id)
+            result = provider.discover(section, limit=limit, user_id=db_user_id)
             books_data = [asdict(book) for book in result.books]
 
             from shelfmark.core.utils import transform_cover_url
