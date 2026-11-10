@@ -244,6 +244,51 @@ def register_metadata_routes(
             logger.error_trace(f"Metadata config error: {e}")
             return jsonify({"error": "Could not load the metadata configuration"}), 500
 
+    @app.route("/api/metadata/discover", methods=["GET"])
+    @login_required
+    def api_metadata_discover() -> Response | tuple[Response, int]:
+        """Return a provider-backed homepage discovery shelf."""
+        try:
+            from dataclasses import asdict
+
+            from shelfmark.metadata_providers import get_configured_provider
+
+            section = request.args.get("section", "").strip()
+            content_type = request.args.get("content_type", "ebook").strip()
+            if section not in {"trending", "new_releases"}:
+                return jsonify({"error": "Unsupported discovery section"}), 400
+            if content_type not in {"ebook", "audiobook"}:
+                return jsonify({"error": "Unsupported content type"}), 400
+
+            db_user_id = get_session_db_user_id(session)
+            provider = get_configured_provider(content_type=content_type, user_id=db_user_id)
+            if not provider or not provider.is_available():
+                return jsonify({"books": [], "provider": None, "section": section}), 200
+
+            result = provider.discover(section, limit=18, user_id=db_user_id)
+            books_data = [asdict(book) for book in result.books]
+
+            from shelfmark.core.utils import transform_cover_url
+
+            for book_dict in books_data:
+                if book_dict.get("cover_url"):
+                    cache_id = f"{book_dict['provider']}_{book_dict['provider_id']}"
+                    book_dict["cover_url"] = transform_cover_url(book_dict["cover_url"], cache_id)
+            for book, book_dict in zip(result.books, books_data, strict=True):
+                attach_library_ownership(book, book_dict)
+
+            return jsonify(
+                {
+                    "books": books_data,
+                    "provider": provider.name,
+                    "section": section,
+                    "total_found": result.total_found,
+                }
+            )
+        except _IMPORT_OPERATIONAL_ERRORS as e:
+            logger.error_trace(f"Metadata discovery error: {e}")
+            return jsonify({"error": "Metadata discovery failed"}), 500
+
     @app.route("/api/metadata/search", methods=["GET"])
     @login_required
     def api_metadata_search() -> Response | tuple[Response, int]:
