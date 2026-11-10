@@ -392,6 +392,21 @@ class MetadataProvider(ABC):
             has_more=has_more,
         )
 
+    def discover(
+        self,
+        section: str,
+        *,
+        limit: int = 20,
+        user_id: int | None = None,
+    ) -> SearchResult:
+        """Return a provider-backed discovery shelf, when supported.
+
+        Providers should override this method only when they can supply a genuine
+        editorial/discovery result set. The default deliberately returns no books
+        rather than fabricating a catalogue from release-source search results.
+        """
+        return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
     def get_search_field_options(
         self,
         field_key: str,
