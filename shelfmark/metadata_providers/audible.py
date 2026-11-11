@@ -97,7 +97,7 @@ class _DescriptionParser(HTMLParser):
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         if tag.lower() in self._BLOCK_TAGS:
-            self.parts.append("\\n")
+            self.parts.append("\n")
 
     def handle_endtag(self, tag: str) -> None:
         if tag.lower() in self._BLOCK_TAGS:
@@ -117,7 +117,7 @@ def _clean_description(value: Any) -> str | None:
         parser.close()
         cleaned = "".join(parser.parts)
         lines = [" ".join(line.split()) for line in cleaned.splitlines()]
-        result = "\\n".join(line for line in lines if line)
+        result = "\n".join(line for line in lines if line)
         return result or None
     return " ".join(raw.split())
 
@@ -165,28 +165,59 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
 
 
 def _series_fields(product: dict[str, Any]) -> tuple[str | None, str | None, float | None]:
-    raw = product.get("series") or product.get("series_list") or product.get("series_info")
-    if isinstance(raw, dict):
-        entries = [raw]
-    elif isinstance(raw, list):
-        entries = raw
-    else:
-        entries = []
-    if not entries:
-        return None, None, None
+    """Extract Audible series metadata from its supported nested response shapes."""
+    candidates: list[Any] = [
+        product.get("series"),
+        product.get("series_list"),
+        product.get("series_info"),
+        product.get("featured_series"),
+        product.get("product_extended_attrs"),
+    ]
+    relationships = product.get("relationships")
+    if isinstance(relationships, dict):
+        candidates.extend(
+            [relationships.get("series"), relationships.get("series_list")]
+        )
 
-    series = next((entry for entry in entries if isinstance(entry, dict)), None)
-    if not series:
-        return None, None, None
+    for raw in candidates:
+        if isinstance(raw, dict):
+            # Some responses wrap the actual series object one level deeper.
+            nested = raw.get("series")
+            if isinstance(nested, dict):
+                entry = dict(raw)
+                entry.update(nested)
+            else:
+                entry = raw
+            entries = [entry]
+        elif isinstance(raw, list):
+            entries = [item for item in raw if isinstance(item, dict)]
+        else:
+            continue
 
-    series_id = _text(series.get("asin") or series.get("id") or series.get("series_id"))
-    series_name = _text(series.get("title") or series.get("name") or series.get("series_title"))
-    raw_position = series.get("sequence") or series.get("position") or series.get("sequence_number")
-    position = None
-    with suppress(TypeError, ValueError):
-        position = float(str(raw_position).replace(",", "."))
-    return series_id, series_name, position
+        for entry in entries:
+            nested_series = entry.get("series")
+            series = nested_series if isinstance(nested_series, dict) else entry
+            series_id = _text(
+                series.get("asin") or series.get("id") or series.get("series_id")
+            )
+            series_name = _text(
+                series.get("title") or series.get("name") or series.get("series_title")
+            )
+            raw_position = (
+                entry.get("sequence")
+                or entry.get("position")
+                or entry.get("sequence_number")
+                or series.get("sequence")
+                or series.get("position")
+                or series.get("sequence_number")
+            )
+            position = None
+            with suppress(TypeError, ValueError):
+                position = float(str(raw_position).replace(",", "."))
+            if series_name or series_id:
+                return series_id, series_name, position
 
+    return None, None, None
 
 def _product_items(payload: Any) -> list[dict[str, Any]]:
     if not isinstance(payload, dict):
