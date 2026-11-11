@@ -2611,7 +2611,7 @@ function App() {
                 right: '25rem',
                 zIndex: 20,
               }
-            : { paddingTop: `${headerHeight}px` }
+            : { paddingTop: isDesktopViewport ? 0 : `${headerHeight}px` }
         }
       >
         <AdvancedFilters
