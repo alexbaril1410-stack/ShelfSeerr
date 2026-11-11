@@ -1,4 +1,4 @@
-from shelfmark.metadata_providers.hardcover import HardcoverProvider
+from shelfmark.metadata_providers.hardcover import HardcoverProvider, _looks_like_compilation_title
 
 
 def test_french_edition_selection_prefers_most_popular_non_audio_edition(monkeypatch):
@@ -105,3 +105,11 @@ def test_apply_french_edition_updates_title_isbn_and_cover():
     assert book["title"] == "Harry Potter à l'école des sorciers"
     assert book["isbn_13"] == "9782070541201"
     assert book["cached_image"]["url"] == "https://example.com/harry-potter.jpg"
+
+
+
+def test_compilation_title_detection_catches_french_box_sets_and_integrals():
+    assert _looks_like_compilation_title("Coffret Harry Potter en 8 tomes")
+    assert _looks_like_compilation_title("L'intégrale de la série")
+    assert _looks_like_compilation_title("Harry Potter: The Complete Collection")
+    assert not _looks_like_compilation_title("Harry Potter et la chambre des secrets")
