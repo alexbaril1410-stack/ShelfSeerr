@@ -587,15 +587,39 @@ export const ReleaseCell = ({
       );
     }
 
-    case 'number':
+    case 'number': {
       if (compact) {
         return <span>{displayValue}</span>;
       }
-      return (
-        <div className={`flex items-center ${alignClass} text-xs text-gray-600 dark:text-gray-300`}>
+      const isCustomScore = column.key === 'extra.custom_score';
+      const scoreBreakdown = isCustomScore && Array.isArray(release.extra?.custom_score_breakdown)
+        ? release.extra.custom_score_breakdown as Array<{ name?: string; score?: number; matched_value?: string }>
+        : [];
+      const scoreTooltip = isCustomScore ? (
+        <div className="flex min-w-36 flex-col gap-1.5">
+          <div className="font-semibold">Détail du score</div>
+          {scoreBreakdown.length ? scoreBreakdown.map((rule, index) => (
+            <div key={`${rule.name ?? 'rule'}-${index}`} className="flex items-start justify-between gap-3">
+              <span>{rule.name ?? 'Règle'}</span>
+              <span className="font-semibold tabular-nums">{(Number(rule.score) > 0 ? '+' : '') + Number(rule.score || 0)}</span>
+            </div>
+          )) : <span className="text-gray-500">Aucune règle déclenchée</span>}
+        </div>
+      ) : null;
+      const scoreClass = isCustomScore
+        ? Number(cellValue) > 0
+          ? 'font-semibold text-emerald-600 dark:text-emerald-400'
+          : Number(cellValue) < 0
+            ? 'font-semibold text-red-600 dark:text-red-400'
+            : 'text-gray-500 dark:text-gray-400'
+        : 'text-gray-600 dark:text-gray-300';
+      const scoreContent = (
+        <div className={`flex items-center ${alignClass} text-xs ${scoreClass}`}>
           {displayValue}
         </div>
       );
+      return scoreTooltip ? <Tooltip content={scoreTooltip} position="top">{scoreContent}</Tooltip> : scoreContent;
+    }
 
     case 'text':
     default: {
