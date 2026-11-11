@@ -876,7 +876,7 @@ body { background-image: radial-gradient(ellipse at 72% -18%, rgba(91,65,180,.13
 .shelfseerr-primary-nav button:hover { background:rgba(148,163,184,.1); color:#fff; }
 .shelfseerr-header-inner .hover-action { color:#c7cede; }
 .shelfseerr-content-shell {
-  margin-left:260px; min-height:100dvh; padding-top:0 !important; background:transparent;
+  margin-left:260px; min-height:100dvh; background:transparent;
 }
 .shelfseerr-content-shell > main {
   width:100%; max-width:1600px; padding:26px clamp(20px,3vw,48px) 44px !important;
