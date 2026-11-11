@@ -312,3 +312,59 @@ def test_audible_requests_series_response_group_for_search_and_details(monkeypat
     assert detail.series_id == "B0SERIES999"
     assert detail.series_name == "Dungeon Crawler Carl"
     assert all("series" in params["response_groups"].split(",") for _, params in calls)
+
+
+def test_audible_exposes_series_browse_capability():
+    provider = AudibleProvider(marketplace="fr")
+
+    assert any(capability.key == "view_series" and capability.field_key == "series" for capability in provider.capabilities)
+    assert any(field.key == "series" for field in provider.search_fields)
+
+
+def test_audible_series_browse_loads_child_books_in_sequence_order(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        if params.get("asins") == "B0SERIES999":
+            return {"products": [{
+                "asin": "B0SERIES999",
+                "title": "Dungeon Crawler Carl",
+                "relationships": [
+                    {"asin": "B0BOOK0002", "relationship_to_product": "child", "relationship_type": "series", "sequence": "2"},
+                    {"asin": "B0BOOK0001", "relationship_to_product": "child", "relationship_type": "series", "sequence": "1"},
+                ],
+            }]}
+        return {"products": [
+            {"asin": "B0BOOK0001", "title": "Book One", "language": "French"},
+            {"asin": "B0BOOK0002", "title": "Book Two", "language": "French"},
+        ]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    result = provider.search_paginated(MetadataSearchOptions(
+        query="",
+        limit=1,
+        page=1,
+        fields={"series": "id:B0SERIES999"},
+    ))
+
+    assert [book.provider_id for book in result.books] == ["B0BOOK0001"]
+    assert result.books[0].series_name == "Dungeon Crawler Carl"
+    assert result.books[0].series_position == 1.0
+    assert result.books[0].series_count == 2
+    assert result.total_found == 2
+    assert result.has_more is True
+    assert calls[1][1]["asins"] == "B0BOOK0001"
+
+
+def test_audible_series_suggestions_are_deduplicated(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    monkeypatch.setattr(provider, "_request", lambda _path, _params: {"products": [
+        {"series": [{"asin": "B0SERIES999", "title": "Dungeon Crawler Carl"}]},
+        {"series": [{"asin": "B0SERIES999", "title": "Dungeon Crawler Carl"}]},
+    ]})
+
+    assert provider.get_search_field_options("series", "Dungeon") == [
+        {"value": "asin:B0SERIES999", "label": "Dungeon Crawler Carl"}
+    ]
