@@ -8,7 +8,6 @@ from contextlib import suppress
 from datetime import date
 from html import unescape
 from html.parser import HTMLParser
-import unicodedata
 from typing import Any
 from urllib.parse import quote
 
@@ -52,7 +51,7 @@ _AUDIBLE_MARKETPLACES = [
     {"value": "com.au", "label": "Australie (audible.com.au)"},
 ]
 _RESPONSE_GROUPS = (
-    "contributors,product_attrs,product_desc,product_extended_attrs,media,rating,series"
+    "contributors,product_desc,product_attrs,product_extended_attrs,media,rating,series,category_ladders,product_details"
 )
 _TIMEOUT_SECONDS = 20
 _MAX_RESULTS = 50
@@ -390,20 +389,18 @@ class AudibleProvider(MetadataProvider):
             return None
 
     def _search_once(self, query: str, options: MetadataSearchOptions) -> dict[str, Any] | None:
+        """Search Audible's JSON catalogue directly, as ReadMeABook does."""
         page_size = min(max(options.limit, 1), _MAX_RESULTS)
-        sort_values = {
-            SortOrder.RELEVANCE: "Relevance",
-            SortOrder.POPULARITY: "BestSellers",
-            SortOrder.NEWEST: "-ReleaseDate",
-        }
         params: dict[str, Any] = {
             "keywords": query,
-            "content_type": "Audiobook",
             "num_results": page_size,
             "page": max(options.page - 1, 0),
-            "products_sort_by": sort_values.get(options.sort, "Relevance"),
             "response_groups": _RESPONSE_GROUPS,
         }
+        if options.sort == SortOrder.POPULARITY:
+            params["products_sort_by"] = "BestSellers"
+        elif options.sort == SortOrder.NEWEST:
+            params["products_sort_by"] = "-ReleaseDate"
         if options.search_type == SearchType.AUTHOR:
             params.pop("keywords")
             params["author"] = query
@@ -411,94 +408,44 @@ class AudibleProvider(MetadataProvider):
             params.pop("keywords")
             params["title"] = query
 
-        payload = self._request("catalog/search", params)
-        if payload and _product_items(payload):
-            return payload
-
-        # The catalog/products fallback does not accept content_type.
-        fallback_params = dict(params)
-        fallback_params.pop("content_type", None)
-        payload = self._request("catalog/products", fallback_params)
+        payload = self._request("catalog/products", params)
         return payload if payload and _product_items(payload) else None
 
     def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
-        """Search books once; series discovery uses its dedicated catalogue flow."""
+        """Run one direct Audible catalogue search; no speculative spelling retries."""
         query = options.query.strip()
         if not query:
             return None
         return self._search_once(query, options)
 
+
     def get_search_field_options(self, field_key: str, query: str | None = None) -> list[dict[str, str]]:
-        """Find series by aggregating series attached to Audible catalogue products."""
-        keywords = (query or "").strip()
-        if field_key != "series" or len(keywords) < 2:
+        """Return Audible series suggestions without changing the existing series workflow."""
+        if field_key != "series" or len((query or "").strip()) < 2:
             return []
         payload = self._request("catalog/products", {
-            "keywords": keywords,
+            "keywords": (query or "").strip(),
             "num_results": 50,
-            "response_groups": "series,media,product_attrs,category_ladders",
+            "response_groups": "series,product_attrs",
         })
-        candidates: dict[str, dict[str, Any]] = {}
-        for index, product in enumerate(_product_items(payload)):
-            accepted = _is_french_language(_language(product)) if self.marketplace == "fr" else False
+        options: list[dict[str, str]] = []
+        seen: set[str] = set()
+        for product in _product_items(payload):
             raw_series = product.get("series")
             if isinstance(raw_series, dict):
                 raw_series = [raw_series]
             if not isinstance(raw_series, list):
                 continue
-            seen_in_product: set[str] = set()
-            for entry in raw_series:
-                if not isinstance(entry, dict):
+            for series in raw_series:
+                if not isinstance(series, dict):
                     continue
-                asin = _text(entry.get("asin") or entry.get("id"))
-                title = _text(entry.get("title") or entry.get("name"))
-                if not asin or not title or asin in seen_in_product:
+                asin = _text(series.get("asin") or series.get("id"))
+                name = _text(series.get("title") or series.get("name"))
+                if not asin or not name or asin in seen:
                     continue
-                seen_in_product.add(asin)
-                if self.french_only and not accepted:
-                    continue
-                candidate = candidates.setdefault(asin, {
-                    "title": title, "product_count": 0, "first_seen": index,
-                    "accepted": False,
-                })
-                candidate["product_count"] += 1
-                candidate["accepted"] = candidate["accepted"] or accepted
-
-        def normalized_words(value: str) -> list[str]:
-            normalized = unicodedata.normalize("NFKD", value.casefold())
-            normalized = "".join(char for char in normalized if not unicodedata.combining(char))
-            return re.findall(r"[^\W_]+", normalized, flags=re.UNICODE)
-
-        query_words = normalized_words(keywords)
-        stop_words = {"the", "a", "an", "of", "and", "le", "la", "les", "de", "des", "du", "et"}
-        content_words = [word for word in query_words if word not in stop_words] or query_words
-
-        def match_share(title: str) -> float:
-            title_words = normalized_words(title)
-            if not content_words:
-                return 0.0
-            matched = sum(
-                1 for index, word in enumerate(content_words)
-                if word in title_words or (
-                    index == len(content_words) - 1
-                    and any(item.startswith(word) for item in title_words)
-                )
-            )
-            return matched / len(content_words)
-
-        ranked = sorted(
-            candidates.items(),
-            key=lambda item: (
-                -match_share(item[1]["title"]),
-                -int(item[1]["accepted"]),
-                -item[1]["product_count"],
-                item[1]["first_seen"],
-            ),
-        )
-        return [
-            {"value": f"asin:{asin}", "label": candidate["title"]}
-            for asin, candidate in ranked[:15]
-        ]
+                seen.add(asin)
+                options.append({"value": f"asin:{asin}", "label": name})
+        return options[:15]
 
     def _fetch_series_books(self, series_asin: str, page: int, limit: int) -> SearchResult:
         """Load child products from Audible series relationships in reading order."""
