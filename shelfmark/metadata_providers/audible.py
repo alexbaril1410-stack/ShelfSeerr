@@ -467,7 +467,7 @@ class AudibleProvider(MetadataProvider):
         def normalized_words(value: str) -> list[str]:
             normalized = unicodedata.normalize("NFKD", value.casefold())
             normalized = "".join(char for char in normalized if not unicodedata.combining(char))
-            return re.findall(r"[^\\W_]+", normalized, flags=re.UNICODE)
+            return re.findall(r"[^\W_]+", normalized, flags=re.UNICODE)
 
         query_words = normalized_words(keywords)
         stop_words = {"the", "a", "an", "of", "and", "le", "la", "les", "de", "des", "du", "et"}
