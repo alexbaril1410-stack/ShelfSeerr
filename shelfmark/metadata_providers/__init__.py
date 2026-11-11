@@ -739,3 +739,6 @@ with suppress(ImportError):
 
 with suppress(ImportError):
     from shelfmark.metadata_providers import dnb as dnb
+
+with suppress(ImportError):
+    from shelfmark.metadata_providers import audible as audible
