@@ -3177,7 +3177,9 @@ class HardcoverProvider(MetadataProvider):
 
             search_author = _simplify_author_for_search(authors[0]) if authors else None
 
-            cover_url = _extract_cover_url(item, "image")
+            # Search hits may carry the selected localized edition cover in cached_image.
+            # Prefer it before the generic work image so simple search matches series results.
+            cover_url = _extract_cover_url(item, "cached_image", "image")
             publish_year = _extract_publish_year(item)
             source_url = _build_source_url(item.get("slug", ""))
 
