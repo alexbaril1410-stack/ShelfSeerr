@@ -187,3 +187,58 @@ def test_audible_search_does_not_retry_multi_word_queries(monkeypatch):
 
     assert results == []
     assert attempted_queries == ["Dongeon Crawler"]
+
+
+
+def test_parse_audible_product_extracts_contributors_series_and_html_description():
+    book = _parse_product(
+        {
+            "asin": "B0SERIES123",
+            "title": "Dungeon Crawler Carl",
+            "contributors": [
+                {"name": "Matt Dinniman", "role": "Author"},
+                {"name": "Jeff Hays", "role": "Narrator"},
+            ],
+            "series": [
+                {"asin": "B0SERIES999", "title": "Dungeon Crawler Carl", "sequence": "1"}
+            ],
+            "publisher_summary": "<p>First paragraph.</p><p>Second <strong>paragraph</strong>.</p>",
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Matt Dinniman"]
+    assert any(
+        field.label == "Narrateur" and field.value == "Jeff Hays"
+        for field in book.display_fields
+    )
+    assert book.series_id == "B0SERIES999"
+    assert book.series_name == "Dungeon Crawler Carl"
+    assert book.series_position == 1.0
+    assert book.description == "First paragraph.\\nSecond paragraph."
+    assert "<p>" not in book.description
+
+
+def test_parse_audible_product_handles_contributor_objects_and_fallback_fields():
+    book = _parse_product(
+        {
+            "asin": "B0CONTRIB12",
+            "title": "Test",
+            "contributors": {
+                "authors": {"name": "Auteur"},
+                "narrators": {"name": "Narrateur"},
+            },
+            "series_info": {"name": "Série test", "position": "2.5"},
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Auteur"]
+    assert any(
+        field.label == "Narrateur" and field.value == "Narrateur"
+        for field in book.display_fields
+    )
+    assert book.series_name == "Série test"
+    assert book.series_position == 2.5
