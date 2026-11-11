@@ -870,7 +870,7 @@ body { background-image: radial-gradient(ellipse at 72% -18%, rgba(91,65,180,.13
   border-radius:9px; color:#b9c0d1; text-align:left; font-size:14px; font-weight:600; white-space:nowrap;
 }
 .shelfseerr-primary-nav button[aria-pressed="true"],
-.shelfseerr-primary-nav button:first-child {
+.shelfseerr-primary-nav button[aria-current="page"] {
   color:#fff; background:linear-gradient(100deg,rgba(112,75,219,.36),rgba(112,75,219,.12));
 }
 .shelfseerr-primary-nav button:hover { background:rgba(148,163,184,.1); color:#fff; }
@@ -951,4 +951,124 @@ input, select, textarea { color-scheme:dark; }
 }
 @media (prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; }
+}
+
+
+/* Search results: consistent premium poster cards */
+#results-section {
+  border: 0;
+  padding: 8px 0 24px;
+  background: transparent;
+}
+#results-section > .relative {
+  min-height: 48px;
+  margin-bottom: 18px;
+  padding: 0 2px 12px;
+  border-bottom: 1px solid #252d40;
+}
+#results-section .book-card {
+  overflow: hidden;
+  border: 1px solid #252d40 !important;
+  border-radius: 12px !important;
+  background: #111827 !important;
+  box-shadow: 0 8px 26px rgba(0,0,0,.18) !important;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+#results-section .book-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(139,110,235,.65) !important;
+  box-shadow: 0 16px 34px rgba(0,0,0,.28) !important;
+}
+#results-section .book-card img { object-fit: cover; }
+#results-section .book-card .text-gray-900,
+#results-section .book-card .dark\\:text-gray-100 { color:#edf0f7; }
+#results-section .book-card .text-gray-500,
+#results-section .book-card .dark\\:text-gray-400 { color:#929bb0; }
+#results-section button[aria-pressed="true"] {
+  background:#7654df !important;
+  color:white !important;
+}
+#results-section select,
+#results-section [role="combobox"] {
+  border-color:#30394e;
+  background:#151c2b;
+  color:#e7eaf2;
+}
+#results-grid { grid-auto-rows: minmax(0, auto); }
+
+/* Activity / requests drawer */
+.fixed.inset-0.z-45 { background:rgba(2,5,12,.72); backdrop-filter:blur(5px); }
+.fixed.top-0.right-0.z-50 {
+  border-left:1px solid #293247;
+  background:#0d1321 !important;
+  color:#e7eaf2;
+  box-shadow:-24px 0 70px rgba(0,0,0,.42);
+}
+.fixed.top-0.right-0.z-50 > header,
+.fixed.top-0.right-0.z-50 > div:first-child {
+  border-color:#293247 !important;
+  background:#111827;
+}
+.fixed.top-0.right-0.z-50 button { transition:background-color .16s ease, color .16s ease; }
+.fixed.top-0.right-0.z-50 [role="tablist"] {
+  gap:4px;
+  border-bottom:1px solid #293247;
+}
+.fixed.top-0.right-0.z-50 [role="tab"] {
+  border-radius:8px 8px 0 0;
+  color:#9ba5ba;
+}
+.fixed.top-0.right-0.z-50 [role="tab"][aria-selected="true"] {
+  color:#fff;
+  background:rgba(118,84,223,.18);
+  box-shadow:inset 0 -2px #8b6cf0;
+}
+.fixed.right-0.z-30 {
+  border:1px solid #293247;
+  background:#101727 !important;
+  color:#e7eaf2;
+}
+.fixed.top-0.right-0.z-50 .rounded-xl,
+.fixed.top-0.right-0.z-50 .rounded-2xl {
+  border-color:#293247;
+}
+
+/* Book details modal */
+.modal-overlay {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px;
+}
+.details-container {
+  width:min(1120px,100%);
+  max-width:1120px;
+  overflow:hidden;
+  border:1px solid #30394e !important;
+  border-radius:18px;
+  background:#111827;
+  box-shadow:0 28px 100px rgba(0,0,0,.55);
+}
+.details-container > div {
+  background:#111827 !important;
+}
+.details-container header { border-color:#293247 !important; }
+.details-container .bg-(--bg-soft),
+.details-container .bg-(--bg) { background:#111827; }
+.details-container .text-gray-900,
+.details-container .dark\\:text-gray-100 { color:#edf0f7; }
+.details-container .text-gray-600,
+.details-container .dark\\:text-gray-300 { color:#aab3c5; }
+
+@media (max-width:1023px) {
+  #results-section { padding-top:4px; }
+  #results-section > .relative { flex-wrap:wrap; row-gap:8px; }
+  .modal-overlay { padding:0; }
+  .details-container { border-radius:0; border:0 !important; }
+}
+@media (max-width:639px) {
+  #results-grid { gap:12px; }
+  #results-section > .relative { gap:8px; }
+  #results-section .book-card { min-height:168px; }
+  .fixed.top-0.right-0.z-50 { width:100%; }
 }
