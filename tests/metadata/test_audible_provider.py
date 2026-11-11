@@ -368,3 +368,50 @@ def test_audible_series_suggestions_are_deduplicated(monkeypatch):
     assert provider.get_search_field_options("series", "Dungeon") == [
         {"value": "asin:B0SERIES999", "label": "Dungeon Crawler Carl"}
     ]
+
+
+def test_audible_search_enriches_sparse_results_with_spelling_variants(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    attempted_queries = []
+
+    def fake_search_once(query, options):
+        attempted_queries.append(query)
+        if query == "Dongeon":
+            return {"products": [
+                {"asin": "B0ORIGINAL1", "title": "Résultat approximatif"}
+            ]}
+        if query == "Dungeon":
+            return {"products": [
+                {"asin": "B0DUNGEON01", "title": "Dungeon Crawler Carl 1"},
+                {"asin": "B0DUNGEON02", "title": "Dungeon Crawler Carl 2"},
+                {"asin": "B0ORIGINAL1", "title": "Résultat déjà trouvé"},
+            ]}
+        return None
+
+    monkeypatch.setattr(provider, "_search_once", fake_search_once)
+    results = provider.search(MetadataSearchOptions(query="Dongeon", limit=10))
+
+    assert "Dongeon" == attempted_queries[0]
+    assert "Dungeon" in attempted_queries
+    assert [book.provider_id for book in results] == [
+        "B0ORIGINAL1",
+        "B0DUNGEON01",
+        "B0DUNGEON02",
+    ]
+
+
+def test_audible_search_does_not_run_spelling_variants_when_page_is_full(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    attempted_queries = []
+
+    def fake_search_once(query, options):
+        attempted_queries.append(query)
+        return {"products": [
+            {"asin": f"B0BOOK{i:06d}", "title": f"Book {i}"}
+            for i in range(options.limit)
+        ]}
+
+    monkeypatch.setattr(provider, "_search_once", fake_search_once)
+    provider.search(MetadataSearchOptions(query="Dungeon", limit=5))
+
+    assert attempted_queries == ["Dungeon"]
