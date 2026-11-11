@@ -76,3 +76,32 @@ def test_audible_does_not_treat_isbn_as_an_asin():
 
     assert provider.search_by_isbn("9782070612758") is None
     assert provider.search(MetadataSearchOptions(query="9782070612758", search_type=SearchType.ISBN)) == []
+
+
+
+def test_audible_search_fallback_omits_unsupported_content_type(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        if path == "catalog/search":
+            return None
+        assert path == "catalog/products"
+        return {
+            "items": [
+                {
+                    "asin": "B0ABC12345",
+                    "title": "Dungeon Crawler Carl",
+                }
+            ]
+        }
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    results = provider.search(MetadataSearchOptions(query="Dungeon Crawler Carl"))
+
+    assert len(results) == 1
+    assert calls[0][0] == "catalog/search"
+    assert calls[1][0] == "catalog/products"
+    assert "content_type" not in calls[1][1]
+    assert calls[1][1]["keywords"] == "Dungeon Crawler Carl"
