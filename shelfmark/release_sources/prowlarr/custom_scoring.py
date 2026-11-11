@@ -63,9 +63,9 @@ def _release_language_signal(release: Release) -> str | None:
     title = str(release.title or "")
     # Check explicit French tags first; VO/ENG/EN markers are not inferred from
     # arbitrary words, only standalone tokens or bracketed release labels.
-    if re.search(r"(?:^|[\\s._\\[\\](){}-])(?:VF|VFF|VFQ|FR|FRENCH|FRA)(?:$|[\\s._\\[\\](){}-])", title, re.I):
+    if re.search(r"(?:^|[\s._\[\](){}-])(?:VF|VFF|VFQ|FR|FRENCH|FRA)(?:$|[\s._\[\](){}-])", title, re.I):
         return "fr"
-    if re.search(r"(?:^|[\\s._\\[\\](){}-])(?:VO|VOSTFR|VOST|ENG|ENGLISH|ENG)(?:$|[\\s._\\[\\](){}-])", title, re.I):
+    if re.search(r"(?:^|[\s._\[\](){}-])(?:VO|VOSTFR|VOST|ENG|ENGLISH)(?:$|[\s._\[\](){}-])", title, re.I):
         return "vo"
     return None
 
