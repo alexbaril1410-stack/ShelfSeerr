@@ -231,6 +231,20 @@ class AudibleProvider(MetadataProvider):
             response.raise_for_status()
             payload = response.json()
             return payload if isinstance(payload, dict) else None
+        except requests.HTTPError as exc:
+            response = exc.response
+            detail = ""
+            if response is not None:
+                with suppress(Exception):
+                    detail = response.text[:1000].strip()
+            logger.warning(
+                "Audible catalogue request failed (%s) [%s] %s: %s",
+                self.marketplace,
+                response.status_code if response is not None else "HTTP",
+                exc,
+                detail or "no response body",
+            )
+            return None
         except (requests.RequestException, ValueError) as exc:
             logger.warning("Audible catalogue request failed (%s): %s", self.marketplace, exc)
             return None
@@ -265,8 +279,12 @@ class AudibleProvider(MetadataProvider):
         if payload and _product_items(payload):
             return payload
 
-        # Some marketplaces expose the same search through catalog/products.
-        return self._request("catalog/products", params)
+        # The documented catalog/products search endpoint does not accept
+        # content_type (unlike catalog/search). Passing it causes HTTP 400 on
+        # marketplaces that fall back to this endpoint.
+        fallback_params = dict(params)
+        fallback_params.pop("content_type", None)
+        return self._request("catalog/products", fallback_params)
 
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         if options.search_type == SearchType.ISBN:
