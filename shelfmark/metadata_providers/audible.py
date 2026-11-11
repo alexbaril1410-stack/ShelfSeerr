@@ -8,6 +8,7 @@ from contextlib import suppress
 from datetime import date
 from html import unescape
 from html.parser import HTMLParser
+import unicodedata
 from typing import Any
 from urllib.parse import quote
 
@@ -55,31 +56,6 @@ _RESPONSE_GROUPS = (
 )
 _TIMEOUT_SECONDS = 20
 _MAX_RESULTS = 50
-_VOWELS = "uaeio"
-
-
-def _spelling_variants(query: str, max_variants: int = 5) -> list[str]:
-    """Build a small set of likely vowel-typo corrections for a failed search."""
-    words = query.split()
-    if len(words) != 1 or len(words[0]) < 4:
-        return []
-
-    word = words[0]
-    variants: list[str] = []
-    for index, character in enumerate(word):
-        if character.lower() not in _VOWELS:
-            continue
-        for replacement in _VOWELS:
-            if replacement == character.lower():
-                continue
-            candidate_word = word[:index] + replacement + word[index + 1 :]
-            candidate = candidate_word if word.islower() else candidate_word.capitalize()
-            if candidate.casefold() not in {word.casefold(), *(item.casefold() for item in variants)}:
-                variants.append(candidate)
-                if len(variants) >= max_variants:
-                    return variants
-    return variants
-
 
 def _text(value: Any) -> str | None:
     if value is None:
@@ -446,81 +422,83 @@ class AudibleProvider(MetadataProvider):
         return payload if payload and _product_items(payload) else None
 
     def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
+        """Search books once; series discovery uses its dedicated catalogue flow."""
         query = options.query.strip()
         if not query:
             return None
-
-        payload = self._search_once(query, options)
-        initial_products = _product_items(payload)
-        if options.search_type not in (SearchType.GENERAL, SearchType.TITLE):
-            return payload
-
-        # A misspelled query can still return one weak match. Do not treat that
-        # as a successful search: enrich it with likely spelling corrections
-        # until the requested page is reasonably full.
-        page_size = min(max(options.limit, 1), _MAX_RESULTS)
-        merged: list[dict[str, Any]] = list(initial_products)
-        seen = {
-            str(item.get("asin") or item.get("product_id") or "").strip().upper()
-            for item in merged
-            if item.get("asin") or item.get("product_id")
-        }
-        if len(merged) >= page_size:
-            return payload
-
-        for variant in _spelling_variants(query):
-            logger.info(
-                "Audible search for %r returned %s result(s); enriching with spelling variant %r",
-                query,
-                len(merged),
-                variant,
-            )
-            variant_payload = self._search_once(variant, options)
-            for product in _product_items(variant_payload):
-                asin = str(product.get("asin") or product.get("product_id") or "").strip().upper()
-                if asin and asin in seen:
-                    continue
-                if asin:
-                    seen.add(asin)
-                merged.append(product)
-                if len(merged) >= page_size:
-                    break
-            if len(merged) >= page_size:
-                break
-
-        if merged:
-            return {"products": merged}
-        return payload
-
-
+        return self._search_once(query, options)
 
     def get_search_field_options(self, field_key: str, query: str | None = None) -> list[dict[str, str]]:
-        """Return Audible series suggestions backed by catalog series relations."""
-        if field_key != "series" or len((query or "").strip()) < 2:
+        """Find series by aggregating series attached to Audible catalogue products."""
+        keywords = (query or "").strip()
+        if field_key != "series" or len(keywords) < 2:
             return []
         payload = self._request("catalog/products", {
-            "keywords": (query or "").strip(),
+            "keywords": keywords,
             "num_results": 50,
-            "response_groups": "series,product_attrs",
+            "response_groups": "series,media,product_attrs,category_ladders",
         })
-        options: list[dict[str, str]] = []
-        seen: set[str] = set()
-        for product in _product_items(payload):
+        candidates: dict[str, dict[str, Any]] = {}
+        for index, product in enumerate(_product_items(payload)):
+            accepted = _is_french_language(_language(product)) if self.marketplace == "fr" else False
             raw_series = product.get("series")
             if isinstance(raw_series, dict):
                 raw_series = [raw_series]
             if not isinstance(raw_series, list):
                 continue
-            for series in raw_series:
-                if not isinstance(series, dict):
+            seen_in_product: set[str] = set()
+            for entry in raw_series:
+                if not isinstance(entry, dict):
                     continue
-                asin = _text(series.get("asin") or series.get("id"))
-                name = _text(series.get("title") or series.get("name"))
-                if not asin or not name or asin in seen:
+                asin = _text(entry.get("asin") or entry.get("id"))
+                title = _text(entry.get("title") or entry.get("name"))
+                if not asin or not title or asin in seen_in_product:
                     continue
-                seen.add(asin)
-                options.append({"value": f"asin:{asin}", "label": name})
-        return options[:15]
+                seen_in_product.add(asin)
+                if self.french_only and not accepted:
+                    continue
+                candidate = candidates.setdefault(asin, {
+                    "title": title, "product_count": 0, "first_seen": index,
+                    "accepted": False,
+                })
+                candidate["product_count"] += 1
+                candidate["accepted"] = candidate["accepted"] or accepted
+
+        def normalized_words(value: str) -> list[str]:
+            normalized = unicodedata.normalize("NFKD", value.casefold())
+            normalized = "".join(char for char in normalized if not unicodedata.combining(char))
+            return re.findall(r"[^\\W_]+", normalized, flags=re.UNICODE)
+
+        query_words = normalized_words(keywords)
+        stop_words = {"the", "a", "an", "of", "and", "le", "la", "les", "de", "des", "du", "et"}
+        content_words = [word for word in query_words if word not in stop_words] or query_words
+
+        def match_share(title: str) -> float:
+            title_words = normalized_words(title)
+            if not content_words:
+                return 0.0
+            matched = sum(
+                1 for index, word in enumerate(content_words)
+                if word in title_words or (
+                    index == len(content_words) - 1
+                    and any(item.startswith(word) for item in title_words)
+                )
+            )
+            return matched / len(content_words)
+
+        ranked = sorted(
+            candidates.items(),
+            key=lambda item: (
+                -match_share(item[1]["title"]),
+                -int(item[1]["accepted"]),
+                -item[1]["product_count"],
+                item[1]["first_seen"],
+            ),
+        )
+        return [
+            {"value": f"asin:{asin}", "label": candidate["title"]}
+            for asin, candidate in ranked[:15]
+        ]
 
     def _fetch_series_books(self, series_asin: str, page: int, limit: int) -> SearchResult:
         """Load child products from Audible series relationships in reading order."""
