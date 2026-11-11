@@ -559,7 +559,7 @@ class AudibleProvider(MetadataProvider):
         """Support the full series view workflow, with accurate page metadata."""
         series_value = str(options.fields.get("series", "")).strip()
         if series_value:
-            series_asin = series_value.removeprefix("asin:").strip().upper()
+            series_asin = series_value.removeprefix("id:").removeprefix("asin:").strip().upper()
             if not re.fullmatch(r"[A-Z0-9]{10}", series_asin):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
