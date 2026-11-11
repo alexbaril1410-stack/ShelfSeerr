@@ -241,6 +241,16 @@ def prowlarr_config_settings() -> list[SettingsField]:
             show_when={"field": "PROWLARR_ENABLED", "value": True},
         ),
         CheckboxField(
+            key="PROWLARR_HIDE_ZERO_SEEDERS",
+            label="Hide torrent results with 0 seeders",
+            default=False,
+            description=(
+                "Hide torrents with no seeders from search results by default. "
+                "You can temporarily show them from the release filters."
+            ),
+            show_when={"field": "PROWLARR_ENABLED", "value": True},
+        ),
+        CheckboxField(
             key="PROWLARR_AUTO_EXPAND",
             label="Auto-expand search on no results",
             default=False,
