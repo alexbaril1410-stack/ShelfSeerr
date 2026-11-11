@@ -934,7 +934,7 @@ input, select, textarea { color-scheme:dark; }
   }
   .shelfseerr-primary-nav button { width:auto; min-height:38px; padding:8px 12px; }
   .shelfseerr-content-shell {
-    margin-left:0; padding-top:var(--shelfseerr-mobile-header-height,0px) !important;
+    margin-left:0;
   }
   .shelfseerr-content-shell > main { padding:18px 16px 36px !important; }
 }
