@@ -44,6 +44,7 @@ from shelfmark.release_sources.prowlarr.api import (
     is_myanonamouse_indexer,
 )
 from shelfmark.release_sources.prowlarr.cache import cache_release
+from shelfmark.release_sources.prowlarr.custom_scoring import minimum_score, score_release
 from shelfmark.release_sources.prowlarr.mam import (
     lookup_torrent_details,
     mam_search_options,
@@ -1429,11 +1430,32 @@ class ProwlarrSource(ReleaseSource):
                     # Enrichment only decorates rows; never let it lose the search.
                     logger.warning("MAM enrichment failed", exc_info=True)
 
-            # Indexer priority first: it is an explicit user preference. Author
-            # agreement then orders what one indexer returned, so the editions that
-            # match the requested author lead and the rest stay reachable below.
+            # Apply the configured custom-format style score after MAM enrichment,
+            # so enriched series/volume/audio metadata can participate in the rules.
+            for release in results:
+                score_release(release, book, content_type)
+
+            # A minimum of zero deliberately means "do not filter". Positive
+            # thresholds hide only results that fall below the configured score.
+            score_threshold = minimum_score(content_type)
+            if score_threshold > 0:
+                before_threshold = len(results)
+                results = [
+                    release for release in results
+                    if int(release.extra.get("custom_score", 0)) >= score_threshold
+                ]
+                if len(results) != before_threshold:
+                    logger.info(
+                        "Prowlarr: custom scoring hid %s result(s) below score %s",
+                        before_threshold - len(results),
+                        score_threshold,
+                    )
+
+            # Custom score determines relevance. Prowlarr's indexer priority remains
+            # the first tie-breaker, followed by author affinity and enrichment.
             results.sort(
                 key=lambda r: (
+                    -int(r.extra.get("custom_score", 0)),
                     _release_indexer_rank(r, indexer_priority),
                     affinity_by_source_id.get(r.source_id, AUTHOR_UNKNOWN),
                     0 if r.source_id in enriched_source_ids else 1,
