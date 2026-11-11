@@ -451,20 +451,47 @@ class AudibleProvider(MetadataProvider):
             return None
 
         payload = self._search_once(query, options)
-        if payload:
+        initial_products = _product_items(payload)
+        if options.search_type not in (SearchType.GENERAL, SearchType.TITLE):
             return payload
 
-        # Only retry a short list of single-word vowel substitutions when the
-        # exact query returns no catalogue results. This keeps normal searches
-        # fast and avoids broad, noisy searches for multi-word queries.
-        if options.search_type not in (SearchType.GENERAL, SearchType.TITLE):
-            return None
+        # A misspelled query can still return one weak match. Do not treat that
+        # as a successful search: enrich it with likely spelling corrections
+        # until the requested page is reasonably full.
+        page_size = min(max(options.limit, 1), _MAX_RESULTS)
+        merged: list[dict[str, Any]] = list(initial_products)
+        seen = {
+            str(item.get("asin") or item.get("product_id") or "").strip().upper()
+            for item in merged
+            if item.get("asin") or item.get("product_id")
+        }
+        if len(merged) >= page_size:
+            return payload
+
         for variant in _spelling_variants(query):
-            logger.info("Audible search returned no results for %r; trying spelling variant %r", query, variant)
-            payload = self._search_once(variant, options)
-            if payload:
-                return payload
-        return None
+            logger.info(
+                "Audible search for %r returned %s result(s); enriching with spelling variant %r",
+                query,
+                len(merged),
+                variant,
+            )
+            variant_payload = self._search_once(variant, options)
+            for product in _product_items(variant_payload):
+                asin = str(product.get("asin") or product.get("product_id") or "").strip().upper()
+                if asin and asin in seen:
+                    continue
+                if asin:
+                    seen.add(asin)
+                merged.append(product)
+                if len(merged) >= page_size:
+                    break
+            if len(merged) >= page_size:
+                break
+
+        if merged:
+            return {"products": merged}
+        return payload
+
 
 
     def get_search_field_options(self, field_key: str, query: str | None = None) -> list[dict[str, str]]:
