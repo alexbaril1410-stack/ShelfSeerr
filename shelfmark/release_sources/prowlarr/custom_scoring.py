@@ -58,6 +58,26 @@ def _volume_from_title(title: str, series_name: str | None = None) -> float | No
     return None
 
 
+def _release_language_signal(release: Release) -> str | None:
+    """Infer an explicit language marker from the release title when metadata is absent."""
+    title = str(release.title or "")
+    # Check explicit French tags first; VO/ENG/EN markers are not inferred from
+    # arbitrary words, only standalone tokens or bracketed release labels.
+    if re.search(r"(?:^|[\\s._\\[\\](){}-])(?:VF|VFF|VFQ|FR|FRENCH|FRA)(?:$|[\\s._\\[\\](){}-])", title, re.I):
+        return "fr"
+    if re.search(r"(?:^|[\\s._\\[\\](){}-])(?:VO|VOSTFR|VOST|ENG|ENGLISH|ENG)(?:$|[\\s._\\[\\](){}-])", title, re.I):
+        return "vo"
+    return None
+
+
+def _requested_language_is_french(book: Any) -> bool:
+    language = str(getattr(book, "language", "") or "").strip().casefold()
+    if language in {"fr", "fra", "fre", "french", "français", "francais"}:
+        return True
+    localized = getattr(book, "titles_by_language", {}) or {}
+    return any(str(key).casefold() in {"fr", "fra", "fre", "french"} for key in localized)
+
+
 def _actual(release: Release, field: str, book: Any) -> object | None:
     extra = release.extra or {}
     attrs = extra.get("torznab_attrs")
@@ -75,7 +95,7 @@ def _actual(release: Release, field: str, book: Any) -> object | None:
     if field == "author":
         return extra.get("author")
     if field == "language":
-        return _first(release.language, extra.get("language"))
+        return _first(release.language, extra.get("language"), _release_language_signal(release))
     if field == "format":
         formats = extra.get("formats") or []
         match = re.search(r"\b(epub|mobi|azw3?|pdf|cbz|cbr|fb2|djvu|m4b|mp3|m4a)\b", release.title or "", re.I)
@@ -169,6 +189,33 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
     }
     total = 0
     breakdown: list[dict[str, Any]] = []
+
+    # Language is a hard relevance signal for a French request. Indexers often
+    # omit Torznab language metadata, so inspect explicit release tags such as
+    # [VO], [ENG], [FR] and [VFF] as well. Do not assume an untagged release is VO.
+    if _requested_language_is_french(book):
+        language_signal = _first(
+            release.language,
+            (release.extra or {}).get("language"),
+            _release_language_signal(release),
+        )
+        normalized_language = str(language_signal or "").strip().casefold()
+        if normalized_language in {"vo", "eng", "en", "english", "anglais"}:
+            total -= 300
+            breakdown.append({
+                "name": "Version originale (non française)",
+                "field": "language",
+                "score": -300,
+                "matched_value": str(language_signal),
+            })
+        elif normalized_language in {"fr", "fra", "fre", "french", "français", "francais"}:
+            total += 120
+            breakdown.append({
+                "name": "Version française identifiée",
+                "field": "language",
+                "score": 120,
+                "matched_value": str(language_signal),
+            })
     for rule in config.get(rules_key, []) or []:
         if not isinstance(rule, dict) or not rule.get("enabled", True):
             continue
