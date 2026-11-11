@@ -678,10 +678,10 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
 
     return (
       <header
-        className="sticky top-0 z-40 w-full"
+        className="shelfseerr-header sticky top-0 z-40 w-full"
         style={{ background: 'var(--bg)', paddingTop: 'env(safe-area-inset-top)' }}
       >
-        <div className="mx-auto max-w-full px-4 py-4 sm:px-6 lg:px-8">
+        <div className="shelfseerr-header-inner mx-auto max-w-full px-4 py-4 sm:px-6 lg:px-8">
           {/* When search is active: stack on mobile, side-by-side on desktop */}
           {showSearch && (
             <div className="animate-pop-up flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
