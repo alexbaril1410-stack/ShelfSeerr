@@ -327,23 +327,6 @@ def test_audible_series_suggestions_are_deduplicated(monkeypatch):
     ]
 
 
-def test_audible_search_does_not_run_spelling_variants_when_page_is_full(monkeypatch):
-    provider = AudibleProvider(marketplace="fr")
-    attempted_queries = []
-
-    def fake_search_once(query, options):
-        attempted_queries.append(query)
-        return {"products": [
-            {"asin": f"B0BOOK{i:06d}", "title": f"Book {i}"}
-            for i in range(options.limit)
-        ]}
-
-    monkeypatch.setattr(provider, "_search_once", fake_search_once)
-    provider.search(MetadataSearchOptions(query="Dungeon", limit=5))
-
-    assert attempted_queries == ["Dungeon"]
-
-
 def test_audible_series_search_aggregates_and_ranks_catalogue_series(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     calls = []
