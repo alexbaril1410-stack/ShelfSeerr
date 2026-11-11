@@ -275,3 +275,40 @@ def test_audible_description_decodes_html_entities_and_uses_real_newlines():
     assert description == "Premier & deuxième\nTroisième"
     assert "\\n" not in description
     assert "<p>" not in description
+
+
+
+def test_audible_requests_series_response_group_for_search_and_details(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {
+            "products": [
+                {
+                    "asin": "B0BOOK1234",
+                    "title": "Dungeon Crawler Carl",
+                    "series": [
+                        {
+                            "asin": "B0SERIES999",
+                            "title": "Dungeon Crawler Carl",
+                            "sequence": "1",
+                        }
+                    ],
+                }
+            ]
+        }
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+
+    search_results = provider.search(MetadataSearchOptions(query="Dungeon Crawler Carl"))
+    detail = provider.get_book("B0BOOK1234")
+
+    assert search_results[0].series_id == "B0SERIES999"
+    assert search_results[0].series_name == "Dungeon Crawler Carl"
+    assert search_results[0].series_position == 1.0
+    assert detail is not None
+    assert detail.series_id == "B0SERIES999"
+    assert detail.series_name == "Dungeon Crawler Carl"
+    assert all("series" in params["response_groups"].split(",") for _, params in calls)
