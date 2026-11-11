@@ -216,7 +216,7 @@ def test_parse_audible_product_extracts_contributors_series_and_html_description
     assert book.series_id == "B0SERIES999"
     assert book.series_name == "Dungeon Crawler Carl"
     assert book.series_position == 1.0
-    assert book.description == "First paragraph.\\nSecond paragraph."
+    assert book.description == "First paragraph.\nSecond paragraph."
     assert "<p>" not in book.description
 
 
@@ -242,3 +242,36 @@ def test_parse_audible_product_handles_contributor_objects_and_fallback_fields()
     )
     assert book.series_name == "Série test"
     assert book.series_position == 2.5
+
+
+
+def test_audible_series_parser_handles_hardcover_like_nested_series():
+    from shelfmark.metadata_providers.audible import _series_fields
+
+    series_id, series_name, position = _series_fields(
+        {
+            "featured_series": {
+                "position": "3",
+                "series": {
+                    "asin": "B0SERIES999",
+                    "name": "Dungeon Crawler Carl",
+                },
+            }
+        }
+    )
+
+    assert series_id == "B0SERIES999"
+    assert series_name == "Dungeon Crawler Carl"
+    assert position == 3.0
+
+
+def test_audible_description_decodes_html_entities_and_uses_real_newlines():
+    from shelfmark.metadata_providers.audible import _clean_description
+
+    description = _clean_description(
+        "<p>Premier &amp; deuxième</p><p>Troisième</p>"
+    )
+
+    assert description == "Premier & deuxième\nTroisième"
+    assert "\\n" not in description
+    assert "<p>" not in description
