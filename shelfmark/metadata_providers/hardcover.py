@@ -2666,7 +2666,7 @@ class HardcoverProvider(MetadataProvider):
             reading_format_id = coerce_int(edition.get("reading_format_id"), 0)
             audio_seconds = coerce_int(edition.get("audio_seconds"), 0)
             is_audio = (
-                reading_format_id == 2
+                reading_format_id in {2, 3}
                 or audio_seconds > 0
                 or any(marker in edition_format for marker in ("audio", "audiobook", "audible"))
             )
