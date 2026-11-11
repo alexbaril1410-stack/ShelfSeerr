@@ -44,7 +44,7 @@ from shelfmark.release_sources.prowlarr.api import (
     is_myanonamouse_indexer,
 )
 from shelfmark.release_sources.prowlarr.cache import cache_release
-from shelfmark.release_sources.prowlarr.custom_scoring import minimum_score, score_release
+from shelfmark.release_sources.prowlarr.custom_scoring import (\n    minimum_score,\n    release_title_matches_book,\n    score_release,\n)
 from shelfmark.release_sources.prowlarr.mam import (
     lookup_torrent_details,
     mam_search_options,
@@ -1391,6 +1391,16 @@ class ProwlarrSource(ReleaseSource):
                     content_type,
                     enable_format_detection=is_enriched,
                 )
+                # Prowlarr can return fuzzy matches that are not the requested
+                # book (e.g. "d'une" for "Dune", or "(1984)" as a publication year).
+                # Manual searches are intentionally left untouched.
+                if not plan.manual_query and not release_title_matches_book(release, book):
+                    logger.debug(
+                        "Prowlarr: hiding unrelated title for '%s': '%s'",
+                        book.search_title or book.title,
+                        release.title,
+                    )
+                    continue
                 if hide_unsupported_formats:
                     unsupported_extension = _unsupported_title_extension(
                         release.title, content_type
