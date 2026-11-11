@@ -864,7 +864,19 @@ def get_setting_value(field: FieldBase, tab_name: str) -> object:
     # 2. Check config file
     config = load_config_file(tab_name)
     if field.key in config:
-        return config[field.key]
+        configured_value = config[field.key]
+        # The custom scoring tab may already have been initialized with empty
+        # tables before its default rules were introduced. Treat those legacy
+        # empty tables as uninitialized so existing installations receive the
+        # new starter rules. Users can disable individual rules or the profile.
+        if (
+            field.key in {"CUSTOM_SCORES_EBOOK_RULES", "CUSTOM_SCORES_AUDIOBOOK_RULES"}
+            and isinstance(field, TableField)
+            and configured_value == []
+            and field.default
+        ):
+            return field.default
+        return configured_value
 
     # 3. Return default
     return field.default
