@@ -240,11 +240,17 @@ class AudibleProvider(MetadataProvider):
         if not query:
             return None
         page_size = min(max(options.limit, 1), _MAX_RESULTS)
+        sort_values = {
+            SortOrder.RELEVANCE: "Relevance",
+            SortOrder.POPULARITY: "BestSellers",
+            SortOrder.NEWEST: "-ReleaseDate",
+        }
         params: dict[str, Any] = {
             "keywords": query,
             "content_type": "Audiobook",
             "num_results": page_size,
             "page": max(options.page - 1, 0),
+            "products_sort_by": sort_values.get(options.sort, "Relevance"),
             "response_groups": _RESPONSE_GROUPS,
         }
         if options.search_type == SearchType.AUTHOR:
