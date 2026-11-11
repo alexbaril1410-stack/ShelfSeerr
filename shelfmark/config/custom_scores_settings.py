@@ -54,7 +54,7 @@ _RULE_COLUMNS = [
         ],
     },
     {"key": "value", "label": "Expected value", "type": "text", "placeholder": "Value"},
-    {"key": "score", "label": "Score", "type": "number", "defaultValue": 0},
+    {"key": "score", "label": "Score", "type": "text", "placeholder": "e.g. 100 or -50"},
 ]
 
 
