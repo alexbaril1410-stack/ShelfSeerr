@@ -2219,3 +2219,7 @@ register_on_save("advanced", _on_save_advanced)
 # Register the Hardcover Sync settings tab. Imported here (rather than at each
 # settings endpoint) so every code path that imports this module also registers it.
 from shelfmark.config import hardcover_sync_settings as _hardcover_sync_settings  # noqa: E402,F401
+
+
+# Native ShelfSeerr scoring settings are registered alongside the core settings.
+from shelfmark.config import custom_scores_settings as _custom_scores_settings  # noqa: E402,F401
