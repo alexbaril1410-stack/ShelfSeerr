@@ -1135,10 +1135,22 @@ const ReleaseModalSession = ({
     } else if (currentSort && allSortOptions.length > 0) {
       filtered = sortReleases(filtered, currentSort.key, currentSort.direction);
     } else {
-      const responseBook = releasesBySource[activeTab]?.book;
-      const titleCandidates = getBookTitleCandidates(book, responseBook);
-      const authorCandidates = getBookAuthorCandidates(book, responseBook);
-      filtered = sortReleasesByBookMatch(filtered, titleCandidates, authorCandidates);
+      // Prowlarr already ranks results with the server-side configurable score.
+      // Do not run the generic client title matcher afterwards: it can undo the
+      // volume-aware order (e.g. place every "Season 2/3" above the requested book).
+      const hasCustomScores = filtered.some(
+        (release) => typeof release.extra?.custom_score === 'number',
+      );
+      if (hasCustomScores) {
+        filtered = [...filtered].sort(
+          (a, b) => Number(b.extra?.custom_score ?? 0) - Number(a.extra?.custom_score ?? 0),
+        );
+      } else {
+        const responseBook = releasesBySource[activeTab]?.book;
+        const titleCandidates = getBookTitleCandidates(book, responseBook);
+        const authorCandidates = getBookAuthorCandidates(book, responseBook);
+        filtered = sortReleasesByBookMatch(filtered, titleCandidates, authorCandidates);
+      }
     }
 
     return filtered;
