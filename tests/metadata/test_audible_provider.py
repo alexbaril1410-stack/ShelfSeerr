@@ -105,3 +105,42 @@ def test_audible_search_fallback_omits_unsupported_content_type(monkeypatch):
     assert calls[1][0] == "catalog/products"
     assert "content_type" not in calls[1][1]
     assert calls[1][1]["keywords"] == "Dungeon Crawler Carl"
+
+
+
+def test_audible_french_only_filter_keeps_only_identified_french_books(monkeypatch):
+    provider = AudibleProvider(marketplace="fr", french_only=True)
+    monkeypatch.setattr(
+        provider,
+        "_search_payload",
+        lambda options: {
+            "items": [
+                {"asin": "FR12345678", "title": "Livre français", "language": "French"},
+                {"asin": "EN12345678", "title": "English book", "language": "English"},
+                {"asin": "XX12345678", "title": "Langue inconnue"},
+                {"asin": "FR22345678", "title": "Livre français 2", "language_code": "fr-FR"},
+            ]
+        },
+    )
+
+    results = provider.search(MetadataSearchOptions(query="test"))
+
+    assert [book.provider_id for book in results] == ["FR12345678", "FR22345678"]
+
+
+def test_audible_french_only_filter_is_disabled_by_default(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    monkeypatch.setattr(
+        provider,
+        "_search_payload",
+        lambda options: {
+            "items": [
+                {"asin": "FR12345678", "title": "Livre français", "language": "French"},
+                {"asin": "EN12345678", "title": "English book", "language": "English"},
+            ]
+        },
+    )
+
+    results = provider.search(MetadataSearchOptions(query="test"))
+
+    assert len(results) == 2
