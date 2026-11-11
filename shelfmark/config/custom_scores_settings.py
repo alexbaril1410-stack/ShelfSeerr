@@ -60,11 +60,11 @@ _RULE_COLUMNS = [
 ]
 
 _DEFAULT_EBOOK_RULES = [
-    {"enabled": True, "name": "Titre exact", "field": "title", "operator": "equals", "value": "{{book_title}}", "score": 120},
-    {"enabled": True, "name": "Titre correspondant", "field": "title", "operator": "contains", "value": "{{book_title}}", "score": 70},
-    {"enabled": True, "name": "Série correspondante", "field": "series", "operator": "contains", "value": "{{series_name}}", "score": 50},
-    {"enabled": True, "name": "Tome demandé", "field": "volume", "operator": "equals", "value": "{{requested_volume}}", "score": 150},
-    {"enabled": True, "name": "Mauvais tome", "field": "volume", "operator": "not_equals", "value": "{{requested_volume}}", "score": -200},
+    {"enabled": True, "name": "Titre exact", "field": "title", "operator": "equals", "value": "{{book_title}}", "score": 220},
+    {"enabled": True, "name": "Titre correspondant", "field": "title", "operator": "contains", "value": "{{book_title}}", "score": 90},
+    {"enabled": True, "name": "Série correspondante", "field": "series", "operator": "contains", "value": "{{series_name}}", "score": 15},
+    {"enabled": True, "name": "Tome demandé", "field": "volume", "operator": "equals", "value": "{{requested_volume}}", "score": 300},
+    {"enabled": True, "name": "Mauvais tome", "field": "volume", "operator": "not_equals", "value": "{{requested_volume}}", "score": -500},
     {"enabled": True, "name": "Auteur correspondant", "field": "author", "operator": "contains", "value": "{{book_author}}", "score": 60},
     {"enabled": True, "name": "Langue française", "field": "language", "operator": "equals", "value": "fr", "score": 40},
     {"enabled": True, "name": "Format EPUB", "field": "format", "operator": "equals", "value": "epub", "score": 25},
