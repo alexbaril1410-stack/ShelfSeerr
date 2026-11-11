@@ -120,6 +120,25 @@ query GetListBooksById($id: Int!, $limit: Int!, $offset: Int!) {
 }
 """
 
+FRENCH_EDITION_BOOK_IDS_QUERY = """
+query GetFrenchEditionBookIds($bookIds: [Int!]!) {
+    editions(
+        where: {
+            book_id: {_in: $bookIds},
+            language: {code2: {_eq: "fr"}}
+        },
+        limit: 1000
+    ) {
+        book_id
+        title
+        language {
+            code2
+            code3
+        }
+    }
+}
+
+"""
 USER_LISTS_QUERY = """
 query GetUserLists {
     me {
@@ -2533,8 +2552,41 @@ class HardcoverProvider(MetadataProvider):
             app_config.get("HARDCOVER_EXCLUDE_UNRELEASED", False),
             default=False,
         )
-        cache_key = f"{options.query}:{options.search_type.value}:{options.sort.value}:{options.limit}:{options.page}:{fields_key}:excl_comp={exclude_compilations}:excl_unrel={exclude_unreleased}"
+        french_only = coerce_bool(
+            app_config.get("HARDCOVER_FRENCH_ONLY", True),
+            default=True,
+        )
+        cache_key = f"{options.query}:{options.search_type.value}:{options.sort.value}:{options.limit}:{options.page}:{fields_key}:excl_comp={exclude_compilations}:excl_unrel={exclude_unreleased}:fr_only={french_only}"
         return self._search_cached(cache_key, options)
+
+    @cacheable(ttl=3600, key_prefix="hardcover:french_editions")
+    def _fetch_french_editions(self, book_ids: tuple[int, ...]) -> dict[int, str]:
+        """Return French edition titles keyed by Hardcover work ID."""
+        if not book_ids:
+            return {}
+
+        result = self._execute_query(
+            FRENCH_EDITION_BOOK_IDS_QUERY,
+            {"bookIds": list(book_ids)},
+        )
+        if not result:
+            # Do not silently hide every result when Hardcover's edition lookup fails.
+            return {}
+
+        titles: dict[int, str] = {}
+        for edition in result.get("editions", []):
+            if not isinstance(edition, dict):
+                continue
+            language = edition.get("language") or {}
+            code2 = str(language.get("code2") or "").casefold()
+            code3 = str(language.get("code3") or "").casefold()
+            if code2 != "fr" and code3 not in {"fre", "fra"}:
+                continue
+            book_id = coerce_int(edition.get("book_id"), 0)
+            title = str(edition.get("title") or "").strip()
+            if book_id > 0 and title and book_id not in titles:
+                titles[book_id] = title
+        return titles
 
     @cacheable(ttl_key="METADATA_CACHE_SEARCH_TTL", ttl_default=300, key_prefix="hardcover:search")
     def _search_cached(self, cache_key: str, options: MetadataSearchOptions) -> SearchResult:
@@ -2592,7 +2644,26 @@ class HardcoverProvider(MetadataProvider):
             # Extract hits from Typesense response
             hits, found_count = _extract_typesense_hits(result)
 
-            # Parse hits, filtering compilations and unreleased books if enabled
+            # When enabled, keep only works with at least one French-language edition.
+            french_only = coerce_bool(
+                app_config.get("HARDCOVER_FRENCH_ONLY", True),
+                default=True,
+            )
+            french_titles: dict[int, str] = {}
+            if french_only:
+                book_ids = tuple(
+                    sorted(
+                        {
+                            coerce_int(item.get("id"), 0)
+                            for hit in hits
+                            if (item := _unwrap_hit_document(hit)) is not None
+                            and coerce_int(item.get("id"), 0) > 0
+                        }
+                    )
+                )
+                french_titles = self._fetch_french_editions(book_ids)
+
+            # Parse hits, filtering compilations, unreleased books, and non-French works.
             exclude_compilations = coerce_bool(
                 app_config.get("HARDCOVER_EXCLUDE_COMPILATIONS", False),
                 default=False,
@@ -2607,6 +2678,9 @@ class HardcoverProvider(MetadataProvider):
                 item = _unwrap_hit_document(hit)
                 if item is None:
                     continue
+                book_id = coerce_int(item.get("id"), 0)
+                if french_only and book_id not in french_titles:
+                    continue
                 if exclude_compilations and item.get("compilation"):
                     continue
                 if exclude_unreleased:
@@ -2617,6 +2691,11 @@ class HardcoverProvider(MetadataProvider):
                     item, matched_title=_matched_alternative_title(hit, item)
                 )
                 if book:
+                    # Keep the original Hardcover work ID; use the French edition title
+                    # only for presentation and downstream title matching.
+                    if french_only and french_titles.get(book_id):
+                        book.title = french_titles[book_id]
+                        book.search_title = french_titles[book_id]
                     books.append(book)
 
             logger.info(
@@ -3342,6 +3421,12 @@ def hardcover_settings() -> list[SettingsField]:
             description="Default sort order for Hardcover search results.",
             options=_HARDCOVER_SORT_OPTIONS,
             default="relevance",
+        ),
+        CheckboxField(
+            key="HARDCOVER_FRENCH_ONLY",
+            label="French Editions Only",
+            description="Show only books with at least one French-language edition. Uses the French edition title when available.",
+            default=True,
         ),
         CheckboxField(
             key="HARDCOVER_EXCLUDE_COMPILATIONS",
