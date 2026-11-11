@@ -147,49 +147,6 @@ def test_audible_french_only_filter_is_disabled_by_default(monkeypatch):
 
 
 
-def test_audible_search_retries_common_vowel_typo(monkeypatch):
-    provider = AudibleProvider(marketplace="fr")
-    attempted_queries = []
-
-    def fake_search_once(query, options):
-        attempted_queries.append(query)
-        if query == "Dungeon":
-            return {
-                "items": [
-                    {
-                        "asin": "B0DUNGEON1",
-                        "title": "Dungeon Crawler Carl",
-                        "language": "English",
-                    }
-                ]
-            }
-        return None
-
-    monkeypatch.setattr(provider, "_search_once", fake_search_once)
-    results = provider.search(MetadataSearchOptions(query="Dongeon"))
-
-    assert attempted_queries[0] == "Dongeon"
-    assert "Dungeon" in attempted_queries
-    assert len(results) == 1
-    assert results[0].title == "Dungeon Crawler Carl"
-
-
-def test_audible_search_does_not_retry_multi_word_queries(monkeypatch):
-    provider = AudibleProvider(marketplace="fr")
-    attempted_queries = []
-
-    def fake_search_once(query, options):
-        attempted_queries.append(query)
-        return None
-
-    monkeypatch.setattr(provider, "_search_once", fake_search_once)
-    results = provider.search(MetadataSearchOptions(query="Dongeon Crawler"))
-
-    assert results == []
-    assert attempted_queries == ["Dongeon Crawler"]
-
-
-
 def test_parse_audible_product_extracts_contributors_series_and_html_description():
     book = _parse_product(
         {
@@ -370,36 +327,6 @@ def test_audible_series_suggestions_are_deduplicated(monkeypatch):
     ]
 
 
-def test_audible_search_enriches_sparse_results_with_spelling_variants(monkeypatch):
-    provider = AudibleProvider(marketplace="fr")
-    attempted_queries = []
-
-    def fake_search_once(query, options):
-        attempted_queries.append(query)
-        if query == "Dongeon":
-            return {"products": [
-                {"asin": "B0ORIGINAL1", "title": "Résultat approximatif"}
-            ]}
-        if query == "Dungeon":
-            return {"products": [
-                {"asin": "B0DUNGEON01", "title": "Dungeon Crawler Carl 1"},
-                {"asin": "B0DUNGEON02", "title": "Dungeon Crawler Carl 2"},
-                {"asin": "B0ORIGINAL1", "title": "Résultat déjà trouvé"},
-            ]}
-        return None
-
-    monkeypatch.setattr(provider, "_search_once", fake_search_once)
-    results = provider.search(MetadataSearchOptions(query="Dongeon", limit=10))
-
-    assert "Dongeon" == attempted_queries[0]
-    assert "Dungeon" in attempted_queries
-    assert [book.provider_id for book in results] == [
-        "B0ORIGINAL1",
-        "B0DUNGEON01",
-        "B0DUNGEON02",
-    ]
-
-
 def test_audible_search_does_not_run_spelling_variants_when_page_is_full(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     attempted_queries = []
@@ -415,3 +342,69 @@ def test_audible_search_does_not_run_spelling_variants_when_page_is_full(monkeyp
     provider.search(MetadataSearchOptions(query="Dungeon", limit=5))
 
     assert attempted_queries == ["Dungeon"]
+
+
+def test_audible_series_search_aggregates_and_ranks_catalogue_series(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {"products": [
+            {"language": "French", "series": [
+                {"asin": "B0SERIES001", "title": "Dungeon Crawler Carl"},
+                {"asin": "B0SERIES002", "title": "Dungeon"},
+            ]},
+            {"language": "French", "series": [
+                {"asin": "B0SERIES001", "title": "Dungeon Crawler Carl"},
+            ]},
+            {"language": "English", "series": [
+                {"asin": "B0SERIES003", "title": "The Dongeon Adventures"},
+            ]},
+        ]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    options = provider.get_search_field_options("series", "Dongeon")
+
+    assert calls[0][0] == "catalog/products"
+    assert calls[0][1]["keywords"] == "Dongeon"
+    assert calls[0][1]["num_results"] == 50
+    assert calls[0][1]["response_groups"] == "series,media,product_attrs,category_ladders"
+    assert options[0] == {"value": "asin:B0SERIES003", "label": "The Dongeon Adventures"}
+    assert {option["value"] for option in options} == {
+        "asin:B0SERIES001", "asin:B0SERIES002", "asin:B0SERIES003"
+    }
+
+
+def test_audible_series_search_deduplicates_series_per_product_and_caps_at_15(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    products = []
+    for index in range(20):
+        products.append({
+            "language": "French",
+            "series": [
+                {"asin": f"B0SERIES{index:04d}", "title": f"Dungeon Series {index}"},
+                {"asin": f"B0SERIES{index:04d}", "title": f"Dungeon Series {index}"},
+            ],
+        })
+    monkeypatch.setattr(provider, "_request", lambda _path, _params: {"products": products})
+
+    options = provider.get_search_field_options("series", "Dungeon")
+
+    assert len(options) == 15
+    assert len({option["value"] for option in options}) == 15
+
+
+def test_audible_book_search_does_not_retry_spelling_variants(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    attempted_queries = []
+
+    def fake_search_once(query, options):
+        attempted_queries.append(query)
+        return {"products": [{"asin": "B0ORIGINAL1", "title": "Approximate result"}]}
+
+    monkeypatch.setattr(provider, "_search_once", fake_search_once)
+    results = provider.search(MetadataSearchOptions(query="Dongeon", limit=10))
+
+    assert attempted_queries == ["Dongeon"]
+    assert [book.provider_id for book in results] == ["B0ORIGINAL1"]
