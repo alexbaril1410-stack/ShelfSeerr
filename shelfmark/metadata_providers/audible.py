@@ -6,6 +6,8 @@ Audible account credentials are required for public catalogue searches.
 
 from contextlib import suppress
 from datetime import date
+from html import unescape
+from html.parser import HTMLParser
 from typing import Any
 from urllib.parse import quote
 
@@ -84,7 +86,47 @@ def _text(value: Any) -> str | None:
     return result or None
 
 
+class _DescriptionParser(HTMLParser):
+    """Convert Audible HTML descriptions to readable plain text."""
+
+    _BLOCK_TAGS = {"p", "div", "br", "li", "ul", "ol", "h1", "h2", "h3"}
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag.lower() in self._BLOCK_TAGS:
+            self.parts.append("\\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() in self._BLOCK_TAGS:
+            self.parts.append("\\n")
+
+    def handle_data(self, data: str) -> None:
+        self.parts.append(data)
+
+
+def _clean_description(value: Any) -> str | None:
+    raw = _text(value)
+    if not raw:
+        return None
+    parser = _DescriptionParser()
+    with suppress(Exception):
+        parser.feed(unescape(raw))
+        parser.close()
+        cleaned = "".join(parser.parts)
+        lines = [" ".join(line.split()) for line in cleaned.splitlines()]
+        result = "\\n".join(line for line in lines if line)
+        return result or None
+    return " ".join(raw.split())
+
+
 def _names(value: Any) -> list[str]:
+    if isinstance(value, dict):
+        value = [value]
+    elif isinstance(value, str):
+        value = [value]
     if not isinstance(value, list):
         return []
     names = []
@@ -93,6 +135,57 @@ def _names(value: Any) -> list[str]:
         if name and name not in names:
             names.append(name)
     return names
+
+
+def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
+    authors: list[str] = []
+    narrators: list[str] = []
+    raw = product.get("contributors")
+    if isinstance(raw, dict):
+        authors = _names(raw.get("authors") or raw.get("author"))
+        narrators = _names(raw.get("narrators") or raw.get("narrator"))
+    elif isinstance(raw, list):
+        for entry in raw:
+            if not isinstance(entry, dict):
+                continue
+            role = str(entry.get("role") or entry.get("role_name") or "").casefold()
+            name = _text(entry)
+            if not name:
+                continue
+            if "author" in role and name not in authors:
+                authors.append(name)
+            if "narrat" in role and name not in narrators:
+                narrators.append(name)
+
+    if not authors:
+        authors = _names(product.get("authors") or product.get("author"))
+    if not narrators:
+        narrators = _names(product.get("narrators") or product.get("narrator"))
+    return authors, narrators
+
+
+def _series_fields(product: dict[str, Any]) -> tuple[str | None, str | None, float | None]:
+    raw = product.get("series") or product.get("series_list") or product.get("series_info")
+    if isinstance(raw, dict):
+        entries = [raw]
+    elif isinstance(raw, list):
+        entries = raw
+    else:
+        entries = []
+    if not entries:
+        return None, None, None
+
+    series = next((entry for entry in entries if isinstance(entry, dict)), None)
+    if not series:
+        return None, None, None
+
+    series_id = _text(series.get("asin") or series.get("id") or series.get("series_id"))
+    series_name = _text(series.get("title") or series.get("name") or series.get("series_title"))
+    raw_position = series.get("sequence") or series.get("position") or series.get("sequence_number")
+    position = None
+    with suppress(TypeError, ValueError):
+        position = float(str(raw_position).replace(",", "."))
+    return series_id, series_name, position
 
 
 def _product_items(payload: Any) -> list[dict[str, Any]]:
@@ -175,29 +268,15 @@ def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | 
     if not asin or not title:
         return None
 
-    contributors = product.get("contributors") or {}
-    if isinstance(contributors, list):
-        authors = _names(
-            [entry for entry in contributors if isinstance(entry, dict) and
-             str(entry.get("role") or entry.get("role_name") or "").lower() in ("author", "authors")]
-        )
-    else:
-        authors = _names(contributors.get("authors") or contributors.get("author"))
-        narrators = _names(contributors.get("narrators") or contributors.get("narrator"))
-
-    if isinstance(contributors, list):
-        narrators = _names(
-            [entry for entry in contributors if isinstance(entry, dict) and
-             "narrat" in str(entry.get("role") or entry.get("role_name") or "").lower()]
-        )
-
+    authors, narrators = _contributors(product)
     publisher = _text(product.get("publisher_name") or product.get("publisher"))
-    description = _text(
+    description = _clean_description(
         product.get("publisher_summary")
         or product.get("merchandising_summary")
         or product.get("product_description")
         or product.get("description")
     )
+    series_id, series_name, series_position = _series_fields(product)
     genres = _names(product.get("category_ladders") or product.get("categories"))
     rating = product.get("rating") or {}
     rating_value = None
@@ -232,6 +311,9 @@ def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | 
         source_url=f"https://www.audible.{marketplace}/pd/{quote(asin)}",
         cover_aspect="square",
         display_fields=display_fields,
+        series_id=series_id,
+        series_name=series_name,
+        series_position=series_position,
     )
 
 
