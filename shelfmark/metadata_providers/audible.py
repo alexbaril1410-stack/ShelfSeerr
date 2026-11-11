@@ -101,7 +101,7 @@ class _DescriptionParser(HTMLParser):
 
     def handle_endtag(self, tag: str) -> None:
         if tag.lower() in self._BLOCK_TAGS:
-            self.parts.append("\\n")
+            self.parts.append("\n")
 
     def handle_data(self, data: str) -> None:
         self.parts.append(data)
