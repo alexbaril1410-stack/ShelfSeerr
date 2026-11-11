@@ -1072,3 +1072,72 @@ input, select, textarea { color-scheme:dark; }
   #results-section .book-card { min-height:168px; }
   .fixed.top-0.right-0.z-50 { width:100%; }
 }
+
+
+/* Settings workspace */
+.fixed.inset-0.z-50 > .relative.flex.h-\\[85vh\\] {
+  border:1px solid #30394e !important;
+  border-radius:16px;
+  background:#101726 !important;
+  box-shadow:0 28px 100px rgba(0,0,0,.58);
+}
+.fixed.inset-0.z-50 > .relative.flex.h-\\[85vh\\] > header,
+.fixed.inset-0.z-50 > .relative.flex.h-\\[85vh\\] > div:first-of-type {
+  border-color:#293247 !important;
+}
+.fixed.inset-0.z-50 .w-60.shrink-0 {
+  background:#0c1321;
+  border-color:#293247 !important;
+}
+.fixed.inset-0.z-50 .w-60 button {
+  margin:3px 8px;
+  width:calc(100% - 16px);
+  border-radius:8px;
+  color:#aeb8ca;
+}
+.fixed.inset-0.z-50 .w-60 button[aria-current="page"],
+.fixed.inset-0.z-50 .w-60 button[aria-selected="true"] {
+  background:rgba(118,84,223,.2);
+  color:#fff;
+}
+.fixed.inset-0.z-50 .flex-1.overflow-y-auto.p-6 {
+  background:#101726;
+}
+.fixed.inset-0.z-50 input:not([type="checkbox"]):not([type="radio"]),
+.fixed.inset-0.z-50 select,
+.fixed.inset-0.z-50 textarea {
+  border-color:#30394e !important;
+  background:#151e2e !important;
+  color:#e7eaf2 !important;
+}
+.fixed.inset-0.z-50 label { color:#d7ddeb; }
+.fixed.inset-0.z-50 .border-(--border-muted) { border-color:#293247 !important; }
+.fixed.inset-0.z-50 .bg-(--bg-soft) { background:#151e2e !important; }
+
+/* Authentication screen */
+#login-form input:not([type="checkbox"]) {
+  border-color:#30394e !important;
+  border-radius:10px;
+  background:#151e2e !important;
+  color:#f1f5f9 !important;
+}
+#login-form button[type="submit"] {
+  border-radius:10px;
+  background:linear-gradient(110deg,#7654df,#5b42bd);
+  box-shadow:0 8px 22px rgba(91,66,189,.25);
+}
+#login-form button[type="submit"]:hover {
+  background:linear-gradient(110deg,#8767ed,#694bd0);
+}
+@media (max-width:767px) {
+  .fixed.inset-0.z-50 > .relative.flex.h-\\[85vh\\] {
+    width:100%;
+    height:100dvh;
+    max-height:100dvh;
+    border:0 !important;
+    border-radius:0;
+  }
+  .fixed.inset-0.z-50 .w-60.shrink-0 {
+    width:190px;
+  }
+}
