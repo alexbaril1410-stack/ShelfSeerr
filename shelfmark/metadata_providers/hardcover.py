@@ -1672,6 +1672,7 @@ class HardcoverProvider(MetadataProvider):
         *,
         exclude_compilations: bool,
         exclude_unreleased: bool,
+        french_only: bool,
     ) -> dict[str, Any]:
         """Fetch and process all books for a series (cached independently of page)."""
         empty: dict[str, Any] = {"rows": [], "series_name": "", "total": 0}
@@ -1738,7 +1739,39 @@ class HardcoverProvider(MetadataProvider):
             entry["row"]
             for _position, entry in sorted(rows_by_position.items(), key=lambda item: item[0])
         ]
-        return {"rows": ordered_rows, "series_name": series_name, "total": len(ordered_rows)}
+
+        french_titles: dict[int, str] | None = {}
+        if french_only and ordered_rows:
+            book_ids = tuple(
+                sorted(
+                    {
+                        coerce_int(row.get("book", {}).get("id"), 0)
+                        for row in ordered_rows
+                        if isinstance(row.get("book"), dict)
+                        and coerce_int(row.get("book", {}).get("id"), 0) > 0
+                    }
+                )
+            )
+            french_titles = self._fetch_french_editions(book_ids)
+            if french_titles is not None:
+                ordered_rows = [
+                    row
+                    for row in ordered_rows
+                    if coerce_int(row.get("book", {}).get("id"), 0) in french_titles
+                ]
+            else:
+                logger.warning(
+                    "Hardcover French-edition lookup failed for series %s; "
+                    "keeping all series books",
+                    series_id,
+                )
+
+        return {
+            "rows": ordered_rows,
+            "series_name": series_name,
+            "total": len(ordered_rows),
+            "french_titles": french_titles,
+        }
 
     def _fetch_series_books_by_id(
         self,
@@ -1748,16 +1781,19 @@ class HardcoverProvider(MetadataProvider):
         *,
         exclude_compilations: bool,
         exclude_unreleased: bool,
+        french_only: bool,
     ) -> SearchResult:
         """Fetch books for a Hardcover series in canonical series order."""
         cached = self._fetch_series_ordered_rows(
             series_id,
             exclude_compilations=exclude_compilations,
             exclude_unreleased=exclude_unreleased,
+            french_only=french_only,
         )
         ordered_rows = cached["rows"]
         series_name = cached["series_name"]
         total_found = cached["total"]
+        french_titles = cached.get("french_titles")
 
         offset = (page - 1) * limit
         page_rows = ordered_rows[offset : offset + limit]
@@ -1771,6 +1807,11 @@ class HardcoverProvider(MetadataProvider):
                 parsed_book = self._parse_book(book_data)
                 if not parsed_book:
                     continue
+                book_id = coerce_int(book_data.get("id"), 0)
+                if french_only and isinstance(french_titles, dict) and french_titles.get(book_id):
+                    french_title = french_titles[book_id]
+                    parsed_book.title = french_title
+                    parsed_book.search_title = french_title
                 parsed_book.series_id = str(series_id)
                 if series_name:
                     parsed_book.series_name = series_name
@@ -2505,12 +2546,17 @@ class HardcoverProvider(MetadataProvider):
                 app_config.get("HARDCOVER_EXCLUDE_UNRELEASED", False),
                 default=False,
             )
+            french_only = coerce_bool(
+                app_config.get("HARDCOVER_FRENCH_ONLY", True),
+                default=True,
+            )
             return self._fetch_series_books_by_id(
                 int(resolved_series["id"]),
                 options.page,
                 options.limit,
                 exclude_compilations=exclude_compilations,
                 exclude_unreleased=exclude_unreleased,
+                french_only=french_only,
             )
 
         author_value_from_field = str(options.fields.get("author", "")).strip()
