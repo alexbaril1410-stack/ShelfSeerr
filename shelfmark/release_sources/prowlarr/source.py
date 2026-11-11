@@ -922,6 +922,17 @@ class ProwlarrSource(ReleaseSource):
             columns=[
                 *mam_columns,
                 ColumnSchema(
+                    key="extra.custom_score",
+                    label="Score",
+                    render_type=ColumnRenderType.NUMBER,
+                    align=ColumnAlign.CENTER,
+                    width="64px",
+                    hide_mobile=False,
+                    fallback="0",
+                    sortable=True,
+                    sort_key="extra.custom_score",
+                ),
+                ColumnSchema(
                     key="indexer",
                     label="Indexer",
                     render_type=ColumnRenderType.INDEXER_PROTOCOL,
@@ -984,7 +995,7 @@ class ProwlarrSource(ReleaseSource):
                 ),
             ],
             grid_template=(
-                f"minmax(0,2fr){mam_tracks} minmax(140px,1fr) 50px 50px 90px"
+                f"minmax(0,2fr){mam_tracks} 64px minmax(140px,1fr) 50px 50px 90px"
                 f"{mam_bitrate_track} 80px"
             ),
             leading_cell=LeadingCellConfig(
