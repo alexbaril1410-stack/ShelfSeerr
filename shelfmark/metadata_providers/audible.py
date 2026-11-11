@@ -12,6 +12,7 @@ from typing import Any
 from urllib.parse import quote
 
 import requests
+import re
 
 from shelfmark.core.config import config as app_config
 from shelfmark.core.logger import setup_logger
@@ -26,10 +27,13 @@ from shelfmark.core.settings_registry import (
 from shelfmark.metadata_providers import (
     BookMetadata,
     DisplayField,
+    MetadataCapability,
     MetadataProvider,
     MetadataSearchOptions,
+    SearchResult,
     SearchType,
     SortOrder,
+    TextSearchField,
     register_provider,
     register_provider_kwargs,
 )
@@ -355,7 +359,19 @@ class AudibleProvider(MetadataProvider):
     name = "audible"
     display_name = "Audible"
     requires_auth = False
-    supported_sorts = (SortOrder.RELEVANCE, SortOrder.POPULARITY, SortOrder.NEWEST)
+    supported_sorts = (SortOrder.RELEVANCE, SortOrder.POPULARITY, SortOrder.NEWEST, SortOrder.SERIES_ORDER)
+    capabilities = (
+        MetadataCapability(key="view_series", field_key="series", sort=SortOrder.SERIES_ORDER),
+    )
+    search_fields = (
+        TextSearchField(
+            key="series",
+            label="Série",
+            placeholder="Rechercher une série Audible...",
+            description="Afficher les livres audio appartenant à une série",
+            suggestions_endpoint="/api/metadata/field-options?provider=audible&field=series",
+        ),
+    )
 
     def __init__(self, marketplace: str = "fr", french_only: bool = False) -> None:
         self.marketplace = marketplace if marketplace in {item["value"] for item in _AUDIBLE_MARKETPLACES} else "fr"
@@ -449,6 +465,106 @@ class AudibleProvider(MetadataProvider):
             if payload:
                 return payload
         return None
+
+
+    def get_search_field_options(self, field_key: str, query: str | None = None) -> list[dict[str, str]]:
+        """Return Audible series suggestions backed by catalog series relations."""
+        if field_key != "series" or len((query or "").strip()) < 2:
+            return []
+        payload = self._request("catalog/products", {
+            "keywords": (query or "").strip(),
+            "num_results": 50,
+            "response_groups": "series,product_attrs",
+        })
+        options: list[dict[str, str]] = []
+        seen: set[str] = set()
+        for product in _product_items(payload):
+            raw_series = product.get("series")
+            if isinstance(raw_series, dict):
+                raw_series = [raw_series]
+            if not isinstance(raw_series, list):
+                continue
+            for series in raw_series:
+                if not isinstance(series, dict):
+                    continue
+                asin = _text(series.get("asin") or series.get("id"))
+                name = _text(series.get("title") or series.get("name"))
+                if not asin or not name or asin in seen:
+                    continue
+                seen.add(asin)
+                options.append({"value": f"asin:{asin}", "label": name})
+        return options[:15]
+
+    def _fetch_series_books(self, series_asin: str, page: int, limit: int) -> SearchResult:
+        """Load child products from Audible series relationships in reading order."""
+        empty = SearchResult(books=[], page=page, total_found=0, has_more=False)
+        payload = self._request("catalog/products", {
+            "asins": series_asin,
+            "num_results": 1,
+            "response_groups": "relationships,product_attrs",
+        })
+        series_products = _product_items(payload)
+        if not series_products:
+            return empty
+        series_product = series_products[0]
+        relationships = series_product.get("relationships")
+        if not isinstance(relationships, list):
+            return empty
+
+        children: list[tuple[float, str]] = []
+        seen: set[str] = set()
+        for relation in relationships:
+            if not isinstance(relation, dict):
+                continue
+            asin = _text(relation.get("asin"))
+            if relation.get("relationship_to_product") != "child" or relation.get("relationship_type") != "series" or not asin or asin in seen:
+                continue
+            seen.add(asin)
+            try:
+                position = float(str(relation.get("sequence")).replace(",", "."))
+            except (TypeError, ValueError):
+                position = float("inf")
+            children.append((position, asin))
+
+        children.sort(key=lambda item: (item[0], item[1]))
+        total = len(children)
+        offset = max(page - 1, 0) * max(limit, 1)
+        page_children = children[offset:offset + max(limit, 1)]
+        if not page_children:
+            return SearchResult(books=[], page=page, total_found=total, has_more=False)
+
+        book_payload = self._request("catalog/products", {
+            "asins": ",".join(asin for _position, asin in page_children),
+            "num_results": len(page_children),
+            "response_groups": _RESPONSE_GROUPS,
+        })
+        products = {str(item.get("asin") or "").upper(): item for item in _product_items(book_payload)}
+        books: list[BookMetadata] = []
+        series_name = _text(series_product.get("title") or series_product.get("name"))
+        for position, asin in page_children:
+            product = products.get(asin.upper())
+            if not product:
+                continue
+            book = _parse_product(product, self.marketplace)
+            if not book or (self.french_only and not _is_french_language(book.language)):
+                continue
+            book.series_id = series_asin
+            book.series_name = series_name or book.series_name
+            book.series_position = position if position != float("inf") else book.series_position
+            book.series_count = total
+            books.append(book)
+        return SearchResult(books=books, page=page, total_found=total, has_more=offset + len(page_children) < total)
+
+    def search_paginated(self, options: MetadataSearchOptions) -> SearchResult:
+        """Support the full series view workflow, with accurate page metadata."""
+        series_value = str(options.fields.get("series", "")).strip()
+        if series_value:
+            series_asin = series_value.removeprefix("asin:").strip().upper()
+            if not re.fullmatch(r"[A-Z0-9]{10}", series_asin):
+                return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+            return self._fetch_series_books(series_asin, options.page, options.limit)
+        books = self.search(options)
+        return SearchResult(books=books, page=options.page, total_found=0, has_more=len(books) >= options.limit)
 
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         if options.search_type == SearchType.ISBN:
