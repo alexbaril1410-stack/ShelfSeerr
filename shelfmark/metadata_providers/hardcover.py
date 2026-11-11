@@ -859,6 +859,21 @@ def _query_matches_author_name(query: str, author_name: str) -> bool:
     )
 
 
+def _looks_like_compilation_title(title: str) -> bool:
+    """Detect obvious boxed sets and omnibus editions even when Hardcover flags are missing."""
+    normalized = _normalize_search_text(title).casefold()
+    if not normalized:
+        return False
+    return bool(
+        re.search(
+            r"\\b(?:coffret|intégrale|integrale|omnibus|box\\s*set|complete\\s+collection|"
+            r"complete\\s+series|collector'?s?\\s+set|bundle)\\b",
+            normalized,
+            re.IGNORECASE,
+        )
+    )
+
+
 def _split_part_base_title(title: str) -> str | None:
     """Extract the base title from segmented part releases like ', Part 2'."""
     normalized_title = _normalize_search_text(title)
@@ -1718,7 +1733,9 @@ class HardcoverProvider(MetadataProvider):
             book_data = row.get("book", {})
             if not isinstance(book_data, dict) or not book_data:
                 continue
-            if exclude_compilations and book_data.get("compilation"):
+            if (exclude_compilations and book_data.get("compilation")) or _looks_like_compilation_title(
+                str(book_data.get("title") or "")
+            ):
                 continue
             if not allow_split_parts and _split_part_base_title(str(book_data.get("title") or "")):
                 continue
@@ -2775,7 +2792,9 @@ class HardcoverProvider(MetadataProvider):
                 book_id = coerce_int(item.get("id"), 0)
                 if french_only and french_titles is not None and book_id not in french_titles:
                     continue
-                if exclude_compilations and item.get("compilation"):
+                if (exclude_compilations and item.get("compilation")) or _looks_like_compilation_title(
+                    str(item.get("title") or "")
+                ):
                     continue
                 if exclude_unreleased:
                     release_year = item.get("release_year")
