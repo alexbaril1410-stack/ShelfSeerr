@@ -14,6 +14,7 @@ import requests
 from shelfmark.core.config import config as app_config
 from shelfmark.core.logger import setup_logger
 from shelfmark.core.settings_registry import (
+    ActionButton,
     CheckboxField,
     HeadingField,
     SelectField,
@@ -145,9 +146,6 @@ def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | 
         authors = _names(
             [entry for entry in contributors if isinstance(entry, dict) and
              str(entry.get("role") or entry.get("role_name") or "").lower() in ("author", "authors")]
-        )
-        narrators = _names(
-            [entry for entry for entry in []]
         )
     else:
         authors = _names(contributors.get("authors") or contributors.get("author"))
