@@ -84,6 +84,22 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
         if offered[index:index + width] != wanted:
             continue
 
+        # A one-word title is common inside unrelated prose ("dune", for
+        # example). Unless it starts the release title, require the requested
+        # author to appear as well. Enriched bookTitle is trusted as a title field.
+        if width == 1 and not release.extra.get("book_title"):
+            author = _first(
+                getattr(book, "search_author", None),
+                ", ".join(getattr(book, "authors", []) or []),
+            )
+            author_tokens = _text(author).split()
+            author_present = bool(author_tokens) and any(
+                offered[pos:pos + len(author_tokens)] == author_tokens
+                for pos in range(len(offered) - len(author_tokens) + 1)
+            )
+            if index != 0 and not author_present:
+                continue
+
         # A four-digit numeric book title is easily confused with a publication
         # year. Do not accept it when it is explicitly formatted as a year.
         if width == 1 and wanted[0].isdigit() and len(wanted[0]) == 4:
