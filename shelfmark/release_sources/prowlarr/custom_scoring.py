@@ -58,6 +58,48 @@ def _volume_from_title(title: str, series_name: str | None = None) -> float | No
     return None
 
 
+def release_title_matches_book(release: Release, book: Any) -> bool:
+    """Reject obvious title false positives before scoring.
+
+    Prowlarr searches are fuzzy and may return a result because a short query is
+    embedded in another word (Dune / d'une), or because a numeric title appears
+    only as a publication year (1984). Require the complete requested title as
+    a sequence of normalized words in the release title. Unknown metadata is
+    not treated as evidence of a match.
+    """
+    requested = _first(
+        getattr(book, "search_title", None),
+        getattr(book, "title", None),
+    )
+    if not requested:
+        return True
+
+    wanted = _text(requested).split()
+    offered = _text(release.extra.get("book_title") or release.title).split()
+    if not wanted or not offered:
+        return False
+
+    width = len(wanted)
+    for index in range(len(offered) - width + 1):
+        if offered[index:index + width] != wanted:
+            continue
+
+        # A four-digit numeric book title is easily confused with a publication
+        # year. Do not accept it when it is explicitly formatted as a year.
+        if width == 1 and wanted[0].isdigit() and len(wanted[0]) == 4:
+            raw = str(release.extra.get("book_title") or release.title or "")
+            year_only = re.search(
+                rf"[([]\\s*{re.escape(wanted[0])}\\s*[)]]|"
+                rf"(?:^|[\\s._-]){re.escape(wanted[0])}(?:$|[\\s._-])",
+                raw,
+                re.I,
+            )
+            if year_only and (index == 0 or index == len(offered) - 1 or "(" in raw or "[" in raw):
+                continue
+        return True
+    return False
+
+
 def _release_language_signal(release: Release) -> str | None:
     """Infer an explicit language marker from the release title when metadata is absent."""
     title = str(release.title or "")
