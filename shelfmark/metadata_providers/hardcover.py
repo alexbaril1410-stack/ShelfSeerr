@@ -2560,7 +2560,7 @@ class HardcoverProvider(MetadataProvider):
         return self._search_cached(cache_key, options)
 
     @cacheable(ttl=3600, key_prefix="hardcover:french_editions")
-    def _fetch_french_editions(self, book_ids: tuple[int, ...]) -> dict[int, str]:
+    def _fetch_french_editions(self, book_ids: tuple[int, ...]) -> dict[int, str] | None:
         """Return French edition titles keyed by Hardcover work ID."""
         if not book_ids:
             return {}
@@ -2569,9 +2569,9 @@ class HardcoverProvider(MetadataProvider):
             FRENCH_EDITION_BOOK_IDS_QUERY,
             {"bookIds": list(book_ids)},
         )
-        if not result:
-            # Do not silently hide every result when Hardcover's edition lookup fails.
-            return {}
+        if result is None:
+            # Distinguish an API failure from a valid response with no French editions.
+            return None
 
         titles: dict[int, str] = {}
         for edition in result.get("editions", []):
@@ -2649,7 +2649,7 @@ class HardcoverProvider(MetadataProvider):
                 app_config.get("HARDCOVER_FRENCH_ONLY", True),
                 default=True,
             )
-            french_titles: dict[int, str] = {}
+            french_titles: dict[int, str] | None = {}
             if french_only:
                 book_ids = tuple(
                     sorted(
@@ -2662,6 +2662,10 @@ class HardcoverProvider(MetadataProvider):
                     )
                 )
                 french_titles = self._fetch_french_editions(book_ids)
+                if french_titles is None:
+                    logger.warning(
+                        "Hardcover French-edition lookup failed; showing unfiltered results"
+                    )
 
             # Parse hits, filtering compilations, unreleased books, and non-French works.
             exclude_compilations = coerce_bool(
@@ -2679,7 +2683,7 @@ class HardcoverProvider(MetadataProvider):
                 if item is None:
                     continue
                 book_id = coerce_int(item.get("id"), 0)
-                if french_only and book_id not in french_titles:
+                if french_only and french_titles is not None and book_id not in french_titles:
                     continue
                 if exclude_compilations and item.get("compilation"):
                     continue
@@ -2693,7 +2697,7 @@ class HardcoverProvider(MetadataProvider):
                 if book:
                     # Keep the original Hardcover work ID; use the French edition title
                     # only for presentation and downstream title matching.
-                    if french_only and french_titles.get(book_id):
+                    if french_only and french_titles is not None and french_titles.get(book_id):
                         book.title = french_titles[book_id]
                         book.search_title = french_titles[book_id]
                     books.append(book)
