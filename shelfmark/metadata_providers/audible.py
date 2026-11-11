@@ -49,6 +49,30 @@ _RESPONSE_GROUPS = (
 )
 _TIMEOUT_SECONDS = 20
 _MAX_RESULTS = 50
+_VOWELS = "uaeio"
+
+
+def _spelling_variants(query: str, max_variants: int = 5) -> list[str]:
+    """Build a small set of likely vowel-typo corrections for a failed search."""
+    words = query.split()
+    if len(words) != 1 or len(words[0]) < 4:
+        return []
+
+    word = words[0]
+    variants: list[str] = []
+    for index, character in enumerate(word):
+        if character.lower() not in _VOWELS:
+            continue
+        for replacement in _VOWELS:
+            if replacement == character.lower():
+                continue
+            candidate_word = word[:index] + replacement + word[index + 1 :]
+            candidate = candidate_word if word.islower() else candidate_word.capitalize()
+            if candidate.casefold() not in {word.casefold(), *(item.casefold() for item in variants)}:
+                variants.append(candidate)
+                if len(variants) >= max_variants:
+                    return variants
+    return variants
 
 
 def _text(value: Any) -> str | None:
@@ -260,10 +284,7 @@ class AudibleProvider(MetadataProvider):
             logger.warning("Audible catalogue request failed (%s): %s", self.marketplace, exc)
             return None
 
-    def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
-        query = options.query.strip()
-        if not query:
-            return None
+    def _search_once(self, query: str, options: MetadataSearchOptions) -> dict[str, Any] | None:
         page_size = min(max(options.limit, 1), _MAX_RESULTS)
         sort_values = {
             SortOrder.RELEVANCE: "Relevance",
@@ -285,17 +306,36 @@ class AudibleProvider(MetadataProvider):
             params.pop("keywords")
             params["title"] = query
 
-        # Audible's catalogue search endpoint is the storefront search API.
         payload = self._request("catalog/search", params)
         if payload and _product_items(payload):
             return payload
 
-        # The documented catalog/products search endpoint does not accept
-        # content_type (unlike catalog/search). Passing it causes HTTP 400 on
-        # marketplaces that fall back to this endpoint.
+        # The catalog/products fallback does not accept content_type.
         fallback_params = dict(params)
         fallback_params.pop("content_type", None)
-        return self._request("catalog/products", fallback_params)
+        payload = self._request("catalog/products", fallback_params)
+        return payload if payload and _product_items(payload) else None
+
+    def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
+        query = options.query.strip()
+        if not query:
+            return None
+
+        payload = self._search_once(query, options)
+        if payload:
+            return payload
+
+        # Only retry a short list of single-word vowel substitutions when the
+        # exact query returns no catalogue results. This keeps normal searches
+        # fast and avoids broad, noisy searches for multi-word queries.
+        if options.search_type not in (SearchType.GENERAL, SearchType.TITLE):
+            return None
+        for variant in _spelling_variants(query):
+            logger.info("Audible search returned no results for %r; trying spelling variant %r", query, variant)
+            payload = self._search_once(variant, options)
+            if payload:
+                return payload
+        return None
 
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         if options.search_type == SearchType.ISBN:
