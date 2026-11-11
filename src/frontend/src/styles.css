@@ -858,7 +858,7 @@ body { background-image: radial-gradient(ellipse at 72% -18%, rgba(91,65,180,.13
 }
 .shelfseerr-header-inner > .animate-pop-up > div:last-child { width:100%; order:1; }
 .shelfseerr-header-inner .search-wrapper { width:100%; max-width:100%; }
-.shelfseerr-header-inner > .flex.min-h-\\[48px\\] {
+.shelfseerr-header-inner > div[class~="min-h-[48px]"] {
   order:2; justify-content:flex-start; padding:0 6px;
 }
 .shelfseerr-primary-nav {
@@ -928,7 +928,7 @@ input, select, textarea { color-scheme:dark; }
   .shelfseerr-header-inner > .animate-pop-up { order:1; gap:8px; }
   .shelfseerr-header-inner > .animate-pop-up > div:first-child,
   .shelfseerr-header-inner > .animate-pop-up > div:last-child { order:initial; }
-  .shelfseerr-header-inner > .flex.min-h-\\[48px\\] { order:1; }
+  .shelfseerr-header-inner > div[class~="min-h-[48px]"] { order:1; }
   .shelfseerr-primary-nav {
     order:2; flex-direction:row; overflow-x:auto; padding:8px 0 2px !important; gap:5px;
   }
