@@ -127,18 +127,29 @@ query GetFrenchEditionBookIds($bookIds: [Int!]!) {
             book_id: {_in: $bookIds},
             language: {code2: {_eq: "fr"}}
         },
+        order_by: [{users_count: desc}, {id: asc}],
         limit: 1000
     ) {
+        id
         book_id
         title
+        edition_format
+        reading_format_id
+        audio_seconds
+        compilation
+        users_count
+        isbn_10
+        isbn_13
+        release_date
+        cached_image
         language {
             code2
             code3
         }
     }
 }
-
 """
+
 USER_LISTS_QUERY = """
 query GetUserLists {
     me {
@@ -1809,9 +1820,10 @@ class HardcoverProvider(MetadataProvider):
                     continue
                 book_id = coerce_int(book_data.get("id"), 0)
                 if french_only and isinstance(french_titles, dict) and french_titles.get(book_id):
-                    french_title = french_titles[book_id]
-                    parsed_book.title = french_title
-                    parsed_book.search_title = french_title
+                    french_edition = french_titles[book_id]
+                    self._apply_french_edition(book_data, french_edition)
+                    parsed_book = self._parse_book(book_data)
+                    parsed_book.search_title = parsed_book.title
                 parsed_book.series_id = str(series_id)
                 if series_name:
                     parsed_book.series_name = series_name
@@ -2605,9 +2617,9 @@ class HardcoverProvider(MetadataProvider):
         cache_key = f"{options.query}:{options.search_type.value}:{options.sort.value}:{options.limit}:{options.page}:{fields_key}:excl_comp={exclude_compilations}:excl_unrel={exclude_unreleased}:fr_only={french_only}"
         return self._search_cached(cache_key, options)
 
-    @cacheable(ttl=3600, key_prefix="hardcover:french_editions")
-    def _fetch_french_editions(self, book_ids: tuple[int, ...]) -> dict[int, str] | None:
-        """Return French edition titles keyed by Hardcover work ID."""
+    @cacheable(ttl=3600, key_prefix="hardcover:french_editions:v2")
+    def _fetch_french_editions(self, book_ids: tuple[int, ...]) -> dict[int, dict[str, Any]] | None:
+        """Return the most popular eligible French non-audio edition per Hardcover work."""
         if not book_ids:
             return {}
 
@@ -2616,23 +2628,55 @@ class HardcoverProvider(MetadataProvider):
             {"bookIds": list(book_ids)},
         )
         if result is None:
-            # Distinguish an API failure from a valid response with no French editions.
             return None
 
-        titles: dict[int, str] = {}
-        for edition in result.get("editions", []):
-            if not isinstance(edition, dict):
-                continue
+        selected: dict[int, dict[str, Any]] = {}
+        candidates = sorted(
+            (edition for edition in result.get("editions", []) if isinstance(edition, dict)),
+            key=lambda edition: (
+                -coerce_int(edition.get("users_count"), 0),
+                coerce_int(edition.get("id"), 0),
+            ),
+        )
+        for edition in candidates:
             language = edition.get("language") or {}
             code2 = str(language.get("code2") or "").casefold()
             code3 = str(language.get("code3") or "").casefold()
             if code2 != "fr" and code3 not in {"fre", "fra"}:
                 continue
+
+            edition_format = str(edition.get("edition_format") or "").casefold()
+            reading_format_id = coerce_int(edition.get("reading_format_id"), 0)
+            audio_seconds = coerce_int(edition.get("audio_seconds"), 0)
+            is_audio = (
+                reading_format_id == 2
+                or audio_seconds > 0
+                or any(marker in edition_format for marker in ("audio", "audiobook", "audible"))
+            )
+            if is_audio or edition.get("compilation"):
+                continue
+
             book_id = coerce_int(edition.get("book_id"), 0)
             title = str(edition.get("title") or "").strip()
-            if book_id > 0 and title and book_id not in titles:
-                titles[book_id] = title
-        return titles
+            if book_id > 0 and title and book_id not in selected:
+                selected[book_id] = edition
+        return selected
+
+    @staticmethod
+    def _apply_french_edition(book_data: dict[str, Any], edition: dict[str, Any] | None) -> None:
+        """Apply the selected French print/ebook edition without changing the Hardcover work ID."""
+        if not edition:
+            return
+        title = str(edition.get("title") or "").strip()
+        if title:
+            book_data["title"] = title
+        for field in ("isbn_10", "isbn_13", "release_date", "cached_image"):
+            if edition.get(field):
+                book_data[field] = edition[field]
+        book_data["default_physical_edition"] = {
+            "isbn_10": edition.get("isbn_10"),
+            "isbn_13": edition.get("isbn_13"),
+        }
 
     @cacheable(ttl_key="METADATA_CACHE_SEARCH_TTL", ttl_default=300, key_prefix="hardcover:search")
     def _search_cached(self, cache_key: str, options: MetadataSearchOptions) -> SearchResult:
@@ -2744,8 +2788,13 @@ class HardcoverProvider(MetadataProvider):
                     # Keep the original Hardcover work ID; use the French edition title
                     # only for presentation and downstream title matching.
                     if french_only and french_titles is not None and french_titles.get(book_id):
-                        book.title = french_titles[book_id]
-                        book.search_title = french_titles[book_id]
+                        french_edition = french_titles[book_id]
+                        self._apply_french_edition(item, french_edition)
+                        book = self._parse_search_result(
+                            item, matched_title=_matched_alternative_title(hit, item)
+                        ) or book
+                        book.title = str(french_edition.get("title") or book.title)
+                        book.search_title = book.title
                     books.append(book)
 
             logger.info(
