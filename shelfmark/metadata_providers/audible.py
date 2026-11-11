@@ -47,7 +47,7 @@ _AUDIBLE_MARKETPLACES = [
     {"value": "com.au", "label": "Australie (audible.com.au)"},
 ]
 _RESPONSE_GROUPS = (
-    "contributors,product_attrs,product_desc,product_extended_attrs,media,rating"
+    "contributors,product_attrs,product_desc,product_extended_attrs,media,rating,series"
 )
 _TIMEOUT_SECONDS = 20
 _MAX_RESULTS = 50
