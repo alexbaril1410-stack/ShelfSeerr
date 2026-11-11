@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useDescriptionOverflow } from '../hooks/releaseModal/useDescriptionOverflow';
 import { useHeaderThumbOnScroll } from '../hooks/releaseModal/useHeaderThumbOnScroll';
 import { useReleaseSearchSession } from '../hooks/releaseModal/useReleaseSearchSession';
+import { useSettings } from '../hooks/useSettings';
 import { useTabIndicator } from '../hooks/ui/useTabIndicator';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -818,6 +819,12 @@ const ReleaseModalSession = ({
   const onCombinedClearSelection = combinedMode?.onClearSelection;
 
   const handleClose = onClose;
+  const { values: settingsValues } = useSettings();
+  const hideZeroSeedersByDefault =
+    settingsValues.prowlarr_config?.PROWLARR_HIDE_ZERO_SEEDERS === true;
+  const [showZeroSeedersOverride, setShowZeroSeedersOverride] = useState<boolean | null>(null);
+  const showZeroSeederReleases =
+    showZeroSeedersOverride ?? !hideZeroSeedersByDefault;
 
   const {
     sourcesLoading,
@@ -1106,6 +1113,16 @@ const ReleaseModalSession = ({
       }
       // Releases with no format info pass through when no filter is set (show all)
 
+      // Seeder filtering is local to the release list. Unknown seeder counts are kept.
+      if (
+        !showZeroSeederReleases &&
+        r.protocol === 'torrent' &&
+        typeof r.seeders === 'number' &&
+        r.seeders === 0
+      ) {
+        return false;
+      }
+
       // Language filtering - use r.language when provided by enriched indexers
       // Releases with no language (null/undefined) always pass
       const releaseLang = r.language;
@@ -1167,6 +1184,7 @@ const ReleaseModalSession = ({
     allSortOptions,
     columnConfig,
     book,
+    showZeroSeederReleases,
   ]);
 
   // Pre-compute display field lookups to avoid repeated .find() calls in JSX
@@ -2234,8 +2252,9 @@ const ReleaseModalSession = ({
                             hasResults &&
                             isInitialized &&
                             !indexersMatchDefault;
+                          const hasZeroSeederFilter = !showZeroSeederReleases;
                           const hasActiveFilter =
-                            formatFilter !== '' || hasLanguageFilter || hasIndexerFilter;
+                            formatFilter !== '' || hasLanguageFilter || hasIndexerFilter || hasZeroSeederFilter;
                           return (
                             <button
                               type="button"
@@ -2310,6 +2329,17 @@ const ReleaseModalSession = ({
                                   placeholder="All Indexers"
                                 />
                               )}
+                            <label className="flex cursor-pointer items-center gap-2 text-sm text-(--text)">
+                              <input
+                                type="checkbox"
+                                checked={showZeroSeederReleases}
+                                onChange={(event) =>
+                                  setShowZeroSeedersOverride(event.target.checked)
+                                }
+                                className="h-4 w-4 rounded border-(--border-muted) accent-emerald-600"
+                              />
+                              Afficher les résultats à 0 seeder
+                            </label>
                             {/* Apply button - re-fetch when the source supports server-side filters */}
                             {(columnConfig.supported_filters?.includes('language') ||
                               columnConfig.supported_filters?.includes('indexer')) && (
