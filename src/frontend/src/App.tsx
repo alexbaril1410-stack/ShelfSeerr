@@ -2531,7 +2531,7 @@ function App() {
 
   const mainAppContent = (
     <SearchModeProvider searchMode={effectiveSearchMode}>
-      <div ref={headerRef} className="fixed top-0 right-0 left-0 z-40">
+      <div ref={headerRef} className="shelfseerr-header-shell fixed top-0 right-0 left-0 z-40">
         <Header
           calibreWebUrl={config?.calibre_web_url || ''}
           audiobookLibraryUrl={config?.audiobook_library_url || ''}
@@ -2598,7 +2598,7 @@ function App() {
       </div>
 
       <div
-        className={`flex flex-col${
+        className={`shelfseerr-content-shell flex flex-col${
           usePinnedMainScrollContainer ? ' min-h-0 overflow-y-auto overscroll-y-contain' : ' flex-1'
         }`}
         style={
