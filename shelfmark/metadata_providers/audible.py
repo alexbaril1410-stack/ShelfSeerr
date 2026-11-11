@@ -135,6 +135,16 @@ def _language(product: dict[str, Any]) -> str | None:
     return _text(attrs)
 
 
+def _is_french_language(language: str | None) -> bool:
+    if not language:
+        return False
+    normalized = language.strip().lower().replace("_", "-")
+    return (
+        normalized in {"fr", "fre", "fra", "french", "français", "francais"}
+        or normalized.startswith("fr-")
+    )
+
+
 def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | None:
     asin = _text(product.get("asin") or product.get("product_id"))
     title = _text(product.get("title") or product.get("short_title"))
@@ -210,8 +220,9 @@ class AudibleProvider(MetadataProvider):
     requires_auth = False
     supported_sorts = (SortOrder.RELEVANCE, SortOrder.POPULARITY, SortOrder.NEWEST)
 
-    def __init__(self, marketplace: str = "fr") -> None:
+    def __init__(self, marketplace: str = "fr", french_only: bool = False) -> None:
         self.marketplace = marketplace if marketplace in {item["value"] for item in _AUDIBLE_MARKETPLACES} else "fr"
+        self.french_only = bool(french_only)
         self.base_url = f"https://api.audible.{self.marketplace}/1.0"
 
     def is_available(self) -> bool:
@@ -293,7 +304,7 @@ class AudibleProvider(MetadataProvider):
         results = []
         for product in _product_items(payload):
             book = _parse_product(product, self.marketplace)
-            if book:
+            if book and (not self.french_only or _is_french_language(book.language)):
                 results.append(book)
         return results
 
@@ -319,7 +330,10 @@ class AudibleProvider(MetadataProvider):
 
 @register_provider_kwargs("audible")
 def _audible_provider_kwargs() -> dict[str, Any]:
-    return {"marketplace": app_config.get("AUDIBLE_MARKETPLACE", "fr")}
+    return {
+        "marketplace": app_config.get("AUDIBLE_MARKETPLACE", "fr"),
+        "french_only": app_config.get("AUDIBLE_FRENCH_ONLY", False),
+    }
 
 
 def _test_audible_connection(current_values: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -365,6 +379,12 @@ def audible_settings() -> list[SettingsField]:
             description="Le marketplace détermine les langues et les éditions disponibles. France est sélectionné par défaut.",
             options=_AUDIBLE_MARKETPLACES,
             default="fr",
+        ),
+        CheckboxField(
+            key="AUDIBLE_FRENCH_ONLY",
+            label="Afficher uniquement les livres en français",
+            description="Masquer les livres audio dont la langue n'est pas identifiée comme français, y compris lorsque la langue est inconnue.",
+            default=False,
         ),
         ActionButton(
             key="test_connection",
