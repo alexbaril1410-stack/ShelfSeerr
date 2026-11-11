@@ -144,3 +144,46 @@ def test_audible_french_only_filter_is_disabled_by_default(monkeypatch):
     results = provider.search(MetadataSearchOptions(query="test"))
 
     assert len(results) == 2
+
+
+
+def test_audible_search_retries_common_vowel_typo(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    attempted_queries = []
+
+    def fake_search_once(query, options):
+        attempted_queries.append(query)
+        if query == "Dungeon":
+            return {
+                "items": [
+                    {
+                        "asin": "B0DUNGEON1",
+                        "title": "Dungeon Crawler Carl",
+                        "language": "English",
+                    }
+                ]
+            }
+        return None
+
+    monkeypatch.setattr(provider, "_search_once", fake_search_once)
+    results = provider.search(MetadataSearchOptions(query="Dongeon"))
+
+    assert attempted_queries[0] == "Dongeon"
+    assert "Dungeon" in attempted_queries
+    assert len(results) == 1
+    assert results[0].title == "Dungeon Crawler Carl"
+
+
+def test_audible_search_does_not_retry_multi_word_queries(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    attempted_queries = []
+
+    def fake_search_once(query, options):
+        attempted_queries.append(query)
+        return None
+
+    monkeypatch.setattr(provider, "_search_once", fake_search_once)
+    results = provider.search(MetadataSearchOptions(query="Dongeon Crawler"))
+
+    assert results == []
+    assert attempted_queries == ["Dongeon Crawler"]
