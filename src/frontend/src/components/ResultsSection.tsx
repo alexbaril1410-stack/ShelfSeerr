@@ -142,7 +142,7 @@ export const ResultsSection = ({
             const totalStr = isCapped ? '500+' : String(totalCount);
             return (
               <span className="mx-2 mt-4 px-2 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-                Results 1-{shownEnd} ({totalStr} Total)
+                {t('Results')} 1-{shownEnd} ({totalStr} {t('Total')})
               </span>
             );
           })()}
@@ -348,6 +348,7 @@ const DEFAULT_UNIVERSAL_SORT_OPTIONS: SortOption[] = [
 
 const SortControl = ({ value, onChange, metadataSortOptions }: SortControlProps) => {
   const { searchMode } = useSearchMode();
+  const { t } = useLanguage();
   // Use different sort options based on search mode
   // For universal mode, use dynamic options from API (with fallback)
   let sortOptions = SORT_OPTIONS;
