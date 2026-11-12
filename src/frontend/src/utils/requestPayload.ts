@@ -86,6 +86,8 @@ export const buildReleaseDataFromMetadataRelease = (
     extra: release.extra,
     preview: book.preview,
     content_type: contentType,
+    metadata_provider: book.provider,
+    metadata_provider_id: book.provider_id,
     series_name: book.series_name,
     series_position: book.series_position,
     series_count: book.series_count,
