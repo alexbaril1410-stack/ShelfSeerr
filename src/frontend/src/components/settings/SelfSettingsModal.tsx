@@ -111,6 +111,7 @@ const SelfSettingsModalSession = ({
   onShowToast,
   onSettingsSaved,
 }: SelfSettingsModalSessionProps) => {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -206,7 +207,7 @@ const SelfSettingsModalSession = ({
       return;
     }
     if (passwordError) {
-      onShowToast?.(passwordError, 'error');
+      onShowToast?.(t(passwordError), 'error');
       return;
     }
 
@@ -246,7 +247,7 @@ const SelfSettingsModalSession = ({
       onSettingsSaved?.();
       await loadEditContext();
     } catch (error) {
-      onShowToast?.(getErrorMessage(error, 'Failed to update account'), 'error');
+      onShowToast?.(t(getErrorMessage(error, 'Failed to update account')), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -261,6 +262,7 @@ const SelfSettingsModalSession = ({
     passwordError,
     editPassword,
     editCurrentPassword,
+    t,
   ]);
 
   if (!isOpen && !isClosing) {
@@ -279,7 +281,7 @@ const SelfSettingsModalSession = ({
         className={`absolute inset-0 bg-black/60 transition-opacity duration-150 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         onClick={handleClose}
         tabIndex={-1}
-        aria-label="Close account settings"
+        aria-label={t("Close account settings")}
       />
 
       <div
@@ -291,12 +293,12 @@ const SelfSettingsModalSession = ({
       >
         <header className="flex items-center justify-between border-b border-(--border-muted) px-6 py-4">
           <h3 id={titleId} className="sr-only">
-            My Account
+            {t('My Account')}
           </h3>
           {editingUser ? (
             <UserIdentityHeader user={editingUser} showAuthSource showInactiveState={false} />
           ) : (
-            <div className="text-sm font-medium">My Account</div>
+            <div className="text-sm font-medium">{t('My Account')}</div>
           )}
           <div className="flex items-center">
             <button
@@ -324,7 +326,7 @@ const SelfSettingsModalSession = ({
             if (showInitialLoadingState) {
               return (
                 <div className="flex h-full items-center justify-center text-sm opacity-60">
-                  Loading account settings...
+                  {t('Loading account settings...')}
                 </div>
               );
             }
@@ -332,7 +334,7 @@ const SelfSettingsModalSession = ({
             if (showInitialLoadErrorState) {
               return (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-                  <p className="text-sm opacity-70">{loadError}</p>
+                  <p className="text-sm opacity-70">{t(loadError)}</p>
                   <button
                     type="button"
                     onClick={() => {
@@ -340,7 +342,7 @@ const SelfSettingsModalSession = ({
                     }}
                     className="rounded-lg border border-(--border-muted) bg-(--bg-soft) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface)"
                   >
-                    Retry
+                    {t('Retry')}
                   </button>
                 </div>
               );
@@ -397,7 +399,7 @@ const SelfSettingsModalSession = ({
 
             return (
               <div className="flex h-full items-center justify-center text-sm opacity-60">
-                Unable to load account details.
+                {t('Unable to load account details.')}
               </div>
             );
           })()}
