@@ -202,7 +202,7 @@ const renderField = (
   onAction: () => Promise<ActionResult>,
   isDisabled: boolean,
   allValues: Record<string, unknown>, // All form values for cascading dropdown support
-  authMode?: string,
+  authMode: string | undefined,
   t: (value: string) => string,
 ) => {
   switch (field.type) {
