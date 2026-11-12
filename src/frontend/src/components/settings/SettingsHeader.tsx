@@ -1,3 +1,5 @@
+import { useLanguage } from '../../contexts/LanguageContext';
+
 interface SettingsHeaderProps {
   title: string;
   showBack?: boolean;
@@ -10,7 +12,9 @@ export const SettingsHeader = ({
   showBack = false,
   onBack,
   onClose,
-}: SettingsHeaderProps) => (
+}: SettingsHeaderProps) => {
+  const { t } = useLanguage();
+  return (
   <header
     className="flex shrink-0 items-center gap-3 border-b border-(--border-muted) px-5 py-4"
     style={{ paddingTop: 'calc(1rem + env(safe-area-inset-top))' }}
@@ -20,7 +24,7 @@ export const SettingsHeader = ({
         type="button"
         onClick={onBack}
         className="hover-action -ml-2 rounded-full p-2 transition-colors"
-        aria-label="Go back"
+        aria-label={t("Go back")}
       >
         <svg
           className="h-5 w-5"
@@ -39,7 +43,7 @@ export const SettingsHeader = ({
       type="button"
       onClick={onClose}
       className="hover-action rounded-full p-2 transition-colors"
-      aria-label="Close settings"
+      aria-label={t("Close settings")}
     >
       <svg
         className="h-5 w-5"
@@ -53,4 +57,5 @@ export const SettingsHeader = ({
       </svg>
     </button>
   </header>
-);
+  );
+};
