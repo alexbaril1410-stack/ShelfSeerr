@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 
 import type { SettingsTab, SettingsGroup } from '../../types/settings';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface SettingsSidebarProps {
   tabs: SettingsTab[];
@@ -292,6 +293,7 @@ export const SettingsSidebar = ({
   onSelectTab,
   mode,
 }: SettingsSidebarProps) => {
+  const { t } = useLanguage();
   // Track which groups are expanded (all closed by default)
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => new Set());
 
@@ -364,7 +366,7 @@ export const SettingsSidebar = ({
         {sidebarItems.map((item, itemIndex) => {
           if (item.type === 'section') {
             return (
-              <div key={item.label} className="px-5 pt-6 pb-2">
+              <div key={t(item.label)} className="px-5 pt-6 pb-2">
                 <span className="text-xs font-semibold tracking-wider uppercase opacity-50">
                   {item.label}
                 </span>
@@ -381,7 +383,7 @@ export const SettingsSidebar = ({
                   className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors active:bg-(--hover-surface)"
                 >
                   <span className="opacity-50">{getIcon(item.tab.icon)}</span>
-                  <span className="flex-1">{item.tab.displayName}</span>
+                  <span className="flex-1">{t(item.tab.displayName)}</span>
                 </button>
                 {itemIndex < sidebarItems.length - 1 && (
                   <div className="mr-5 ml-14 border-b border-(--border-muted)" />
@@ -400,7 +402,7 @@ export const SettingsSidebar = ({
                 className="flex w-full items-center gap-4 px-5 py-4 text-left transition-colors active:bg-(--hover-surface)"
               >
                 <span className="opacity-50">{getIcon(item.group.icon)}</span>
-                <span className="flex-1">{item.group.displayName}</span>
+                <span className="flex-1">{t(item.group.displayName)}</span>
                 <ChevronIcon expanded={isExpanded} />
               </button>
 
@@ -413,7 +415,7 @@ export const SettingsSidebar = ({
                         onClick={() => onSelectTab(tab.name)}
                         className="flex w-full items-center gap-4 py-3.5 pr-5 pl-14 text-left transition-colors active:bg-(--hover-surface)"
                       >
-                        <span className="flex-1 text-[15px]">{tab.displayName}</span>
+                        <span className="flex-1 text-[15px]">{t(tab.displayName)}</span>
                       </button>
                       {index < item.tabs.length - 1 && (
                         <div className="mr-5 ml-14 border-b border-(--border-muted)" />
