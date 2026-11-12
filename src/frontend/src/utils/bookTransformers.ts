@@ -12,6 +12,7 @@ export interface MetadataBookData {
   provider_id: string;
   title: string;
   authors?: string[];
+  narrators?: string[];
   isbn_10?: string;
   isbn_13?: string;
   cover_url?: string;
@@ -102,6 +103,7 @@ export function transformMetadataToBook(data: MetadataBookData): Book {
     search_title: data.search_title,
     search_author: data.search_author,
     authors: data.authors,
+    narrators: data.narrators,
     titles_by_language: data.titles_by_language,
     library: data.library,
     info: {
