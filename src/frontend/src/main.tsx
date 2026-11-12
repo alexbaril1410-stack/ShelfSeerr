@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
 import { SocketProvider } from './contexts/SocketContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 import { getBasePath } from './utils/basePath';
 
 const root = document.getElementById('root');
@@ -15,9 +16,11 @@ const routerBase = basePath === '/' ? undefined : basePath;
 createRoot(root).render(
   <StrictMode>
     <BrowserRouter basename={routerBase}>
-      <SocketProvider>
-        <App />
-      </SocketProvider>
+      <LanguageProvider>
+        <SocketProvider>
+          <App />
+        </SocketProvider>
+      </LanguageProvider>
     </BrowserRouter>
   </StrictMode>,
 );
