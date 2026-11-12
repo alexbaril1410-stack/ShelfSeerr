@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useRef, useState, type WheelEvent } from 'react';
 
 import { useTabIndicator } from '../../hooks/ui/useTabIndicator';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useRejectedRequests } from '../../hooks/useRejectedRequests';
@@ -168,6 +169,7 @@ export const ActivitySidebar = ({
   onPinnedOpenChange,
   pinnedTopOffset = 0,
 }: ActivitySidebarProps) => {
+  const { t } = useLanguage();
   const [isPinned, setIsPinned] = useState<boolean>(() => getInitialPinnedPreference());
   const isDesktop = useMediaQuery('(min-width: 1024px)');
   const [activeTab, setActiveTab] = useState<ActivityTabKey>('all');
@@ -355,21 +357,21 @@ export const ActivitySidebar = ({
       : rejectedItems.filter((item) => !item.hiddenInRejected);
   }
   const isHistoryInitialLoad = effectiveActiveTab === 'history' && !historyLoaded;
-  let emptyStateMessage = 'No activity';
+  let emptyStateMessage = t('No activity');
   if (effectiveActiveTab === 'requests') {
-    emptyStateMessage = isRequestsLoading ? 'Loading requests...' : 'No requests';
+    emptyStateMessage = isRequestsLoading ? t('Loading requests...') : t('No requests');
   } else if (effectiveActiveTab === 'history') {
     emptyStateMessage =
-      historyLoading || isHistoryInitialLoad ? 'Loading history...' : 'No history';
+      historyLoading || isHistoryInitialLoad ? t('Loading history...') : t('No history');
   } else if (effectiveActiveTab === 'downloads') {
-    emptyStateMessage = 'No downloads';
+    emptyStateMessage = t('No downloads');
   } else if (effectiveActiveTab === 'rejected') {
     if (rejectedLoading) {
-      emptyStateMessage = 'Loading rejected requests...';
+      emptyStateMessage = t('Loading rejected requests...');
     } else if (hiddenRejectedCount > 0 && !showHiddenRejected) {
-      emptyStateMessage = `No rejected requests shown (${hiddenRejectedCount} hidden)`;
+      emptyStateMessage = t('No rejected requests shown ({count} hidden)').replace('{count}', String(hiddenRejectedCount));
     } else {
-      emptyStateMessage = 'No rejected requests';
+      emptyStateMessage = t('No rejected requests');
     }
   }
 
@@ -501,16 +503,16 @@ export const ActivitySidebar = ({
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <h2 className="text-lg font-semibold">
-              {effectiveActiveTab === 'history' && 'History'}
-              {effectiveActiveTab === 'rejected' && 'Rejected'}
-              {effectiveActiveTab !== 'history' && effectiveActiveTab !== 'rejected' && 'Activity'}
+              {effectiveActiveTab === 'history' && t('History')}
+              {effectiveActiveTab === 'rejected' && t('Rejected')}
+              {effectiveActiveTab !== 'history' && effectiveActiveTab !== 'rejected' && t('Activity')}
             </h2>
             <button
               type="button"
               onClick={handleTogglePinned}
               className="hover-action hidden h-9 w-9 items-center justify-center rounded-full transition-colors lg:inline-flex"
-              title={isPinned ? 'Unpin activity sidebar' : 'Pin activity sidebar'}
-              aria-label={isPinned ? 'Unpin activity sidebar' : 'Pin activity sidebar'}
+              title={t(isPinned ? 'Unpin activity sidebar' : 'Pin activity sidebar')}
+              aria-label={t(isPinned ? 'Unpin activity sidebar' : 'Pin activity sidebar')}
             >
               {isPinned ? (
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -552,13 +554,13 @@ export const ActivitySidebar = ({
                     }`}
                     title={
                       effectiveSelectedUser === ALL_USERS_FILTER
-                        ? 'Filter by user'
-                        : `Filtered: ${effectiveSelectedUser}`
+                        ? t('Filter by user')
+                        : t('Filtered: {user}').replace('{user}', effectiveSelectedUser)
                     }
                     aria-label={
                       effectiveSelectedUser === ALL_USERS_FILTER
-                        ? 'Filter by user'
-                        : `Filtered by user ${effectiveSelectedUser}`
+                        ? t('Filter by user')
+                        : t('Filtered by user {user}').replace('{user}', effectiveSelectedUser)
                     }
                     aria-expanded={isDropdownOpen}
                   >
@@ -583,7 +585,7 @@ export const ActivitySidebar = ({
                   <div role="listbox">
                     {[ALL_USERS_FILTER, ...availableUsers].map((value) => {
                       const isSelected = effectiveSelectedUser === value;
-                      const label = value === ALL_USERS_FILTER ? 'All users' : value;
+                      const label = value === ALL_USERS_FILTER ? t('All users') : value;
                       return (
                         <button
                           type="button"
@@ -629,10 +631,10 @@ export const ActivitySidebar = ({
                   effectiveActiveTab === 'rejected' ? 'text-sky-600 dark:text-sky-400' : ''
                 }`}
                 title={
-                  effectiveActiveTab === 'rejected' ? 'Back to activity' : 'Open rejected requests'
+                  effectiveActiveTab === 'rejected' ? t('Back to activity') : t('Open rejected requests')
                 }
                 aria-label={
-                  effectiveActiveTab === 'rejected' ? 'Back to activity' : 'Open rejected requests'
+                  effectiveActiveTab === 'rejected' ? t('Back to activity') : t('Open rejected requests')
                 }
                 aria-pressed={effectiveActiveTab === 'rejected'}
               >
@@ -655,8 +657,8 @@ export const ActivitySidebar = ({
               className={`hover-action relative inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors ${
                 effectiveActiveTab === 'history' ? 'text-sky-600 dark:text-sky-400' : ''
               }`}
-              title={effectiveActiveTab === 'history' ? 'Back to activity' : 'Open history'}
-              aria-label={effectiveActiveTab === 'history' ? 'Back to activity' : 'Open history'}
+              title={effectiveActiveTab === 'history' ? t('Back to activity') : t('Open history')}
+              aria-label={effectiveActiveTab === 'history' ? t('Back to activity') : t('Open history')}
               aria-pressed={effectiveActiveTab === 'history'}
             >
               <svg
@@ -680,7 +682,7 @@ export const ActivitySidebar = ({
               type="button"
               onClick={onClose}
               className="hover-action inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors"
-              aria-label="Close activity sidebar"
+              aria-label={t('Close activity sidebar')}
             >
               <svg
                 className="h-5 w-5"
@@ -704,7 +706,7 @@ export const ActivitySidebar = ({
                 checked={showHiddenRejected}
                 onChange={(event) => setShowHiddenRejected(event.target.checked)}
               />
-              Show hidden ({hiddenRejectedCount})
+              {t('Show hidden')} ({hiddenRejectedCount})
             </label>
           </div>
         )}
@@ -733,7 +735,7 @@ export const ActivitySidebar = ({
                 }`}
                 aria-current={effectiveActiveTab === 'all' ? 'page' : undefined}
               >
-                All
+                {t('All')}
               </button>
               <button
                 type="button"
@@ -748,7 +750,7 @@ export const ActivitySidebar = ({
                 }`}
                 aria-current={effectiveActiveTab === 'downloads' ? 'page' : undefined}
               >
-                Downloads
+                {t('Downloads')}
                 {mergedDownloadItems.length > 0 && (
                   <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-sky-500/15 px-1 text-[11px] leading-none text-sky-700 dark:text-sky-300">
                     {mergedDownloadItems.length}
@@ -769,7 +771,7 @@ export const ActivitySidebar = ({
                   }`}
                   aria-current={effectiveActiveTab === 'requests' ? 'page' : undefined}
                 >
-                  Requests
+                  {t('Requests')}
                   {pendingRequestCount > 0 && (
                     <span className="ml-1.5 inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-amber-500/15 px-1 text-[11px] leading-none text-amber-700 dark:text-amber-300">
                       {pendingRequestCount}
@@ -827,7 +829,7 @@ export const ActivitySidebar = ({
                       disabled={historyLoading}
                       className="text-sm text-sky-600 hover:underline disabled:opacity-60 dark:text-sky-400"
                     >
-                      {historyLoading ? 'Loading...' : 'Load more'}
+                      {historyLoading ? t('Loading...') : t('Load more')}
                     </button>
                   </div>
                 )}
@@ -1049,7 +1051,7 @@ export const ActivitySidebar = ({
           isOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
         onClick={onClose}
-        aria-label="Close activity sidebar"
+        aria-label={t('Close activity sidebar')}
         tabIndex={-1}
       />
 
