@@ -39,6 +39,9 @@ def test_release_title_matching_avoids_dune_inside_french_contraction():
     assert not release_title_matches_book(
         _release("A. Zavarelli - Les Fils souverains, Tome 1 : Le Requiem d'une..."), book
     )
+    assert not release_title_matches_book(
+        _release("A. Zavarelli - Les Fils souverains, Tome 1 : Le Requiem dune..."), book
+    )
 
 
 def test_release_title_matching_rejects_unrelated_results_for_long_title():
