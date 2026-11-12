@@ -1,5 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
+import { useLanguage } from '../../contexts/LanguageContext';
+import { translateSettingsField } from './translateSettingsField';
 import type {
   SettingsTab,
   SettingsField,
@@ -334,6 +336,15 @@ function SettingsContentPanel({
   embedded = false,
   customFieldContext,
 }: SettingsContentProps) {
+  const { t } = useLanguage();
+  const translatedTab = useMemo(
+    () => ({ ...tab, displayName: t(tab.displayName), fields: tab.fields.map((field) => translateSettingsField(field, t)) }),
+    [tab, t],
+  );
+  const translatedFieldsByKey = useMemo(
+    () => new Map(translatedTab.fields.map((field) => [field.key, field])),
+    [translatedTab.fields],
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
   const [customFieldUiState, setCustomFieldUiState] = useState<
     Record<string, Record<string, unknown>>
@@ -444,8 +455,8 @@ function SettingsContentPanel({
         const renderedField =
           field.type === 'CustomComponentField'
             ? renderCustomSettingsField({
-                field,
-                tab,
+                field: displayField as typeof field,
+                tab: translatedTab,
                 values,
                 onChange,
                 onAction,
@@ -460,7 +471,7 @@ function SettingsContentPanel({
                 onSettingsSaved: customFieldContext?.onSettingsSaved,
               })
             : renderField(
-                field,
+                displayField,
                 values[field.key],
                 (v) => onChange(field.key, v),
                 () => onAction(field.key),
@@ -480,7 +491,7 @@ function SettingsContentPanel({
         return (
           <FieldWrapper
             key={`${tab.name}-${field.key}`}
-            field={field}
+            field={displayField}
             disabledOverride={disabledState.disabled}
             disabledReasonOverride={disabledState.reason}
             userOverrideCount={fieldOverrideSummary?.count}
