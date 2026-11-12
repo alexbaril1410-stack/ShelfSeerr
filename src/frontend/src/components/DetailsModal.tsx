@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useMountEffect } from '../hooks/useMountEffect';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { Book, ButtonStateInfo } from '../types';
 import { isMetadataBook } from '../types';
 import { bookSupportsTargets } from '../utils/bookTargetLoader';
@@ -47,6 +48,7 @@ export const DetailsModal = ({
   showReleaseSourceLinks = true,
   onShowToast,
 }: DetailsModalProps) => {
+  const { t } = useLanguage();
   const [isQueuing, setIsQueuing] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
@@ -96,7 +98,7 @@ export const DetailsModal = ({
     }
     return isMetadata ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-sky-700 hover:bg-sky-800';
   })();
-  const publisherInfo = { label: 'Publisher', value: book.publisher || '-' };
+  const publisherInfo = { label: t('Publisher'), value: book.publisher || '-' };
   const bookProvider = book.provider;
   const bookProviderId = book.provider_id;
 
@@ -106,18 +108,18 @@ export const DetailsModal = ({
   const downloadCount = book.info?.Downloads?.[0];
   const metadata = isMetadata
     ? [
-        { label: 'Year', value: book.year || '-' },
+        { label: t('Year'), value: book.year || '-' },
         ...(book.genres && book.genres.length > 0
-          ? [{ label: 'Genres', value: book.genres.slice(0, 3).join(', ') }]
+          ? [{ label: t('Genres'), value: book.genres.slice(0, 3).join(', ') }]
           : []),
       ]
     : [
-        { label: 'Year', value: book.year || '-' },
-        { label: 'Language', value: book.language || '-' },
-        { label: 'Format', value: book.format || '-' },
-        { label: 'Size', value: book.size || '-' },
+        { label: t('Year'), value: book.year || '-' },
+        { label: t('Language'), value: book.language || '-' },
+        { label: t('Format'), value: book.format || '-' },
+        { label: t('Size'), value: book.size || '-' },
         ...(downloadCount
-          ? [{ label: 'Downloads', value: Number(downloadCount).toLocaleString() }]
+          ? [{ label: t('Downloads'), value: Number(downloadCount).toLocaleString() }]
           : []),
       ];
 
@@ -160,7 +162,7 @@ export const DetailsModal = ({
         className="absolute inset-0 border-0 bg-transparent p-0"
         onClick={handleClose}
         tabIndex={-1}
-        aria-label="Close details"
+        aria-label={t('Close details')}
       />
       <div
         className={`details-container relative z-10 h-full w-full sm:h-auto ${isClosing ? 'settings-modal-exit' : 'settings-modal-enter'}`}
@@ -172,13 +174,13 @@ export const DetailsModal = ({
           <header className="flex items-start gap-4 border-b border-(--border-muted) bg-(--bg) px-5 py-4 sm:bg-(--bg-soft)">
             <div className="flex-1 space-y-1">
               <p className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                Book
+                {t('Book')}
               </p>
               <h3 id={titleId} className="text-lg leading-snug font-semibold">
-                {book.title || 'Untitled'}
+                {book.title || t('Untitled')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                {book.author || 'Unknown author'}
+                {book.author || t('Unknown author')}
               </p>
             </div>
             <button
@@ -209,7 +211,7 @@ export const DetailsModal = ({
                   >
                     <img
                       src={book.preview}
-                      alt="Book cover"
+                      alt={t('Book cover')}
                       className="h-auto max-h-full w-auto max-w-full rounded-xl object-contain shadow-lg"
                       style={{ maxHeight: '100%', maxWidth: '100%' }}
                     />
@@ -219,7 +221,7 @@ export const DetailsModal = ({
                     className="flex w-full items-center justify-center rounded-xl border border-dashed border-(--border-muted) bg-(--bg)/60 p-6 text-sm text-gray-500 lg:h-full lg:max-w-none"
                     style={{ maxHeight: artworkMaxHeight, maxWidth: artworkMaxWidth }}
                   >
-                    No cover
+                    {t('No cover')}
                   </div>
                 )}
               </div>
@@ -227,7 +229,7 @@ export const DetailsModal = ({
               <div className="flex flex-1 flex-col gap-4 sm:gap-5 lg:min-h-0">
                 {book.description && (
                   <div className={`${infoCardClass} space-y-1`}>
-                    <p className={infoLabelClass}>Description</p>
+                    <p className={infoLabelClass}>{t('Description')}</p>
                     <p className={`${infoValueClass} whitespace-pre-line`}>{book.description}</p>
                   </div>
                 )}
@@ -295,7 +297,7 @@ export const DetailsModal = ({
 
                 {isMetadata && isInLibrary(book.library) && (
                   <div className={`${infoCardClass} space-y-1`}>
-                    <p className={infoLabelClass}>Library</p>
+                    <p className={infoLabelClass}>{t('Library')}</p>
                     <LibraryBadge library={book.library} />
                   </div>
                 )}
@@ -303,7 +305,7 @@ export const DetailsModal = ({
                 {/* ISBN - Universal mode only */}
                 {isMetadata && (book.isbn_13 || book.isbn_10) && (
                   <div className={`${infoCardClass} space-y-1`}>
-                    <p className={infoLabelClass}>ISBN</p>
+                    <p className={infoLabelClass}>{t('ISBN')}</p>
                     <p className={infoValueClass}>{book.isbn_13 || book.isbn_10}</p>
                   </div>
                 )}
@@ -311,7 +313,7 @@ export const DetailsModal = ({
                 {/* Series info - Universal mode only */}
                 {isMetadata && book.series_name && (
                   <div className={`${infoCardClass} space-y-1`}>
-                    <p className={infoLabelClass}>Series</p>
+                    <p className={infoLabelClass}>{t('Series')}</p>
                     <div className="flex items-center justify-between gap-2">
                       <p className={infoValueClass}>
                         {book.series_position != null ? (
@@ -320,7 +322,7 @@ export const DetailsModal = ({
                             {Number.isInteger(book.series_position)
                               ? book.series_position
                               : book.series_position}
-                            {book.series_count ? ` of ${book.series_count}` : ''} in{' '}
+                            {book.series_count ? ` ${t('of')} ${book.series_count}` : ''} {t('in')}{' '}
                             {book.series_name}
                           </>
                         ) : (
@@ -353,7 +355,7 @@ export const DetailsModal = ({
                               d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                             />
                           </svg>
-                          View series
+                          {t('View series')}
                         </button>
                       )}
                     </div>
@@ -389,7 +391,7 @@ export const DetailsModal = ({
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
                 >
-                  View on {isMetadata ? providerDisplay : 'Source'}
+                  {t('View on')} {isMetadata ? providerDisplay : t('Source')}
                   <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
