@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 import type { SettingsField } from '../../../types/settings';
 import { Tooltip } from '../../shared/Tooltip';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { EnvLockBadge } from './EnvLockBadge';
 
 const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
@@ -76,10 +77,12 @@ interface FieldWrapperProps {
 }
 
 // Badge shown when a field is disabled
-const DisabledBadge = ({ reason }: { reason?: string }) => (
+const DisabledBadge = ({ reason }: { reason?: string }) => {
+  const { t } = useLanguage();
+  return (
   <span
     className="inline-flex items-center gap-1 rounded border border-zinc-500/30 bg-zinc-500/20 px-1.5 py-0.5 text-xs text-zinc-400"
-    title={reason || 'This setting is not available'}
+    title={reason || t('This setting is not available')}
   >
     <svg
       className="h-3 w-3"
@@ -95,15 +98,18 @@ const DisabledBadge = ({ reason }: { reason?: string }) => (
         d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
       />
     </svg>
-    Unavailable
+    {t('Unavailable')}
   </span>
-);
+  );
+};
 
 // Badge shown when changing a field requires a container restart
-const RestartRequiredBadge = () => (
+const RestartRequiredBadge = () => {
+  const { t } = useLanguage();
+  return (
   <span
     className="inline-flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/20 px-1.5 py-0.5 text-xs text-amber-600 dark:text-amber-400"
-    title="Changing this setting requires a container restart to take effect"
+    title={t("Changing this setting requires a container restart to take effect")}
   >
     <svg
       className="h-3 w-3"
@@ -119,9 +125,10 @@ const RestartRequiredBadge = () => (
         d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
       />
     </svg>
-    Restart
+    {t('Restart')}
   </span>
-);
+  );
+};
 
 function formatUserOverrideValue(value: unknown): string {
   if (value === null || value === undefined) return '(empty)';
@@ -148,6 +155,7 @@ const UserOverriddenBadge = ({
   count: number;
   details?: Array<{ userId: number; username: string; value: unknown }>;
 }) => {
+  const { t } = useLanguage();
   const visibleDetails = details.slice(0, 10);
   const extraCount = Math.max(details.length - visibleDetails.length, 0);
 
@@ -159,7 +167,7 @@ const UserOverriddenBadge = ({
           <span className="opacity-70">: {formatUserOverrideValue(entry.value)}</span>
         </div>
       ))}
-      {extraCount > 0 && <div className="text-[11px] opacity-70">and {extraCount} more...</div>}
+      {extraCount > 0 && <div className="text-[11px] opacity-70">and {t('and {count} more...').replace('{count}', String(extraCount))}</div>}
     </div>
   );
 
@@ -180,16 +188,19 @@ const ResetActionButton = ({
   label?: string;
   disabled?: boolean;
   onClick: () => void;
-}) => (
+}) => {
+  const { t } = useLanguage();
+  return (
   <button
     type="button"
     onClick={onClick}
     disabled={disabled}
     className="shrink-0 text-xs font-medium text-sky-500 transition-colors hover:text-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
   >
-    {label}
+    {label ?? t('Reset')}
   </button>
-);
+  );
+};
 
 export const FieldWrapper = ({
   field,
