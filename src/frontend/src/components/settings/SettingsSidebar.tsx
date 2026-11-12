@@ -368,7 +368,7 @@ export const SettingsSidebar = ({
             return (
               <div key={t(item.label)} className="px-5 pt-6 pb-2">
                 <span className="text-xs font-semibold tracking-wider uppercase opacity-50">
-                  {item.label}
+                  {t(item.label)}
                 </span>
               </div>
             );
@@ -441,9 +441,9 @@ export const SettingsSidebar = ({
       {sidebarItems.map((item) => {
         if (item.type === 'section') {
           return (
-            <div key={item.label} className="px-4 pt-5 pb-2">
+            <div key={t(item.label)} className="px-4 pt-5 pb-2">
               <span className="text-[11px] font-semibold tracking-wider uppercase opacity-40">
-                {item.label}
+                {t(item.label)}
               </span>
             </div>
           );
@@ -462,7 +462,7 @@ export const SettingsSidebar = ({
               }`}
             >
               <span className="opacity-60">{getIcon(item.tab.icon)}</span>
-              <span>{item.tab.displayName}</span>
+              <span>{t(item.tab.displayName)}</span>
             </button>
           );
         }
@@ -479,7 +479,7 @@ export const SettingsSidebar = ({
               className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-(--hover-surface) ${hasSelectedTab && !isExpanded ? 'bg-(--hover-action)/50' : ''}`}
             >
               <span className="opacity-60">{getIcon(item.group.icon)}</span>
-              <span className="flex-1">{item.group.displayName}</span>
+              <span className="flex-1">{t(item.group.displayName)}</span>
               <ChevronIcon expanded={isExpanded} />
             </button>
 
@@ -496,7 +496,7 @@ export const SettingsSidebar = ({
                         : 'hover:bg-(--hover-surface)'
                     }`}
                   >
-                    <span>{tab.displayName}</span>
+                    <span>{t(tab.displayName)}</span>
                   </button>
                 ))}
               </div>
