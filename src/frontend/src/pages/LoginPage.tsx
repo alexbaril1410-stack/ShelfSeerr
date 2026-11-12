@@ -1,4 +1,5 @@
 import { LoginForm } from '../components/LoginForm';
+import { LanguageSelector } from '../components/LanguageSelector';
 import type { LoginCredentials } from '../types';
 import { withBasePath } from '../utils/basePath';
 
@@ -28,6 +29,9 @@ export const LoginPage = ({
       className="flex min-h-screen items-center justify-center px-4 py-8"
       style={{ backgroundColor: 'var(--background-color)', color: 'var(--text-color)' }}
     >
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
       <div className="w-full max-w-md">
         <div
           className="rounded-lg border p-6 shadow-2xl"
