@@ -358,7 +358,8 @@ const SortControl = ({ value, onChange, metadataSortOptions }: SortControlProps)
         ? metadataSortOptions
         : DEFAULT_UNIVERSAL_SORT_OPTIONS;
   }
-  const selected = sortOptions.find((option) => option.value === value) ?? sortOptions[0];
+  const localizedSortOptions = sortOptions.map((option) => ({ ...option, label: t(option.label) }));
+  const selected = localizedSortOptions.find((option) => option.value === value) ?? localizedSortOptions[0];
 
   return (
     <Dropdown
@@ -395,7 +396,7 @@ const SortControl = ({ value, onChange, metadataSortOptions }: SortControlProps)
     >
       {({ close }) => (
         <div role="listbox" aria-label={t('Sort results')}>
-          {sortOptions.map((option) => {
+          {localizedSortOptions.map((option) => {
             const isSelected = option.value === selected.value;
             let selectedClassName = '';
             if (isSelected) {
