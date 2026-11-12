@@ -2,6 +2,16 @@ import type { SettingsField } from '../../types/settings';
 
 type Translate = (value: string) => string;
 
+const translateOption = <T extends { label: string; description?: string; disabledReason?: string }>(
+  option: T,
+  t: Translate,
+): T => ({
+  ...option,
+  label: t(option.label),
+  description: option.description ? t(option.description) : undefined,
+  disabledReason: option.disabledReason ? t(option.disabledReason) : undefined,
+});
+
 /**
  * Translate only presentation strings received from the settings API.
  * Keys, option values and persisted configuration data remain untouched.
@@ -23,56 +33,52 @@ export const translateSettingsField = (
             ]),
           )
         : undefined,
+      linkText: field.linkText ? t(field.linkText) : undefined,
     };
   }
 
-  const translated = {
+  const base = {
     ...field,
     label: t(field.label),
     description: field.description ? t(field.description) : undefined,
     disabledReason: field.disabledReason ? t(field.disabledReason) : undefined,
-    placeholder: 'placeholder' in field && field.placeholder ? t(field.placeholder) : undefined,
-  } as SettingsField;
+    ...('placeholder' in field
+      ? { placeholder: field.placeholder ? t(field.placeholder) : undefined }
+      : {}),
+  };
 
-  if ('options' in field) {
-    return {
-      ...translated,
-      options: field.options.map((option) => ({
-        ...option,
-        label: t(option.label),
-        description: option.description ? t(option.description) : undefined,
-        disabledReason:
-          'disabledReason' in option && option.disabledReason
-            ? t(option.disabledReason)
-            : undefined,
-      })),
-    } as SettingsField;
-  }
-
-  if (field.type === 'TableField') {
-    return {
-      ...translated,
-      addLabel: field.addLabel ? t(field.addLabel) : undefined,
-      emptyMessage: field.emptyMessage ? t(field.emptyMessage) : undefined,
-      columns: field.columns.map((column) => ({
-        ...column,
-        label: t(column.label),
-        placeholder: column.placeholder ? t(column.placeholder) : undefined,
-        options: column.options?.map((option) => ({
-          ...option,
-          label: t(option.label),
-          description: option.description ? t(option.description) : undefined,
+  switch (field.type) {
+    case 'SelectField':
+    case 'MultiSelectField':
+    case 'OrderableListField':
+      return {
+        ...base,
+        options: field.options.map((option) => translateOption(option, t)),
+      };
+    case 'TableField':
+      return {
+        ...base,
+        addLabel: field.addLabel ? t(field.addLabel) : undefined,
+        emptyMessage: field.emptyMessage ? t(field.emptyMessage) : undefined,
+        columns: field.columns.map((column) => ({
+          ...column,
+          label: t(column.label),
+          placeholder: column.placeholder ? t(column.placeholder) : undefined,
+          options: column.options?.map((option) => ({
+            ...option,
+            label: t(option.label),
+            description: option.description ? t(option.description) : undefined,
+          })),
         })),
-      })),
-    };
+      };
+    case 'CustomComponentField':
+      return {
+        ...base,
+        boundFields: field.boundFields?.map((boundField) =>
+          translateSettingsField(boundField, t),
+        ),
+      };
+    default:
+      return base;
   }
-
-  if (field.type === 'CustomComponentField' && field.boundFields) {
-    return {
-      ...translated,
-      boundFields: field.boundFields.map((boundField) => translateSettingsField(boundField, t)),
-    };
-  }
-
-  return translated;
 };
