@@ -132,6 +132,14 @@ class DownloadTask:
     source_url: str | None = None  # Original release URL used by source-specific handlers
     metadata_provider: str | None = None  # Metadata catalogue (e.g. audible)
     metadata_provider_id: str | None = None  # Provider-native book ID (e.g. Audible ASIN)
+    metadata_description: str | None = None
+    metadata_publisher: str | None = None
+    metadata_genres: list[str] = field(default_factory=list)
+    metadata_isbn_10: str | None = None
+    metadata_isbn_13: str | None = None
+    metadata_language: str | None = None
+    metadata_authors: list[str] = field(default_factory=list)
+    metadata_narrators: list[str] = field(default_factory=list)
     retry_download_url: str | None = None  # Resolved download URL for restart-safe retries
     retry_download_protocol: str | None = (
         None  # Protocol for retry_download_url (e.g. torrent, usenet)
