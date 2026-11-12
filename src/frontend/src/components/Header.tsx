@@ -166,7 +166,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
 
     const actingAsOptions = useMemo(
       () => [
-        { value: '', label: 'Myself' },
+        { value: '', label: t('Myself') },
         ...adminUsers.map((user) => {
           const displayLabel = formatActingAsUserName(user);
           return {
@@ -176,7 +176,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           };
         }),
       ],
-      [adminUsers],
+      [adminUsers, t],
     );
 
     const selectedActingAsValue = actingAsUser ? String(actingAsUser.id) : '';

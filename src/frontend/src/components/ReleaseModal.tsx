@@ -226,6 +226,7 @@ function StarRating({ rating, maxRating = 5 }: { rating: number; maxRating?: num
 
 // Thumbnail component for release rows
 const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string }) => {
+  const { t } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
@@ -233,9 +234,9 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
     return (
       <div
         className="flex h-10 w-7 shrink-0 items-center justify-center rounded-sm bg-zinc-200 text-[7px] font-medium text-zinc-500 sm:h-12 sm:w-8 sm:text-[8px] dark:bg-zinc-700 dark:text-zinc-400"
-        aria-label="No cover available"
+        aria-label={t('No cover available')}
       >
-        No Cover
+        {t('No cover')}
       </div>
     );
   }
@@ -247,7 +248,7 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
       )}
       <img
         src={preview}
-        alt={title || 'Book cover'}
+        alt={title || t('Book cover')}
         className="h-full w-full object-cover object-top"
         loading="lazy"
         onLoad={() => setImageLoaded(true)}
@@ -331,6 +332,7 @@ const PhaseChip = ({
   label: string;
   onClear?: () => void;
 }) => {
+  const { t } = useLanguage();
   let phaseChipClassName = 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500';
   if (release) {
     phaseChipClassName =
@@ -389,7 +391,7 @@ const PhaseChip = ({
         type="button"
         onClick={onClear}
         className={`group inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20 dark:hover:text-red-300 ${phaseChipClassName}`}
-        aria-label={`Remove selected ${label.toLowerCase()}`}
+        aria-label={t('Remove selected {label}').replace('{label}', label.toLowerCase())}
       >
         {chipContent}
       </button>
@@ -1609,7 +1611,7 @@ const ReleaseModalSession = ({
                 {book.preview ? (
                   <img
                     src={book.preview}
-                    alt="Book cover"
+                    alt={t('Book cover')}
                     className={`hidden shrink-0 rounded-lg object-cover shadow-md sm:block ${coverAspectClassName} ${coverSizeClassName}`}
                   />
                 ) : (
@@ -2030,7 +2032,7 @@ const ReleaseModalSession = ({
                             className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
                               isOpen ? 'bg-(--hover-surface)' : ''
                             }`}
-                            aria-label="Sort releases"
+                            aria-label={t('Sort releases')}
                           >
                             <svg
                               className="h-4 w-4"
@@ -2067,7 +2069,7 @@ const ReleaseModalSession = ({
                                   : 'text-zinc-700 dark:text-zinc-300'
                               }`}
                             >
-                              <span>Best Match (Default)</span>
+                              <span>{t('Best Match (Default)')}</span>
                               {!currentSort && (
                                 <svg
                                   className="h-4 w-4"
@@ -2103,7 +2105,7 @@ const ReleaseModalSession = ({
                                       : 'text-zinc-700 dark:text-zinc-300'
                                   }`}
                                 >
-                                  <span>{opt.label}</span>
+                                  <span>{t(opt.label)}</span>
                                   {isSelected && direction && (
                                     <svg
                                       className="h-4 w-4"
@@ -2147,7 +2149,7 @@ const ReleaseModalSession = ({
                                   }`}
                                 >
                                   <span>
-                                    Format
+                                    {t('Format')}
                                     {currentSort?.key === FORMAT_SORT_KEY && currentSort.value
                                       ? ` (${currentSort.value.toUpperCase()})`
                                       : ''}

@@ -1,6 +1,8 @@
 import type { CustomSettingsFieldRendererProps } from './types';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 export const OidcEnvInfo = (_props: CustomSettingsFieldRendererProps) => {
+  const { t } = useLanguage();
   return (
     <div className="overflow-hidden rounded-lg border border-(--border-muted)">
       <div
@@ -11,21 +13,21 @@ export const OidcEnvInfo = (_props: CustomSettingsFieldRendererProps) => {
       </div>
       <pre className="overflow-x-auto px-3 py-3 text-xs" style={{ background: 'var(--bg-soft)' }}>
         <code>
-          <span className="opacity-60">environment:</span>
+          <span className="opacity-60">{t('environment')}:</span>
           {'\n'}
           {'  '}- <span className="text-blue-400">HIDE_LOCAL_AUTH</span>=
           <span className="text-green-400">true</span>
           {'    '}
-          <span className="opacity-40"># Hide the local login form</span>
+          <span className="opacity-40"># {t('Hide the local login form')}</span>
           {'\n'}
           {'  '}- <span className="text-blue-400">DISABLE_LOCAL_AUTH</span>=
           <span className="text-green-400">true</span>{' '}
-          <span className="opacity-40"># Disable username/password login</span>
+          <span className="opacity-40"># {t('Disable username/password login')}</span>
           {'\n'}
           {'  '}- <span className="text-blue-400">OIDC_AUTO_REDIRECT</span>=
           <span className="text-green-400">true</span>
           {'  '}
-          <span className="opacity-40"># Skip login page, redirect straight to OIDC</span>
+          <span className="opacity-40"># {t('Skip login page, redirect straight to OIDC')}</span>
         </code>
       </pre>
     </div>

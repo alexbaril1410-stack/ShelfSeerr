@@ -187,7 +187,7 @@ export const DetailsModal = ({
               type="button"
               onClick={handleClose}
               className="hover-action rounded-full p-2 text-gray-500 transition-colors hover:text-gray-900 dark:hover:text-gray-100"
-              aria-label="Close details"
+              aria-label={t('Close details')}
             >
               <svg
                 className="h-5 w-5"

@@ -718,6 +718,13 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   OIDC: "OIDC",
   CWA: "CWA",
   LDAP: "LDAP",
+  "Remove selected {label}": "Retirer la sélection {label}",
+  "Sort releases": "Trier les versions",
+  "Best Match (Default)": "Meilleure correspondance (par défaut)",
+  environment: "environnement",
+  "Hide the local login form": "Masquer le formulaire de connexion local",
+  "Disable username/password login": "Désactiver la connexion par identifiant et mot de passe",
+  "Skip login page, redirect straight to OIDC": "Ignorer la page de connexion et rediriger directement vers OIDC",
 };
 
 interface LanguageContextValue {
