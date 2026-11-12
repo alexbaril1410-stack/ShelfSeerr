@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 
 import type { Book, ButtonStateInfo } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import { CircularProgress } from './shared';
 
 type ButtonSize = 'sm' | 'md';
@@ -49,6 +50,7 @@ export const BookGetButton = ({
   className = '',
   style,
 }: BookGetButtonProps) => {
+  const { t } = useLanguage();
   const isIconVariant = variant === 'icon';
   const widthClasses = fullWidth ? 'w-full' : '';
   const sizeClass = isIconVariant ? iconSizeClasses[size] : sizeClasses[size];
@@ -190,7 +192,7 @@ export const BookGetButton = ({
         onClick={handleClick}
         disabled={isDisabled}
         style={style}
-        aria-label={`${getDisplayText()} releases for ${book.title}`}
+        aria-label={`${t(getDisplayText())} releases for ${book.title}`}
       >
         {renderIcon()}
       </button>
