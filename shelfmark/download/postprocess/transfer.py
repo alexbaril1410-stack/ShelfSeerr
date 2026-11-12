@@ -170,7 +170,11 @@ def _maybe_write_audible_nfo(final_paths: list[Path], task: DownloadTask) -> Non
         try:
             written = run_blocking_io(_write_audible_nfo_file, parent, content)
             if written:
-                logger.info("Task %s: wrote Audiobookshelf metadata to %s", task.task_id, parent / "metadata.nfo")
+                logger.info(
+                    "Task %s: wrote Audiobookshelf metadata to %s",
+                    task.task_id,
+                    parent / "metadata.nfo",
+                )
             else:
                 logger.debug("Task %s: kept existing NFO metadata in %s", task.task_id, parent)
         except OSError as exc:
