@@ -144,6 +144,7 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Move down': 'Déplacer vers le bas',
   'Running...': 'Exécution…',
   'Action failed': 'Échec de l’action',
+  'Unknown field type': 'Type de champ inconnu',
   'This setting is controlled by an environment variable': 'Ce paramètre est contrôlé par une variable d’environnement',
 
   'Most downloads': 'Le plus téléchargé',
