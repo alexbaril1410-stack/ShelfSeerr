@@ -43,6 +43,35 @@ describe('buildReleaseDownloadPayload', () => {
     expect(payload.book_plan).toBeUndefined();
   });
 
+  it('forwards Audible metadata needed by audiobook post-processing', () => {
+    const audibleBook: Book = {
+      ...book,
+      provider: 'audible',
+      provider_id: 'B0ASIN1234',
+      description: 'Description du livre',
+      publisher: 'Éditeur audio',
+      genres: ['Thriller'],
+      isbn_10: '1234567890',
+      isbn_13: '9781234567890',
+      language: 'fr',
+      authors: ['Maxime Chattam'],
+      narrators: [' comédien '],
+    };
+    const payload = buildReleaseDownloadPayload(audibleBook, release, 'audiobook');
+    expect(payload).toMatchObject({
+      metadata_provider: 'audible',
+      metadata_provider_id: 'B0ASIN1234',
+      metadata_description: 'Description du livre',
+      metadata_publisher: 'Éditeur audio',
+      metadata_genres: ['Thriller'],
+      metadata_isbn_10: '1234567890',
+      metadata_isbn_13: '9781234567890',
+      metadata_language: 'fr',
+      metadata_authors: ['Maxime Chattam'],
+      metadata_narrators: [' comédien '],
+    });
+  });
+
   it('uses the release title and author for manual books', () => {
     const manual: Book = { ...book, provider: 'manual', title: 'ignored' };
     const withAuthor = { ...release, extra: { author: 'Release Author' } };
