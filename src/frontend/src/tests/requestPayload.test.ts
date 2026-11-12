@@ -76,8 +76,29 @@ describe('requestPayload utilities', () => {
     expect(releaseData.content_type).toBe('ebook');
     expect(releaseData.metadata_provider).toBe('openlibrary');
     expect(releaseData.metadata_provider_id).toBe('ol-1');
-    expect(releaseData.metadata_description).toBeUndefined();
-    expect(releaseData.metadata_authors).toBeUndefined();
+    const audibleReleaseData = buildReleaseDataFromMetadataRelease(
+      {
+        ...baseBook,
+        provider: 'audible',
+        provider_id: 'B08BKGYQXW',
+        description: 'Audiobook description',
+        publisher: 'Audible Studios',
+        genres: ['Fantasy'],
+        isbn_13: '9781234567890',
+        language: 'fr',
+        authors: ['Author One'],
+        narrators: ['Narrator One'],
+      },
+      baseRelease,
+      'audiobook',
+    );
+    expect(audibleReleaseData.metadata_description).toBe('Audiobook description');
+    expect(audibleReleaseData.metadata_publisher).toBe('Audible Studios');
+    expect(audibleReleaseData.metadata_genres).toEqual(['Fantasy']);
+    expect(audibleReleaseData.metadata_isbn_13).toBe('9781234567890');
+    expect(audibleReleaseData.metadata_language).toBe('fr');
+    expect(audibleReleaseData.metadata_authors).toEqual(['Author One']);
+    expect(audibleReleaseData.metadata_narrators).toEqual(['Narrator One']);
     expect(directReleaseData.search_mode).toBe('direct');
     expect(sourceBackedReleaseData.search_mode).toBe('direct');
   });
