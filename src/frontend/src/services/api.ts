@@ -571,6 +571,16 @@ export type DownloadReleasePayload = {
   extra?: Record<string, unknown>;
   preview?: string; // Book cover from metadata provider
   content_type?: string; // "ebook" or "audiobook" - for directory routing
+  metadata_provider?: string;
+  metadata_provider_id?: string;
+  metadata_description?: string;
+  metadata_publisher?: string;
+  metadata_genres?: string[];
+  metadata_isbn_10?: string;
+  metadata_isbn_13?: string;
+  metadata_language?: string;
+  metadata_authors?: string[];
+  metadata_narrators?: string[];
   series_name?: string;
   series_position?: number;
   subtitle?: string;
