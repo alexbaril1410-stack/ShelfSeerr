@@ -46,6 +46,7 @@ from shelfmark.release_sources.prowlarr.api import (
 from shelfmark.release_sources.prowlarr.cache import cache_release
 from shelfmark.release_sources.prowlarr.custom_scoring import (
     minimum_score,
+    release_author_matches_book,
     release_title_matches_book,
     score_release,
 )
@@ -1454,6 +1455,29 @@ class ProwlarrSource(ReleaseSource):
                 except _PROWLARR_REQUEST_ERRORS:
                     # Enrichment only decorates rows; never let it lose the search.
                     logger.warning("MAM enrichment failed", exc_info=True)
+
+            # Prefer results that identify the requested author for every title,
+            # not only one-word titles. If no indexer provides the author, fall back
+            # to the already title-filtered results rather than returning nothing.
+            if not plan.manual_query and results:
+                author_matched = [
+                    release for release in results
+                    if release_author_matches_book(release, book)
+                ]
+                if author_matched:
+                    logger.info(
+                        "Prowlarr: author match retained %s/%s result(s) for '%s'",
+                        len(author_matched),
+                        len(results),
+                        book.search_title or book.title,
+                    )
+                    results = author_matched
+                else:
+                    logger.info(
+                        "Prowlarr: no explicit author match for '%s'; "
+                        "falling back to title-matched results",
+                        book.search_title or book.title,
+                    )
 
             # Apply the configured custom-format style score after MAM enrichment,
             # so enriched series/volume/audio metadata can participate in the rules.
