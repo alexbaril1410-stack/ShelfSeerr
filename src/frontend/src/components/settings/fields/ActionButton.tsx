@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import type { ActionButtonConfig, ActionResult } from '../../../types/settings';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface ActionButtonProps {
   field: ActionButtonConfig;
@@ -23,6 +24,7 @@ function createDetailEntries(details: string[]): Array<{ key: string; detail: st
 }
 
 export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) => {
+  const { t } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<ActionResult | null>(null);
   const isDisabled = disabled ?? field.disabled ?? isLoading;
@@ -37,7 +39,7 @@ export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) =
     } catch (err) {
       setResult({
         success: false,
-        message: err instanceof Error ? err.message : 'Action failed',
+        message: err instanceof Error ? err.message : t('Action failed'),
       });
     } finally {
       setIsLoading(false);
@@ -79,7 +81,7 @@ export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) =
                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                 />
               </svg>
-              Running...
+              {t('Running...')}
             </span>
           ) : (
             field.label
