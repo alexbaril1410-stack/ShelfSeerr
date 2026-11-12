@@ -1,9 +1,13 @@
+import { useLanguage } from '../../../contexts/LanguageContext';
+
 interface SettingsSaveBarProps {
   onSave: () => void | Promise<void>;
   isSaving: boolean;
 }
 
-export const SettingsSaveBar = ({ onSave, isSaving }: SettingsSaveBarProps) => (
+export const SettingsSaveBar = ({ onSave, isSaving }: SettingsSaveBarProps) => {
+  const { t } = useLanguage();
+  return (
   <div
     className="animate-slide-up shrink-0 border-t border-(--border-muted) bg-(--bg) px-6 py-4"
     style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}
@@ -34,11 +38,12 @@ export const SettingsSaveBar = ({ onSave, isSaving }: SettingsSaveBarProps) => (
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
-          Saving...
+          {t("Saving...")}
         </span>
       ) : (
-        'Save Changes'
+        {t('Save Changes')}
       )}
     </button>
   </div>
-);
+  );
+};
