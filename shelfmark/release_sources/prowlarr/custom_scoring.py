@@ -84,9 +84,10 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
         if offered[index:index + width] != wanted:
             continue
 
-        # A one-word title is common inside unrelated prose ("dune", for
-        # example). Unless it starts the release title, require the requested
-        # author to appear as well. Enriched bookTitle is trusted as a title field.
+        # One-word titles are especially ambiguous (Dune / "d'une", or
+        # 1984 as a comic title or publication year). Require the requested
+        # author in the release name unless Prowlarr supplied a dedicated
+        # enriched book_title field.
         if width == 1 and not release.extra.get("book_title"):
             author = _first(
                 getattr(book, "search_author", None),
@@ -97,7 +98,7 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
                 offered[pos:pos + len(author_tokens)] == author_tokens
                 for pos in range(len(offered) - len(author_tokens) + 1)
             )
-            if index != 0 and not author_present:
+            if not author_present:
                 continue
 
         # A four-digit numeric book title is easily confused with a publication
