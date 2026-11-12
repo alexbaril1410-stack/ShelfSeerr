@@ -582,13 +582,13 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       }
     };
 
-    let selectorContentTypeLabel = 'audiobooks';
+    let selectorContentTypeLabel = t('Audiobooks');
     let selectorIcon = <AudiobookIcon />;
     if (combinedSelectionActive) {
-      selectorContentTypeLabel = 'books and audiobooks';
+      selectorContentTypeLabel = t('Books and Audiobooks');
       selectorIcon = <BothIcon />;
     } else if (contentType === 'ebook') {
-      selectorContentTypeLabel = 'books';
+      selectorContentTypeLabel = t('Books');
       selectorIcon = <BookIcon />;
     }
 
@@ -758,7 +758,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 }}
                 className="hover-action flex cursor-pointer items-center gap-1.5 rounded-l-full pr-2 pl-5 transition-colors"
                 style={{ color: 'var(--text)' }}
-                aria-label={t(`Searching ${selectorContentTypeLabel} by ${activeTarget?.label ?? 'general'}. Click to change.`)}
+                aria-label={`${t('Searching')} ${selectorContentTypeLabel} ${t('by')} ${t(activeTarget?.label ?? 'general')}. ${t('Click to change.')}`}
                 aria-expanded={isOptionsOpen}
                 aria-controls={optionsPanelId}
                 aria-haspopup={isPopover ? 'dialog' : undefined}
