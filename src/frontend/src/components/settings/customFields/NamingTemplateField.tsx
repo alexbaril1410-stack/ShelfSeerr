@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 
 import type { TextFieldConfig } from '../../../types/settings';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import {
   buildNamingTemplatePreview,
   NAMING_TEMPLATE_TOKENS,
@@ -47,6 +48,7 @@ export const NamingTemplateField = ({
   onChange,
   isDisabled,
 }: CustomSettingsFieldRendererProps) => {
+  const { t } = useLanguage();
   const inputRef = useRef<HTMLInputElement>(null);
   const boundField = useMemo(
     () =>
@@ -55,7 +57,7 @@ export const NamingTemplateField = ({
   );
 
   if (!boundField) {
-    return <p className="text-xs opacity-60">Naming template schema is unavailable.</p>;
+    return <p className="text-xs opacity-60">{t('Naming template schema is unavailable.')}</p>;
   }
 
   const rawValue = values[boundField.key];
@@ -104,7 +106,7 @@ export const NamingTemplateField = ({
           value={value}
           onChange={(event) => onChange(boundField.key, event.target.value)}
           placeholder={boundField.placeholder}
-          aria-label={boundField.placeholder || 'Naming Template'}
+          aria-label={boundField.placeholder || t('Naming Template')}
           maxLength={boundField.maxLength}
           disabled={fieldDisabled}
           className="w-full rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm transition-colors focus:border-sky-500 focus:ring-2 focus:ring-sky-500/50 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
@@ -114,11 +116,11 @@ export const NamingTemplateField = ({
       {(hasPathSeparatorInFilename || preview.unknownTokens.length > 0) && (
         <div className="space-y-1 text-xs text-amber-600 dark:text-amber-400">
           {hasPathSeparatorInFilename && (
-            <p>Rename templates cannot contain folder separators. Use Path Template instead.</p>
+            <p>{t('Rename templates cannot contain folder separators. Use Path Template instead.')}</p>
           )}
           {preview.unknownTokens.length > 0 && (
             <p>
-              {preview.unknownTokens.length === 1 ? 'Unknown variable: ' : 'Unknown variables: '}
+              {preview.unknownTokens.length === 1 ? t('Unknown variable: ') : t('Unknown variables: ')}
               {preview.unknownTokens.map((token) => `{${token}}`).join(', ')}
             </p>
           )}
@@ -126,7 +128,7 @@ export const NamingTemplateField = ({
       )}
 
       <div className="w-full rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm leading-relaxed break-words">
-        <span className="opacity-60">Preview:</span>{' '}
+        <span className="opacity-60">{t('Preview:')}</span>{' '}
         <code className="font-mono text-(--text)">{preview.value}</code>
       </div>
 
@@ -136,7 +138,7 @@ export const NamingTemplateField = ({
         </summary>
         <div className="mt-1.5 space-y-3 rounded-lg border border-(--border-muted) bg-(--bg-soft) p-3">
           {tokenGroups.map((group) => (
-            <div key={group.group} className="min-w-0">
+            <div key={t(group.group)} className="min-w-0">
               <div className="mb-1.5 text-[11px] font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
                 {group.group}
               </div>
@@ -147,7 +149,7 @@ export const NamingTemplateField = ({
                     type="button"
                     onClick={() => insertToken(token.token)}
                     disabled={fieldDisabled}
-                    title={`${token.description}: ${token.value}`}
+                    title={`${t(token.description)}: ${token.value}`}
                     className="inline-flex min-h-8 max-w-full items-center rounded-md bg-zinc-500/15 px-2.5 py-1 font-mono text-xs transition-colors hover:bg-zinc-500/25 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {`{${token.token}}`}
