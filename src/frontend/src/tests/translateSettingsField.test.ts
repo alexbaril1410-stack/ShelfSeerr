@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { SettingsField } from '../../types/settings';
+import type { SettingsField } from '../types/settings';
 import { translateSettingsField } from '../components/settings/translateSettingsField';
 
 const translations: Record<string, string> = {
