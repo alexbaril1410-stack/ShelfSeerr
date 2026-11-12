@@ -33,3 +33,23 @@ def test_without_the_flag_a_request_linked_failure_goes_back_to_its_request():
 
     assert ok is False
     assert message == "Request-linked downloads must be retried from requests"
+
+
+
+def test_metadata_provider_identity_survives_retry_serialization():
+    from shelfmark.core.models import DownloadTask
+
+    task = DownloadTask(
+        task_id="release-asin",
+        source="prowlarr",
+        title="Audible audiobook",
+        metadata_provider="audible",
+        metadata_provider_id="B08BKGYQXW",
+    )
+
+    payload = orchestrator.serialize_task_for_retry(task)
+    restored = orchestrator._restore_task_from_retry_payload(payload)
+
+    assert restored is not None
+    assert restored.metadata_provider == "audible"
+    assert restored.metadata_provider_id == "B08BKGYQXW"
