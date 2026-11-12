@@ -106,7 +106,7 @@ def build_audible_nfo_content(task: DownloadTask) -> str | None:
     def clean(value: object) -> str | None:
         if value is None:
             return None
-        text = " ".join(str(value).replace("\\r", " ").replace("\\n", " ").split())
+        text = " ".join(str(value).replace("\r", " ").replace("\n", " ").split())
         return text or None
 
     def add(lines: list[str], label: str, value: object) -> None:
@@ -137,7 +137,7 @@ def build_audible_nfo_content(task: DownloadTask) -> str | None:
     if description:
         lines.extend(["", "Book Description", "=========", description])
 
-    return "\\n".join(lines).rstrip() + "\\n"
+    return "\n".join(lines).rstrip() + "\n"
 
 
 def _write_audible_nfo_file(parent: Path, content: str) -> bool:
