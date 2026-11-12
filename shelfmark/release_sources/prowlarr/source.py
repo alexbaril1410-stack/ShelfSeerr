@@ -44,7 +44,11 @@ from shelfmark.release_sources.prowlarr.api import (
     is_myanonamouse_indexer,
 )
 from shelfmark.release_sources.prowlarr.cache import cache_release
-from shelfmark.release_sources.prowlarr.custom_scoring import (\n    minimum_score,\n    release_title_matches_book,\n    score_release,\n)
+from shelfmark.release_sources.prowlarr.custom_scoring import (
+    minimum_score,
+    release_title_matches_book,
+    score_release,
+)
 from shelfmark.release_sources.prowlarr.mam import (
     lookup_torrent_details,
     mam_search_options,
