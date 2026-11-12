@@ -1,13 +1,13 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { useLanguage } from '../../contexts/LanguageContext';
-import { translateSettingsField } from './translateSettingsField';
 import type {
   SettingsTab,
   SettingsField,
   ActionResult,
   OrderableListItem,
   ShowWhenCondition,
+  SelectFieldConfig,
 } from '../../types/settings';
 import type { CustomSettingsFieldLayout } from './customFields';
 import { getCustomSettingsFieldLayout, renderCustomSettingsField } from './customFields';
@@ -25,6 +25,18 @@ import {
   TableField,
 } from './fields';
 import { FieldWrapper, SettingsSaveBar } from './shared';
+import { translateSettingsField } from './translateSettingsField';
+
+const LANGUAGE_FIELD: SelectFieldConfig = {
+  type: 'SelectField',
+  key: '_LANGUAGE',
+  label: 'Language',
+  value: 'fr',
+  options: [
+    { value: 'fr', label: 'French' },
+    { value: 'en', label: 'English' },
+  ],
+};
 
 interface SettingsContentProps {
   tab: SettingsTab;
@@ -337,9 +349,13 @@ function SettingsContentPanel({
   embedded = false,
   customFieldContext,
 }: SettingsContentProps) {
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const translatedTab = useMemo(
-    () => ({ ...tab, displayName: t(tab.displayName), fields: tab.fields.map((field) => translateSettingsField(field, t)) }),
+    () => ({
+      ...tab,
+      displayName: t(tab.displayName),
+      fields: tab.fields.map((field) => translateSettingsField(field, t)),
+    }),
     [tab, t],
   );
   const translatedFieldsByKey = useMemo(
@@ -449,6 +465,15 @@ function SettingsContentPanel({
 
   const renderedFields = (
     <div className="space-y-5">
+      {tab.name === 'general' && (
+        <FieldWrapper field={LANGUAGE_FIELD}>
+          <SelectField
+            field={LANGUAGE_FIELD}
+            value={language}
+            onChange={(value) => setLanguage(value === 'en' ? 'en' : 'fr')}
+          />
+        </FieldWrapper>
+      )}
       {visibleFields.map((field) => {
         const disabledState = getDisabledState(field, values);
         const displayField = translatedFieldsByKey.get(field.key) ?? field;

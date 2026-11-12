@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 
-import { useSearchMode } from '../../contexts/SearchModeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSearchMode } from '../../contexts/SearchModeContext';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
@@ -11,7 +11,6 @@ import { getAdminSettingsOverridesSummary, getSettingsTab } from '../../services
 import { SettingsContent } from './SettingsContent';
 import { SettingsHeader } from './SettingsHeader';
 import { SettingsSidebar } from './SettingsSidebar';
-import { LanguageSelector } from '../LanguageSelector';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -395,7 +394,7 @@ const SettingsModalSession = ({
           style={{ willChange: 'opacity', contain: 'strict' }}
           onClick={handleClose}
           tabIndex={-1}
-          aria-label={t("Close settings")}
+          aria-label={t('Close settings')}
         />
         <div
           className="relative rounded-xl bg-(--bg) p-8 shadow-2xl"
@@ -418,7 +417,7 @@ const SettingsModalSession = ({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            <span>{t("Loading settings...")}</span>
+            <span>{t('Loading settings...')}</span>
           </div>
         </div>
       </div>
@@ -435,7 +434,7 @@ const SettingsModalSession = ({
           style={{ willChange: 'opacity', contain: 'strict' }}
           onClick={handleClose}
           tabIndex={-1}
-          aria-label={t("Close settings")}
+          aria-label={t('Close settings')}
         />
         <div
           className="relative max-w-md rounded-xl bg-(--bg) p-8 shadow-2xl"
@@ -482,7 +481,7 @@ const SettingsModalSession = ({
         >
           {!showMobileDetail ? (
             <>
-              <SettingsHeader title={t("Settings")} onClose={handleClose} />
+              <SettingsHeader title={t('Settings')} onClose={handleClose} />
               <SettingsSidebar
                 tabs={tabs}
                 groups={groups}
@@ -516,7 +515,7 @@ const SettingsModalSession = ({
         style={{ willChange: 'opacity', contain: 'strict' }}
         onClick={handleClose}
         tabIndex={-1}
-        aria-label={t("Close settings")}
+        aria-label={t('Close settings')}
       />
 
       <div
@@ -524,9 +523,9 @@ const SettingsModalSession = ({
         style={{ background: 'var(--bg)' }}
         role="dialog"
         aria-modal="true"
-        aria-label={t("Settings")}
+        aria-label={t('Settings')}
       >
-        <SettingsHeader title={t("Settings")} onClose={handleClose} />
+        <SettingsHeader title={t('Settings')} onClose={handleClose} />
 
         <div className="flex min-h-0 flex-1">
           <SettingsSidebar
@@ -538,12 +537,9 @@ const SettingsModalSession = ({
           />
 
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            <div className="flex justify-end border-b border-(--border-muted) px-6 py-3">
-              <LanguageSelector compact />
-            </div>
             {currentTabContent ?? (
               <div className="flex flex-1 items-center justify-center text-sm opacity-60">
-                {t("Select a category to configure")}
+                {t('Select a category to configure')}
               </div>
             )}
           </div>
