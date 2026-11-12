@@ -167,7 +167,7 @@ export const ConfigSetupBanner = ({
                 onClick={handleContinue}
                 className="rounded-lg bg-(--primary-color) px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-(--primary-dark)"
               >
-                Continue to Settings
+                {t('Continue to Settings')}
               </button>
             </>
           ) : (
