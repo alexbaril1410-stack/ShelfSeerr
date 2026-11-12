@@ -143,8 +143,16 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
     return authors, narrators
 
 
-def _series_fields(product: dict[str, Any]) -> tuple[str | None, str | None, float | None]:
-    """Extract Audible series metadata from its supported nested response shapes."""
+def _series_fields(
+    product: dict[str, Any],
+    product_title: str | None = None,
+) -> tuple[str | None, str | None, float | None]:
+    """Extract the most relevant Audible series, preferring the actual book series.
+
+    Audible can attach a broad franchise/collection (for example, Wizarding World)
+    alongside the proper numbered series (Harry Potter). Prefer a series whose name
+    appears in the product title; otherwise preserve the provider's original order.
+    """
     candidates: list[Any] = [
         product.get("series"),
         product.get("series_list"),
@@ -154,13 +162,11 @@ def _series_fields(product: dict[str, Any]) -> tuple[str | None, str | None, flo
     ]
     relationships = product.get("relationships")
     if isinstance(relationships, dict):
-        candidates.extend(
-            [relationships.get("series"), relationships.get("series_list")]
-        )
+        candidates.extend([relationships.get("series"), relationships.get("series_list")])
 
+    parsed: list[tuple[str | None, str | None, float | None]] = []
     for raw in candidates:
         if isinstance(raw, dict):
-            # Some responses wrap the actual series object one level deeper.
             nested = raw.get("series")
             if isinstance(nested, dict):
                 entry = dict(raw)
@@ -176,27 +182,32 @@ def _series_fields(product: dict[str, Any]) -> tuple[str | None, str | None, flo
         for entry in entries:
             nested_series = entry.get("series")
             series = nested_series if isinstance(nested_series, dict) else entry
-            series_id = _text(
-                series.get("asin") or series.get("id") or series.get("series_id")
-            )
-            series_name = _text(
-                series.get("title") or series.get("name") or series.get("series_title")
-            )
+            series_id = _text(series.get("asin") or series.get("id") or series.get("series_id"))
+            series_name = _text(series.get("title") or series.get("name") or series.get("series_title"))
             raw_position = (
-                entry.get("sequence")
-                or entry.get("position")
-                or entry.get("sequence_number")
-                or series.get("sequence")
-                or series.get("position")
-                or series.get("sequence_number")
+                entry.get("sequence") or entry.get("position") or entry.get("sequence_number")
+                or series.get("sequence") or series.get("position") or series.get("sequence_number")
             )
             position = None
             with suppress(TypeError, ValueError):
                 position = float(str(raw_position).replace(",", "."))
-            if series_name or series_id:
-                return series_id, series_name, position
+            if (series_name or series_id) and (series_id, series_name, position) not in parsed:
+                parsed.append((series_id, series_name, position))
 
-    return None, None, None
+    if not parsed:
+        return None, None, None
+
+    normalized_title = " ".join((product_title or "").casefold().split())
+    if normalized_title:
+        matching = [
+            item for item in parsed
+            if item[1] and " ".join(item[1].casefold().split()) in normalized_title
+        ]
+        if matching:
+            # When several names match, use the most specific (longest) one.
+            return max(matching, key=lambda item: len(item[1] or ""))
+
+    return parsed[0]
 
 def _product_items(payload: Any) -> list[dict[str, Any]]:
     if not isinstance(payload, dict):
@@ -286,7 +297,7 @@ def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | 
         or product.get("product_description")
         or product.get("description")
     )
-    series_id, series_name, series_position = _series_fields(product)
+    series_id, series_name, series_position = _series_fields(product, title)
     genres = _names(product.get("category_ladders") or product.get("categories"))
     rating = product.get("rating") or {}
     rating_value = None
