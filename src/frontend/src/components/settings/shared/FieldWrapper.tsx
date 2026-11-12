@@ -167,21 +167,21 @@ const UserOverriddenBadge = ({
           <span className="opacity-70">: {formatUserOverrideValue(entry.value)}</span>
         </div>
       ))}
-      {extraCount > 0 && <div className="text-[11px] opacity-70">and {t('and {count} more...').replace('{count}', String(extraCount))}</div>}
+      {extraCount > 0 && <div className="text-[11px] opacity-70">{t('and {count} more...').replace('{count}', String(extraCount))}</div>}
     </div>
   );
 
   return (
     <Tooltip content={content} position="top">
       <span className="inline-flex items-center gap-1 rounded border border-sky-500/30 bg-sky-500/15 px-1.5 py-0.5 text-xs text-sky-500 dark:text-sky-400">
-        User overridden{count > 1 ? ` (${count})` : ''}
+        {t('User overridden')}{count > 1 ? ` (${count})` : ''}
       </span>
     </Tooltip>
   );
 };
 
 const ResetActionButton = ({
-  label = 'Reset',
+  label,
   disabled = false,
   onClick,
 }: {
