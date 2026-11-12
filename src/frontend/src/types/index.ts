@@ -54,6 +54,7 @@ export interface Book {
   search_title?: string;
   search_author?: string;
   authors?: string[];
+  narrators?: string[];
   titles_by_language?: Record<string, string>;
   username?: string;
   retry_available?: boolean;
