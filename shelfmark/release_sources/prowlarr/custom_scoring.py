@@ -58,6 +58,33 @@ def _volume_from_title(title: str, series_name: str | None = None) -> float | No
     return None
 
 
+def release_author_matches_book(release: Release, book: Any) -> bool:
+    """Return whether the requested author is present in release metadata or title."""
+    requested = _first(
+        getattr(book, "search_author", None),
+        ", ".join(getattr(book, "authors", []) or []),
+    )
+    if not requested:
+        return False
+
+    author = _text(requested).split()
+    if not author:
+        return False
+
+    candidates = [
+        _text(release.extra.get("author")),
+        _text(release.title),
+    ]
+    for candidate in candidates:
+        tokens = candidate.split()
+        if any(
+            tokens[index:index + len(author)] == author
+            for index in range(len(tokens) - len(author) + 1)
+        ):
+            return True
+    return False
+
+
 def release_title_matches_book(release: Release, book: Any) -> bool:
     """Reject obvious title false positives before scoring.
 
