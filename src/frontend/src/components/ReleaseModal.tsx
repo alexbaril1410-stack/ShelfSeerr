@@ -5,6 +5,7 @@ import { useDescriptionOverflow } from '../hooks/releaseModal/useDescriptionOver
 import { useHeaderThumbOnScroll } from '../hooks/releaseModal/useHeaderThumbOnScroll';
 import { useReleaseSearchSession } from '../hooks/releaseModal/useReleaseSearchSession';
 import { useSettings } from '../hooks/useSettings';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useTabIndicator } from '../hooks/ui/useTabIndicator';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
@@ -114,7 +115,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
   columns: [
     {
       key: 'extra.language',
-      label: 'Language',
+      label: t('Language'),
       render_type: 'badge',
       align: 'center',
       width: '60px',
@@ -125,7 +126,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
     },
     {
       key: 'format',
-      label: 'Format',
+      label: t('Format'),
       render_type: 'badge',
       align: 'center',
       width: '80px',
@@ -136,7 +137,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
     },
     {
       key: 'size',
-      label: 'Size',
+      label: t('Size'),
       render_type: 'size',
       align: 'center',
       width: '80px',
@@ -232,7 +233,7 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
     return (
       <div
         className="flex h-10 w-7 shrink-0 items-center justify-center rounded-sm bg-zinc-200 text-[7px] font-medium text-zinc-500 sm:h-12 sm:w-8 sm:text-[8px] dark:bg-zinc-700 dark:text-zinc-400"
-        aria-label="No cover available"
+        aria-label={t('No cover available')}
       >
         No Cover
       </div>
@@ -246,7 +247,7 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
       )}
       <img
         src={preview}
-        alt={title || 'Book cover'}
+        alt={title || t('Book cover')}
         className="h-full w-full object-cover object-top"
         loading="lazy"
         onLoad={() => setImageLoaded(true)}
@@ -522,7 +523,7 @@ const ReleaseRow = ({
             onDownload={onDownload}
             variant="icon"
             size="sm"
-            ariaLabel={`${buttonState.text} ${release.title}`}
+            ariaLabel={`${t(buttonState.text)} ${release.title}`}
           />
         )}
       </div>
@@ -615,7 +616,7 @@ const ReleaseRow = ({
             onDownload={onDownload}
             variant="icon"
             size="sm"
-            ariaLabel={`${buttonState.text} ${release.title}`}
+            ariaLabel={`${t(buttonState.text)} ${release.title}`}
           />
         )}
       </div>
@@ -777,6 +778,7 @@ const ReleaseModalSession = ({
   isClosing,
   animateEnter,
 }: ReleaseModalSessionProps) => {
+  const { t } = useLanguage();
   // Use audiobook formats when in audiobook mode
   const effectiveFormats =
     contentType === 'audiobook' && supportedAudiobookFormats.length > 0
@@ -956,7 +958,7 @@ const ReleaseModalSession = ({
 
   // Build select options for format filter
   const formatOptions = useMemo(() => {
-    const options = [{ value: '', label: 'All Formats' }];
+    const options = [{ value: '', label: t('All Formats') }];
     availableFormats.forEach((fmt) => {
       options.push({ value: fmt, label: fmt.toUpperCase() });
     });
@@ -1438,13 +1440,13 @@ const ReleaseModalSession = ({
     combinedPhase === 'ebook' ? hasCombinedAudiobookAction : hasCombinedEbookAction;
   const canCompleteCombinedAction =
     selectedRelease !== null || hasCombinedActionOutsideCurrentPhase;
-  const currentCombinedPhaseLabel = combinedPhase === 'ebook' ? 'Book' : 'Audiobook';
-  const nextCombinedPhaseLabel = combinedPhase === 'ebook' ? 'Audiobook' : 'Book';
-  let emptyStateMessage = 'No releases found for this book.';
+  const currentCombinedPhaseLabel = t(combinedPhase === 'ebook' ? 'Book' : 'Audiobook');
+  const nextCombinedPhaseLabel = t(combinedPhase === 'ebook' ? 'Audiobook' : 'Book');
+  let emptyStateMessage = t('No releases found for this book.');
   if (formatFilter) {
-    emptyStateMessage = `No ${formatFilter.toUpperCase()} releases found. Try a different format.`;
+    emptyStateMessage = t('No {format} releases found. Try a different format.').replace('{format}', formatFilter.toUpperCase());
   } else if (isCombinedMode) {
-    emptyStateMessage = `No ${currentCombinedPhaseLabel.toLowerCase()} releases found.`;
+    emptyStateMessage = t('No {contentType} releases found.').replace('{contentType}', currentCombinedPhaseLabel.toLowerCase());
   }
   let modalAnimationClassName = '';
   if (isClosing) {
@@ -1481,7 +1483,7 @@ const ReleaseModalSession = ({
         type="button"
         className="absolute inset-0 border-0 bg-transparent p-0"
         onClick={handleClose}
-        aria-label="Close release modal"
+        aria-label={t('Close release modal')}
       />
       <div
         className={`details-container relative z-10 h-full w-full sm:h-auto ${modalAnimationClassName}`}
@@ -1517,7 +1519,7 @@ const ReleaseModalSession = ({
                       minWidth: book.cover_aspect === 'square' ? 68 : 46,
                     }}
                   >
-                    No cover
+                    {t('No cover')}
                   </div>
                 )}
               </div>
@@ -1557,7 +1559,7 @@ const ReleaseModalSession = ({
                         minWidth: book.cover_aspect === 'square' ? 68 : 46,
                       }}
                     >
-                      No cover
+                      {t('No cover')}
                     </div>
                   )}
                 </div>
@@ -1565,14 +1567,14 @@ const ReleaseModalSession = ({
             )}
             <div className="min-w-0 flex-1 space-y-1">
               <p className="text-xs tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
-                {isCombinedMode ? combinedStepLabel : 'Find Releases'}
+                {isCombinedMode ? t(combinedStepLabel) : t('Find Releases')}
               </p>
               <h3 id={titleId} className="truncate text-lg leading-snug font-semibold">
-                {book.provider === 'manual' ? 'Manual Query' : book.title || 'Untitled'}
+                {book.provider === 'manual' ? t('Manual Query') : book.title || t('Untitled')}
               </h3>
               {!isRequestMode && (
                 <p className="truncate text-sm text-zinc-600 dark:text-zinc-300">
-                  {book.author || 'Unknown author'}
+                  {book.author || t('Unknown author')}
                 </p>
               )}
             </div>
@@ -1581,7 +1583,7 @@ const ReleaseModalSession = ({
                 type="button"
                 onClick={handleClose}
                 className="hover-action rounded-full p-2 text-zinc-500 transition-colors hover:text-zinc-900 dark:hover:text-zinc-100"
-                aria-label="Close"
+                aria-label={t('Close')}
               >
                 <svg
                   className="h-5 w-5"
@@ -1614,7 +1616,7 @@ const ReleaseModalSession = ({
                   <div
                     className={`hidden shrink-0 items-center justify-center rounded-lg border border-dashed border-(--border-muted) bg-(--bg)/60 text-[10px] text-zinc-500 sm:flex ${coverSizeClassName}`}
                   >
-                    No cover
+                    {t('No cover')}
                   </div>
                 )}
                 <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -1824,7 +1826,7 @@ const ReleaseModalSession = ({
                                 d="M12 4.5v15m7.5-7.5h-15"
                               />
                             </svg>
-                            {isRequestingBook ? 'Adding...' : 'Add to requests'}
+                            {t(isRequestingBook ? 'Adding...' : 'Add to requests')}
                           </button>
                         )}
                         {bookSupportsTargets(book) && book.provider && book.provider_id && (
@@ -1851,7 +1853,7 @@ const ReleaseModalSession = ({
               )}
               {!sourcesLoading && allTabs.length === 0 && (
                 <div className="px-5 py-3 text-sm text-zinc-500 dark:text-zinc-400">
-                  {sourcesError || 'No release sources are available for this book.'}
+                  {sourcesError ? t(sourcesError) : t('No release sources are available for this book.')}
                 </div>
               )}
               {!sourcesLoading && allTabs.length > 0 && (
