@@ -381,7 +381,18 @@ def transfer_book_files(
         return final_paths, None, op_counts
 
     transfer_destination = destination
-    if is_audiobook and len(book_files) > 1 and organization_mode == "rename_and_group":
+    has_single_audible_metadata = (
+        is_audiobook
+        and (task.metadata_provider or "").strip().lower() == "audible"
+        and bool(task.metadata_provider_id)
+        and not task.multi_book
+        and not task.book_plan
+    )
+    if has_single_audible_metadata:
+        folder_label = f"{task.author} - {task.title}" if task.author else task.title
+        transfer_destination = destination / sanitize_filename(folder_label)
+        run_blocking_io(transfer_destination.mkdir, parents=True, exist_ok=True)
+    elif is_audiobook and len(book_files) > 1 and organization_mode == "rename_and_group":
         source_folder = _group_folder_name(source_root)
         if source_folder:
             transfer_destination = destination / source_folder
