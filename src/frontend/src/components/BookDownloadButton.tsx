@@ -338,7 +338,7 @@ export const BookDownloadButton = ({
       disabled={isDisabled || isInProgress}
       data-action="download"
       style={style}
-      aria-label={ariaLabel ?? displayText}
+      aria-label={t(ariaLabel ?? displayText)}
     >
       {variant === 'primary' &&
         showIcon &&
