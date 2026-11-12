@@ -23,7 +23,7 @@ export const FormatReviewPanel = ({
   isSubmitting,
 }: FormatReviewPanelProps) => {
   const { t } = useLanguage();
-  const [selected, setSelected = useState<ReadonlySet<string>>(
+  const [selected, setSelected] = useState<ReadonlySet<string>>(
     new Set(groups.map((group) => group.format)),
   );
   const [expanded, setExpanded] = useState<string | null>(null);

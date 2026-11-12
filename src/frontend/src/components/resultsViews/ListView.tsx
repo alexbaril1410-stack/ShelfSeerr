@@ -45,6 +45,7 @@ const ListViewThumbnail = ({
   title?: string;
   coverAspect?: string;
 }) => {
+  const { t } = useLanguage();
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const isSquare = coverAspect === 'square';
@@ -56,7 +57,7 @@ const ListViewThumbnail = ({
         className={`${sizeClass} flex items-center justify-center rounded-sm bg-gray-200 text-[8px] font-medium text-gray-500 sm:text-[9px] dark:bg-gray-700 dark:text-gray-300`}
         aria-label={t('No cover available')}
       >
-        No Cover
+        {t('No cover')}
       </div>
     );
   }

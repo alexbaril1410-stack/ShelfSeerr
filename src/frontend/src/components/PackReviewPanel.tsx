@@ -37,7 +37,7 @@ export const PackReviewPanel = ({
   isSubmitting,
 }: PackReviewPanelProps) => {
   const { t } = useLanguage();
-  const [singleBook, setSingleBook = useState(false);
+  const [singleBook, setSingleBook] = useState(false);
   const [expandedFiles, setExpandedFiles] = useState<number | null>(null);
   const [showIgnored, setShowIgnored] = useState(false);
   const [userIgnored, setUserIgnored] = useState<ReadonlySet<string>>(new Set());
