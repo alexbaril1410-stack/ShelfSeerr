@@ -198,6 +198,7 @@ class BookMetadata:
 
     # Optional - not all providers have all fields
     authors: list[str] = field(default_factory=list)
+    narrators: list[str] = field(default_factory=list)
     isbn_10: str | None = None
     isbn_13: str | None = None
     cover_url: str | None = None
