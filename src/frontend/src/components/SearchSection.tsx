@@ -9,6 +9,7 @@ import type {
   Book,
 } from '../types';
 import { AdvancedFilters } from './AdvancedFilters';
+import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from './SearchBar';
 
 interface SearchSectionProps {
@@ -49,20 +50,20 @@ interface SearchSectionProps {
 
 const DISCOVERY_TOPICS = {
   ebook: [
-    { label: 'Fantasy', query: 'fantasy', description: 'Mondes imaginaires et grandes sagas', icon: '✦' },
-    { label: 'Polar & thriller', query: 'thriller', description: 'Enquêtes, suspense et mystères', icon: '⌕' },
-    { label: 'Science-fiction', query: 'science fiction', description: 'Demain commence ici', icon: '◈' },
-    { label: 'Romance', query: 'romance', description: 'Des histoires à dévorer', icon: '♡' },
-    { label: 'Développement personnel', query: 'personal development', description: 'Apprendre et progresser', icon: '↗' },
-    { label: 'Histoire', query: 'history', description: 'Comprendre le monde', icon: '⌂' },
+    { label: 'Fantasy', query: 'fantasy', description: 'Imaginary worlds and epic sagas', icon: '✦' },
+    { label: 'Mystery & thriller', query: 'thriller', description: 'Investigations, suspense, and mysteries', icon: '⌕' },
+    { label: 'Science fiction', query: 'science fiction', description: 'Tomorrow starts here', icon: '◈' },
+    { label: 'Romance', query: 'romance', description: 'Stories to devour', icon: '♡' },
+    { label: 'Personal development', query: 'personal development', description: 'Learn and grow', icon: '↗' },
+    { label: 'History', query: 'history', description: 'Understand the world', icon: '⌂' },
   ],
   audiobook: [
-    { label: 'Romans à écouter', query: 'roman', description: 'Laissez-vous porter par une histoire', icon: '♫' },
-    { label: 'Polars & thrillers', query: 'thriller', description: 'Le suspense dans les oreilles', icon: '⌕' },
-    { label: 'Fantasy', query: 'fantasy', description: 'De grandes aventures à écouter', icon: '✦' },
-    { label: 'Développement personnel', query: 'personal development', description: 'Des idées à emporter', icon: '↗' },
-    { label: 'Biographies', query: 'biography', description: 'Des parcours inspirants', icon: '◉' },
-    { label: 'Science-fiction', query: 'science fiction', description: 'Ailleurs, autrement', icon: '◈' },
+    { label: 'Fiction to listen to', query: 'roman', description: 'Let yourself be carried away by a story', icon: '♫' },
+    { label: 'Mysteries & thrillers', query: 'thriller', description: 'Suspense in your ears', icon: '⌕' },
+    { label: 'Fantasy', query: 'fantasy', description: 'Great adventures to listen to', icon: '✦' },
+    { label: 'Développement personnel', query: 'personal development', description: 'Ideas to take with you', icon: '↗' },
+    { label: 'Biographies', query: 'biography', description: 'Inspiring journeys', icon: '◉' },
+    { label: 'Science-fiction', query: 'science fiction', description: 'Somewhere else, in a different way', icon: '◈' },
   ],
 } as const;
 
@@ -101,6 +102,7 @@ export const SearchSection = ({
   onMetadataProviderChange,
   isAdmin = false,
 }: SearchSectionProps) => {
+  const { t } = useLanguage();
   const topics = DISCOVERY_TOPICS[contentType];
   const selectTopic = (query: string) => onQueryValueChange(query);
 
@@ -119,15 +121,15 @@ export const SearchSection = ({
               <span className="text-sm font-semibold tracking-[0.22em] text-slate-300">{searchPageTitle || 'SHELFSEERR'}</span>
             </div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
-              Votre prochaine lecture commence ici
+              {t('Your next read starts here')}
             </p>
             <h1 className="mx-auto max-w-3xl text-[1.75rem] leading-tight font-bold tracking-tight sm:text-4xl lg:text-5xl">
-              {contentType === 'audiobook' ? 'À écouter. À découvrir. À partager.' : 'Trouvez votre prochain livre préféré.'}
+              {contentType === 'audiobook' ? t('Listen. Discover. Share.') : t('Find your next favorite book.')}
             </h1>
             <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
               {contentType === 'audiobook'
-                ? 'Explorez les livres audio, trouvez votre prochaine écoute et ajoutez-la à votre bibliothèque.'
-                : 'Explorez le catalogue, découvrez de nouveaux univers et retrouvez les livres que vous souhaitez lire.'}
+                ? t('Explore audiobooks, find your next listen, and add it to your library.')
+                : t('Explore the catalog, discover new worlds, and find the books you want to read.')}
             </p>
             <div className="mx-auto mt-6 max-w-3xl rounded-xl bg-white p-1.5 shadow-xl sm:mt-8 sm:rounded-2xl sm:p-2">
               <SearchBar
@@ -153,7 +155,7 @@ export const SearchSection = ({
             </div>
             {activeQueryTarget === 'manual' && (
               <p className="mt-3 text-left text-xs text-slate-400">
-                Manual search queries release sources directly. Some sources may return limited metadata, which can affect file naming templates.
+                {t('Manual search queries release sources directly. Some sources may return limited metadata, which can affect file naming templates.')}
               </p>
             )}
           </div>
@@ -164,19 +166,19 @@ export const SearchSection = ({
         <div>
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500 dark:text-indigo-300">Explorer</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500 dark:text-indigo-300">{t('Explore')}</p>
               <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
-                {contentType === 'audiobook' ? 'À écouter selon vos envies' : 'Explorer par univers'}
+                {contentType === 'audiobook' ? t('Listen by mood') : t('Browse by genre')}
               </h2>
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Choisissez un thème pour lancer une recherche dans votre catalogue.
+                {t('Choose a theme to search your catalog.')}
               </p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {topics.map((topic, index) => (
               <button
-                key={topic.label}
+                key={t(topic.label)}
                 type="button"
                 onClick={() => selectTopic(topic.query)}
                 className="group min-h-32 rounded-2xl border border-gray-200/80 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg dark:border-white/10 dark:bg-slate-900 dark:hover:border-indigo-400/50"
@@ -188,7 +190,7 @@ export const SearchSection = ({
                   {topic.label}
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-gray-500 dark:text-gray-400">
-                  {topic.description}
+                  {t(topic.description)}
                 </span>
               </button>
             ))}
@@ -196,8 +198,8 @@ export const SearchSection = ({
         </div>
 
         {([
-          { key: 'trending', title: contentType === 'audiobook' ? 'Les livres audio populaires' : 'Les livres du moment', eyebrow: 'Tendances' },
-          { key: 'new_releases', title: contentType === 'audiobook' ? 'Les dernières sorties audio' : 'Les nouveautés', eyebrow: 'À paraître et récemment publiés' },
+          { key: 'trending', title: contentType === 'audiobook' ? t('Popular audiobooks') : t('Books trending now'), eyebrow: 'Trends' },
+          { key: 'new_releases', title: contentType === 'audiobook' ? t('Latest audiobook releases') : t('New releases'), eyebrow: 'Coming soon and recently published' },
         ] as const).map((shelf) => {
           const shelfBooks = discoveryShelves[shelf.key];
           if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
@@ -206,11 +208,11 @@ export const SearchSection = ({
             <section key={shelf.key} className="min-w-0">
               <div className="mb-3 flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-300">{shelf.eyebrow}</p>
-                  <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{shelf.title}</h2>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-300">{t(shelf.eyebrow)}</p>
+                  <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
                 </div>
                 {shelfBooks.length > 0 && (
-                  <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} titres</span>
+                  <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} {t('titles')}</span>
                 )}
               </div>
               <div className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
@@ -228,7 +230,7 @@ export const SearchSection = ({
                         type="button"
                         onClick={() => onDiscoveryBookSelect(book)}
                         className="group w-[124px] shrink-0 snap-start text-left sm:w-[142px]"
-                        title={`Rechercher ${book.title}`}
+                        title={`${t('Search')} ${book.title}`}
                       >
                         <div
                           className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl dark:bg-slate-800 dark:ring-white/10"
@@ -252,7 +254,7 @@ export const SearchSection = ({
                           {book.title}
                         </span>
                         <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:text-xs">
-                          {book.author || 'Auteur inconnu'}
+                          {book.author || t('Unknown author')}
                         </span>
                       </button>
                     ))}
@@ -264,15 +266,15 @@ export const SearchSection = ({
         <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-cyan-50 p-5 dark:border-white/10 dark:from-indigo-950/50 dark:via-slate-900 dark:to-cyan-950/40 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
-              {contentType === 'audiobook' ? 'Votre prochaine écoute' : 'À découvrir'}
+              {contentType === 'audiobook' ? t('Your next listen') : t('Discover next')}
             </p>
             <h2 className="mt-1 text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-              {contentType === 'audiobook' ? 'Un livre audio vous attend.' : 'Une nouvelle histoire vous attend.'}
+              {contentType === 'audiobook' ? t('An audiobook is waiting for you.') : t('A new story is waiting for you.')}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-300">
               {contentType === 'audiobook'
-                ? 'Recherchez un titre, un auteur ou parcourez les genres pour trouver votre prochaine écoute.'
-                : 'Lancez une recherche dans le catalogue de métadonnées configuré pour découvrir les titres disponibles.'}
+                ? t('Search for a title or author, or browse genres to find your next listen.')
+                : t('Search the configured metadata catalog to discover available titles.')}
             </p>
           </div>
           <button
@@ -283,7 +285,7 @@ export const SearchSection = ({
             }}
             className="mt-4 shrink-0 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:mt-0"
           >
-            Explorer le catalogue
+            {t('Explore the catalog')}
           </button>
         </div>
       </div>
