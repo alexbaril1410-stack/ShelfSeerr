@@ -351,6 +351,7 @@ const ReviewInlinePanel = ({
   requiresBrowseBeforeApprove,
   reviewApproveHandler,
 }: ReviewInlinePanelProps) => {
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleReviewApprove = async () => {
@@ -471,6 +472,7 @@ const RejectInlinePanel = ({
   onRequestRejectClose,
   onRequestRejectConfirm,
 }: RejectInlinePanelProps) => {
+  const { t } = useLanguage();
   const [rejectNote, setRejectNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
