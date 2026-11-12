@@ -276,11 +276,11 @@ const toOptionalText = (value: unknown): string | undefined => {
 const toSourceLabel = (value: unknown): string => {
   const text = toOptionalText(value);
   if (!text) {
-    return 'Any Source';
+    return t('Any Source');
   }
   const normalized = text.trim().toLowerCase();
   if (normalized === '*' || normalized === 'any' || normalized === 'all') {
-    return 'Any Source';
+    return t('Any Source');
   }
   return text
     .split(/[_\s-]+/)
@@ -402,9 +402,9 @@ const ReviewInlinePanel = ({
       <div
         className={`grid grid-cols-1 ${showSourceField ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-x-3 gap-y-1`}
       >
-        <DetailField label="Requested" value={requestedAt} />
-        <DetailField label="Type" value={requestType} />
-        {showSourceField && <DetailField label="Source" value={sourceLabel} />}
+        <DetailField label={t('Requested')} value={requestedAt} />
+        <DetailField label={t('Type')} value={requestType} />
+        {showSourceField && <DetailField label={t('Source')} value={sourceLabel} />}
       </div>
 
       {hasAttachedRelease ? (
@@ -413,11 +413,11 @@ const ReviewInlinePanel = ({
             Attached File
           </p>
           <div className="grid grid-cols-1 gap-x-3 gap-y-1">
-            <DetailField label="Title" value={fileTitle} />
+            <DetailField label={t('Title')} value={fileTitle} />
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
-            <DetailField label="Size" value={fileSize} />
-            <DetailField label="Format" value={fileFormat.toUpperCase()} />
+            <DetailField label={t('Size')} value={fileSize} />
+            <DetailField label={t('Format')} value={fileFormat.toUpperCase()} />
           </div>
         </div>
       ) : (
@@ -491,15 +491,15 @@ const RejectInlinePanel = ({
   return (
     <div className="animate-fade-in -mx-4 mt-2 space-y-3 px-4 pb-2">
       <p className="text-xs font-medium">
-        Reject request for <span className="opacity-80">{itemTitle || 'Untitled request'}</span>
+        {t('Reject request for')} <span className="opacity-80">{itemTitle || t('Untitled request')}</span>
       </p>
       <textarea
-        aria-label="Optional note shown to the user"
+        aria-label={t('Optional note shown to the user')}
         value={rejectNote}
         onChange={(event) => setRejectNote(event.target.value.slice(0, MAX_ADMIN_NOTE_LENGTH))}
         rows={3}
         maxLength={MAX_ADMIN_NOTE_LENGTH}
-        placeholder="Optional note shown to the user"
+        placeholder={t('Optional note shown to the user')}
         className="min-h-[72px] w-full resize-y rounded-md border border-(--border-muted) bg-(--bg) px-2.5 py-2 text-xs focus:border-red-500 focus:ring-2 focus:ring-red-500/30 focus:outline-hidden"
         disabled={isSubmitting}
       />
@@ -715,14 +715,14 @@ export const ActivityCard = ({
 
   const bookData = asRecord(reviewRecord?.book_data);
   const releaseData = asRecord(reviewRecord?.release_data);
-  const bookTitle = toOptionalText(bookData.title) || 'Unknown title';
+  const bookTitle = toOptionalText(bookData.title) || t('Unknown title');
   const fileTitle = toOptionalText(releaseData.title) || bookTitle;
   const fileFormat =
     toOptionalText(releaseData.format) ||
     toOptionalText(releaseData.filetype) ||
     toOptionalText(releaseData.extension) ||
-    'Unknown';
-  const fileSize = toOptionalText(releaseData.size) || 'Unknown';
+    t('Unknown');
+  const fileSize = toOptionalText(releaseData.size) || t('Unknown');
   const sourceLabel = toSourceLabel(
     releaseData.source_display_name || releaseData.source || reviewRecord?.source_hint,
   );
@@ -745,7 +745,7 @@ export const ActivityCard = ({
 
   const rejectConfirmHandler = onRequestRejectConfirm || onRequestReject;
   const requestedAt = reviewRecord ? formatDateTime(reviewRecord.created_at) : '';
-  const requestType = reviewRecord?.content_type === 'audiobook' ? 'Audiobook' : 'Book';
+  const requestType = reviewRecord?.content_type === 'audiobook' ? t('Audiobook') : t('Book');
   const titleAuthorLine = item.author ? `${item.title} — ${item.author}` : item.title;
   const titleLineClassName = isDetailsExpanded
     ? 'text-sm leading-tight min-w-0 whitespace-normal wrap-break-word'
