@@ -133,7 +133,11 @@ def build_audible_nfo_content(task: DownloadTask) -> str | None:
     add(lines, "Language", normalize_language_code(task.metadata_language or task.language))
     add(lines, "Genre", ", ".join(genres))
 
-    description = clean(task.metadata_description)
+    raw_description = task.metadata_description or ""
+    description = "\\n".join(
+        " ".join(line.split())
+        for line in raw_description.replace("\\r\\n", "\\n").replace("\\r", "\\n").splitlines()
+    ).strip()
     if description:
         lines.extend(["", "Book Description", "=========", description])
 
