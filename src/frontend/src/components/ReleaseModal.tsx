@@ -115,7 +115,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
   columns: [
     {
       key: 'extra.language',
-      label: t('Language'),
+      label: 'Language',
       render_type: 'badge',
       align: 'center',
       width: '60px',
@@ -126,7 +126,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
     },
     {
       key: 'format',
-      label: t('Format'),
+      label: 'Format',
       render_type: 'badge',
       align: 'center',
       width: '80px',
@@ -137,7 +137,7 @@ const DEFAULT_COLUMN_CONFIG: ReleaseColumnConfig = {
     },
     {
       key: 'size',
-      label: t('Size'),
+      label: 'Size',
       render_type: 'size',
       align: 'center',
       width: '80px',
@@ -233,7 +233,7 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
     return (
       <div
         className="flex h-10 w-7 shrink-0 items-center justify-center rounded-sm bg-zinc-200 text-[7px] font-medium text-zinc-500 sm:h-12 sm:w-8 sm:text-[8px] dark:bg-zinc-700 dark:text-zinc-400"
-        aria-label={t('No cover available')}
+        aria-label="No cover available"
       >
         No Cover
       </div>
@@ -247,7 +247,7 @@ const ReleaseThumbnail = ({ preview, title }: { preview?: string; title?: string
       )}
       <img
         src={preview}
-        alt={title || t('Book cover')}
+        alt={title || 'Book cover'}
         className="h-full w-full object-cover object-top"
         loading="lazy"
         onLoad={() => setImageLoaded(true)}
@@ -523,7 +523,7 @@ const ReleaseRow = ({
             onDownload={onDownload}
             variant="icon"
             size="sm"
-            ariaLabel={`${t(buttonState.text)} ${release.title}`}
+            ariaLabel={`${buttonState.text} ${release.title}`}
           />
         )}
       </div>
@@ -616,7 +616,7 @@ const ReleaseRow = ({
             onDownload={onDownload}
             variant="icon"
             size="sm"
-            ariaLabel={`${t(buttonState.text)} ${release.title}`}
+            ariaLabel={`${buttonState.text} ${release.title}`}
           />
         )}
       </div>
