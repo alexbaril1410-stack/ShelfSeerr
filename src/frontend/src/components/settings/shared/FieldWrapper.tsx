@@ -197,7 +197,7 @@ const ResetActionButton = ({
     disabled={disabled}
     className="shrink-0 text-xs font-medium text-sky-500 transition-colors hover:text-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
   >
-    {label ?? t('Reset')}
+    {label ? t(label) : t('Reset')}
   </button>
   );
 };
@@ -219,6 +219,7 @@ export const FieldWrapper = ({
 
   // At this point, field is a regular input field with standard properties
   // Use overrides if provided (from disabledWhen), otherwise use field's static values
+  const { t } = useLanguage();
   const isDisabled = disabledOverride ?? field.disabled;
   const disabledReason = disabledReasonOverride ?? field.disabledReason;
   const requiresRestart = field.requiresRestart;
@@ -242,7 +243,7 @@ export const FieldWrapper = ({
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             {hasLabel && (
               <label className={`text-sm font-medium ${isFullyDimmed ? 'text-zinc-500' : ''}`}>
-                {field.label}
+                {t(field.label)}
                 {field.required && !isDisabled && <span className="ml-0.5 text-red-500">*</span>}
               </label>
             )}
@@ -271,11 +272,11 @@ export const FieldWrapper = ({
       <div className={isFullyDimmed ? 'opacity-50' : ''}>{children}</div>
 
       {field.description && (
-        <p className="text-xs">{renderDescriptionWithLinks(field.description)}</p>
+        <p className="text-xs">{renderDescriptionWithLinks(t(field.description))}</p>
       )}
 
       {isDisabled && disabledReason && (
-        <p className="text-xs text-zinc-400 italic">{disabledReason}</p>
+        <p className="text-xs text-zinc-400 italic">{t(disabledReason)}</p>
       )}
     </div>
   );

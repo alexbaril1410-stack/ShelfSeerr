@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import type { PasswordFieldConfig } from '../../../types/settings';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface PasswordFieldProps {
   field: PasswordFieldConfig;
@@ -10,6 +11,7 @@ interface PasswordFieldProps {
 }
 
 export const PasswordField = ({ field, value, onChange, disabled }: PasswordFieldProps) => {
+  const { t } = useLanguage();
   const [showPassword, setShowPassword] = useState(false);
   // disabled prop is already computed by SettingsContent.getDisabledState()
   const isDisabled = disabled ?? false;
@@ -20,8 +22,8 @@ export const PasswordField = ({ field, value, onChange, disabled }: PasswordFiel
         type={showPassword ? 'text' : 'password'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder={field.placeholder}
-        aria-label={field.label || field.placeholder || 'Password field'}
+        placeholder={field.placeholder ? t(field.placeholder) : undefined}
+        aria-label={t(field.label || field.placeholder || 'Password field')}
         disabled={isDisabled}
         className="w-full rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 pr-10 text-sm transition-colors focus:border-sky-500 focus:ring-2 focus:ring-sky-500/50 focus:outline-hidden disabled:cursor-not-allowed disabled:opacity-60"
       />
@@ -31,7 +33,7 @@ export const PasswordField = ({ field, value, onChange, disabled }: PasswordFiel
         disabled={isDisabled}
         className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-1 transition-colors hover:bg-(--hover-action) disabled:cursor-not-allowed disabled:opacity-60"
         tabIndex={-1}
-        aria-label={showPassword ? 'Hide password' : 'Show password'}
+        aria-label={t(showPassword ? 'Hide password' : 'Show password')}
       >
         {showPassword ? (
           <svg

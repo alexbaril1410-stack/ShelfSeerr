@@ -1,3 +1,4 @@
+import { useLanguage } from '../contexts/LanguageContext';
 import { shortBuildId } from '../utils/buildVersion';
 
 interface FooterProps {
@@ -7,6 +8,7 @@ interface FooterProps {
 }
 
 export const Footer = ({ buildVersion, releaseVersion, debug }: FooterProps) => {
+  const { t } = useLanguage();
   // Determine version display - show "dev" if no version is set
   const versionDisplay = releaseVersion && releaseVersion !== 'N/A' ? releaseVersion : 'dev';
 
@@ -30,7 +32,7 @@ export const Footer = ({ buildVersion, releaseVersion, debug }: FooterProps) => 
         </a>
         <span
           className="text-xs font-normal opacity-40"
-          title={buildVersion && buildVersion !== 'N/A' ? `Build: ${buildVersion}` : undefined}
+          title={buildVersion && buildVersion !== 'N/A' ? `${t('Build')}: ${buildVersion}` : undefined}
         >
           {versionDisplay}
           {buildId && ` (${buildId})`}

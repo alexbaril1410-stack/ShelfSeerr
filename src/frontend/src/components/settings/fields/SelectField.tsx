@@ -48,8 +48,8 @@ export const SelectField = ({
   // Convert options to DropdownList format
   const dropdownOptions = filteredOptions.map((opt) => ({
     value: opt.value,
-    label: opt.label,
-    description: opt.description,
+    label: t(opt.label),
+    description: opt.description ? t(opt.description) : undefined,
   }));
 
   const handleChange = (newValue: string | string[]) => {
