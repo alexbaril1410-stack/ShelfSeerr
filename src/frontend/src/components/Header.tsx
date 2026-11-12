@@ -384,8 +384,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             target="_blank"
             rel="noopener noreferrer"
             className="hover-action flex items-center gap-2 rounded-full px-3 py-2 text-gray-900 transition-all duration-200 dark:text-gray-100"
-            aria-label="Open book library"
-            title={showIconsOnly ? 'Book Library' : 'Go To Library'}
+            aria-label={t('Open book library')}
+            title={t(showIconsOnly ? 'Book Library' : 'Go To Library')}
           >
             <svg
               className="h-5 w-5"
@@ -401,7 +401,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                 d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
               />
             </svg>
-            {!showIconsOnly && <span className="text-sm font-medium">Go To Library</span>}
+            {!showIconsOnly && <span className="text-sm font-medium">{t('Go To Library')}</span>}
           </a>
         )}
 
@@ -412,8 +412,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             target="_blank"
             rel="noopener noreferrer"
             className="hover-action flex items-center gap-2 rounded-full px-3 py-2 text-gray-900 transition-all duration-200 dark:text-gray-100"
-            aria-label="Open audiobook library"
-            title={showIconsOnly ? 'Audiobook Library' : 'Go To Library'}
+            aria-label={t('Open audiobook library')}
+            title={t(showIconsOnly ? 'Audiobook Library' : 'Go To Library')}
           >
             <svg
               className="h-5 w-5"
@@ -429,7 +429,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                 d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
               />
             </svg>
-            {!showIconsOnly && <span className="text-sm font-medium">Go To Library</span>}
+            {!showIconsOnly && <span className="text-sm font-medium">{t('Go To Library')}</span>}
           </a>
         )}
 
@@ -439,8 +439,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             type="button"
             onClick={onDownloadsClick}
             className="hover-action relative flex items-center gap-2 rounded-full px-3 py-2 text-gray-900 transition-all duration-200 dark:text-gray-100"
-            aria-label="View activity"
-            title="Activity"
+            aria-label={t('View activity')}
+            title={t('Activity')}
           >
             <div className="relative">
               <svg
@@ -501,7 +501,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             {actingAsUser && (
               <span
                 className="absolute top-1 right-1 h-2 w-2 rounded-full border border-(--bg) bg-sky-500"
-                title={`Downloading as ${formatActingAsUserName(actingAsUser)}`}
+                title={t('Downloading as {user}').replace('{user}', formatActingAsUserName(actingAsUser))}
               />
             )}
           </button>
@@ -524,7 +524,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left text-slate-700 transition-colors dark:text-slate-200"
-                  title="Submit a bug report"
+                  title={t('Submit a bug report')}
                 >
                   <svg
                     className="h-5 w-5"
@@ -649,13 +649,13 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                         options={actingAsOptions}
                         value={selectedActingAsValue}
                         onChange={handleActingAsChange}
-                        placeholder="Myself"
+                        placeholder={t('Myself')}
                         widthClassName="w-full"
                         buttonClassName="rounded-lg text-sm"
                       />
                     </div>
                     {isAdminUsersLoading && (
-                      <div className="text-xs opacity-70">Loading users...</div>
+                      <div className="text-xs opacity-70">{t('Loading users...')}</div>
                     )}
                     {adminUsersError && (
                       <div className="flex items-center justify-between gap-3">
@@ -698,7 +698,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                       type="button"
                       onClick={onLogoClick}
                       className="shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:hidden"
-                      aria-label="Reset search"
+                      aria-label={t('Reset search')}
                     >
                       <img src={logoUrl} alt="" className="h-10 w-10" />
                     </button>
@@ -722,7 +722,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                       type="button"
                       onClick={onLogoClick}
                       className="hidden shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:block"
-                      aria-label="Reset search"
+                      aria-label={t('Reset search')}
                     >
                       <img src={logoUrl} alt="" className="h-12 w-12" />
                     </button>
