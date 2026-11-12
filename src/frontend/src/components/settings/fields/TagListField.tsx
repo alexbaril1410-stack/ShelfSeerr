@@ -145,7 +145,7 @@ export const TagListField = ({
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            aria-label={field.label || field.placeholder || t('Add item')}
+            aria-label={t(field.label || field.placeholder || 'Add item')}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -158,13 +158,13 @@ export const TagListField = ({
               }
             }}
             onBlur={() => commitDraft()}
-            placeholder={tags.length === 0 ? field.placeholder : ''}
+            placeholder={tags.length === 0 && field.placeholder ? t(field.placeholder) : ''}
             className="min-w-16 flex-1 bg-transparent px-1 py-0 outline-hidden"
           />
         )}
 
         {isDisabled && tags.length === 0 && (
-          <span className="opacity-60">{field.placeholder || t('No values')}</span>
+          <span className="opacity-60">{field.placeholder ? t(field.placeholder) : t('No values')}</span>
         )}
       </div>
     </div>

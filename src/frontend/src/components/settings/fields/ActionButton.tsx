@@ -84,10 +84,10 @@ export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) =
               {t('Running...')}
             </span>
           ) : (
-            field.label
+            {t(field.label)}
           )}
         </button>
-        {field.description && <span className="pt-2 text-xs opacity-60">{field.description}</span>}
+        {field.description && <span className="pt-2 text-xs opacity-60">{t(field.description)}</span>}
       </div>
 
       {result && (
@@ -110,7 +110,7 @@ export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) =
       )}
 
       {field.disabled && field.disabledReason && (
-        <p className="text-xs text-zinc-500 italic">{field.disabledReason}</p>
+        <p className="text-xs text-zinc-500 italic">{t(field.disabledReason)}</p>
       )}
     </div>
   );

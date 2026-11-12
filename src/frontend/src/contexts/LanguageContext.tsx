@@ -751,6 +751,7 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   "Select events...": "Sélectionner les événements…",
   "Personal notification preferences for this user. Reset to inherit global defaults from the Notifications tab.": "Préférences de notification personnelles de cet utilisateur. Réinitialisez-les pour hériter des paramètres par défaut de l’onglet Notifications.",
   "Send a test notification to the configured personal route URLs.": "Envoyer une notification de test aux URL personnelles configurées.",
+  "Number field": "Champ numérique",
 };
 
 interface LanguageContextValue {

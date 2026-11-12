@@ -304,7 +304,7 @@ export const OrderableListField = ({
 
               {/* Label and Description */}
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium">{item.label}</div>
+                <div className="text-sm font-medium">{t(item.label)}</div>
                 {item.description && (
                   <div className="mt-0.5 text-xs text-(--text-muted)">{item.description}</div>
                 )}
