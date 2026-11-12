@@ -181,7 +181,6 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Use book release source': 'Utiliser la source de téléchargement des livres',
   'Auto (Recommended)': 'Automatique (recommandé)',
   Direct: 'Direct',
-  Universal: 'Universel',
   Ebook: 'Livre numérique',
   Audiobook: 'Livre audio',
   'Enabled (Recommended)': 'Activé (recommandé)',
