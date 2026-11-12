@@ -35,7 +35,7 @@ interface DropdownListProps {
 export const DropdownList = ({
   label,
   placeholder = 'Select an option',
-  options,
+  options: rawOptions,
   multiple = false,
   showCheckboxes,
   value,
@@ -53,6 +53,12 @@ export const DropdownList = ({
 }: DropdownListProps) => {
   const { t } = useLanguage();
   const effectivePlaceholder = t(placeholder);
+  const options = rawOptions.map((option) => ({
+    ...option,
+    label: t(option.label),
+    description: option.description ? t(option.description) : undefined,
+    group: option.group ? t(option.group) : undefined,
+  }));
   const selectedValues = normalizeValue(value, multiple);
   const selectedOptions = options.filter((opt) => selectedValues.includes(opt.value));
   const checkboxEnabled = showCheckboxes ?? multiple;
@@ -112,7 +118,7 @@ export const DropdownList = ({
 
   return (
     <Dropdown
-      label={label}
+      label={label ? t(label) : undefined}
       summary={renderSummary()}
       align={align}
       widthClassName={widthClassName}

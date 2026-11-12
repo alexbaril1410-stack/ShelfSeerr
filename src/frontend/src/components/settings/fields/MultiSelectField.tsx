@@ -166,13 +166,16 @@ const MultiSelectDropdownField = ({
   // Custom summary formatter - only count explicit selections
   const summaryFormatter = () => {
     if (allSelected) {
-      return orderedOptions.find((opt) => opt.value === ALL_OPTION_VALUE)?.label || t('All');
+      return orderedOptions.find((opt) => opt.value === ALL_OPTION_VALUE)?.label ? t(orderedOptions.find((opt) => opt.value === ALL_OPTION_VALUE)?.label || '') : t('All');
     }
     if (selectedExplicit.length === 0) {
-      return <span className="opacity-60">{field.placeholder || t('Select categories...')}</span>;
+      return <span className="opacity-60">{field.placeholder ? t(field.placeholder) : t('Select categories...')}</span>;
     }
     const selectedLabels = selectedExplicit
-      .map((v) => orderedOptions.find((o) => o.value === v)?.label)
+      .map((v) => {
+        const label = orderedOptions.find((o) => o.value === v)?.label;
+        return label ? t(label) : undefined;
+      })
       .filter(Boolean);
     if (selectedLabels.length === 1) {
       return selectedLabels[0];

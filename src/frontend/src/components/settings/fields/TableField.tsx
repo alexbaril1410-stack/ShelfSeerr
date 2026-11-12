@@ -226,14 +226,14 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
   if (rows.length === 0) {
     return (
       <div className="space-y-3">
-        {field.emptyMessage && <p className="text-sm opacity-70">{field.emptyMessage}</p>}
+        {field.emptyMessage && <p className="text-sm opacity-70">{t(field.emptyMessage)}</p>}
         <button
           type="button"
           onClick={addRow}
           disabled={isDisabled}
           className="hover-action rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {field.addLabel || t('Add')}
+          {field.addLabel ? t(field.addLabel) : t('Add')}
         </button>
       </div>
     );
@@ -246,7 +246,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
       >
         {columns.map((col) => (
           <div key={col.key} className="min-w-0 truncate">
-            {col.label}
+            {t(col.label)}
           </div>
         ))}
         <div />
@@ -263,7 +263,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
               const cellValue = row[col.key];
 
               const mobileLabel = (
-                <div className="text-xs font-medium opacity-70 sm:hidden">{col.label}</div>
+                <div className="text-xs font-medium opacity-70 sm:hidden">{t(col.label)}</div>
               );
 
               if (col.type === 'checkbox') {
@@ -276,7 +276,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
                         checked={Boolean(cellValue)}
                         onChange={(e) => updateCell(rowIndex, col.key, e.target.checked)}
                         disabled={isDisabled}
-                        aria-label={`${col.label || col.key} ${t('Row')} ${rowIndex + 1}`}
+                        aria-label={`${t(col.label || col.key)} ${t('Row')} ${rowIndex + 1}`}
                         className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
                       />
                     </div>

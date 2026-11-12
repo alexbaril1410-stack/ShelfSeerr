@@ -744,6 +744,13 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   "Type a custom search query (overrides all sources)": "Saisissez une requête personnalisée (remplace toutes les sources)",
   "Searching…": "Recherche…",
   "Find Downloads": "Trouver des téléchargements",
+  "Create one route per URL. Start with All, then add event-specific routes for targeted delivery. Need format examples? [View Apprise URL formats](https://appriseit.com/services/).": "Créez une destination par URL. Commencez par « Tous », puis ajoutez des destinations spécifiques à chaque événement. Des exemples de formats sont disponibles ici : [Voir les formats d’URL Apprise](https://appriseit.com/services/).",
+  "Create one route per URL. Start with All, then add event-specific routes for targeted delivery. Use {User} or {Email} in the path or query to fill in your account details, e.g. ntfys://ntfy.sh/shelfmark-{User}. Personal routes can use ntfy, Gotify, Discord, Slack, Telegram, Pushover and PushBullet. Need format examples? [View Apprise URL formats](https://appriseit.com/services/).": "Créez une destination par URL. Commencez par « Tous », puis ajoutez des destinations spécifiques à chaque événement. Utilisez {User} ou {Email} dans le chemin ou la requête pour insérer les informations de votre compte (ex. : ntfys://ntfy.sh/shelfmark-{User}). Les destinations personnelles peuvent utiliser ntfy, Gotify, Discord, Slack, Telegram, Pushover et PushBullet. Des exemples de formats sont disponibles ici : [Voir les formats d’URL Apprise](https://appriseit.com/services/).",
+  "The routes below replace the default your administrator set.": "Les destinations ci-dessous remplacent celle définie par votre administrateur.",
+  "Your administrator has set a default route that applies to you until you add your own. Routes added below replace it.": "Votre administrateur a défini une destination par défaut qui s’applique jusqu’à ce que vous ajoutiez les vôtres. Les destinations ajoutées ci-dessous la remplacent.",
+  "Select events...": "Sélectionner les événements…",
+  "Personal notification preferences for this user. Reset to inherit global defaults from the Notifications tab.": "Préférences de notification personnelles de cet utilisateur. Réinitialisez-les pour hériter des paramètres par défaut de l’onglet Notifications.",
+  "Send a test notification to the configured personal route URLs.": "Envoyer une notification de test aux URL personnelles configurées.",
 };
 
 interface LanguageContextValue {

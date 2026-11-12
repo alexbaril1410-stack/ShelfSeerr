@@ -1,4 +1,5 @@
 import type { DeliveryPreferencesResponse } from '../../../services/api';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import type {
   ActionButtonConfig,
   ActionResult,
@@ -169,6 +170,7 @@ export const UserNotificationOverridesSection = ({
   onTestNotificationRoutes,
   scope = 'admin',
 }: UserNotificationOverridesSectionProps) => {
+  const { t } = useLanguage();
   if (!notificationPreferences) {
     return null;
   }
@@ -217,10 +219,10 @@ export const UserNotificationOverridesSection = ({
     scope === 'self'
       ? {
           ...baseRoutesField,
-          description: buildSelfRoutesDescription(
+          description: t(buildSelfRoutesDescription(
             Boolean(notificationPreferences.adminDefaultRoutesSet),
             isOverridden('USER_NOTIFICATION_ROUTES'),
-          ),
+          )),
         }
       : baseRoutesField;
 
