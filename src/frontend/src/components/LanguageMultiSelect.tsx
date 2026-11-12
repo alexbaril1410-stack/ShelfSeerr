@@ -1,4 +1,5 @@
 import type { Language } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import {
   LANGUAGE_OPTION_ALL,
   LANGUAGE_OPTION_DEFAULT,
@@ -24,6 +25,7 @@ export const LanguageMultiSelect = ({
   label,
   placeholder,
 }: LanguageMultiSelectProps) => {
+  const { t } = useLanguage();
   const defaultCodeSet = new Set(defaultLanguageCodes);
 
   // Get default languages with their full info
@@ -40,7 +42,7 @@ export const LanguageMultiSelect = ({
   const optionList: DropdownListOption[] = [
     {
       value: LANGUAGE_OPTION_ALL,
-      label: 'All languages',
+      label: t('All languages'),
     },
     // Each default language as a separate option
     ...defaultLanguages.map((lang) => ({
@@ -67,7 +69,7 @@ export const LanguageMultiSelect = ({
 
   const summaryFormatter = (_selected: DropdownListOption[], fallback: string) => {
     if (isAllSelected) {
-      return 'All languages';
+      return t('All languages');
     }
 
     const labels: string[] = [];

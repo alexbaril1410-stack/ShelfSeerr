@@ -1,4 +1,5 @@
 import type { ColumnSchema, Release } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getColorStyleFromHint, getProtocolDotColor, getFormatColor } from '../utils/colorMaps';
 import {
   getNestedValue,
@@ -41,7 +42,7 @@ const normalizeFlagLabel = (tag: string): string => {
   }
 };
 
-const formatRelativeTime = (dateString: string): string | null => {
+const formatRelativeTime = (dateString: string, t: (value: string) => string): string | null => {
   try {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return null;
@@ -50,10 +51,10 @@ const formatRelativeTime = (dateString: string): string | null => {
     const diffMs = now.getTime() - date.getTime();
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return '1 day';
+    if (diffDays === 0) return t('Today');
+    if (diffDays === 1) return t('1 day');
 
-    return `${diffDays} days`;
+    return t('{count} days').replace('{count}', String(diffDays));
   } catch {
     return null;
   }
@@ -77,6 +78,7 @@ export const ReleaseCell = ({
   compact = false,
   onlineServers,
 }: ReleaseCellProps) => {
+  const { t } = useLanguage();
   const rawValue = getNestedValue(release, column.key);
   const cellValue =
     rawValue !== undefined && rawValue !== null ? toComparableText(rawValue) : column.fallback;
@@ -220,38 +222,38 @@ export const ReleaseCell = ({
 
       // Add publish date first if available
       if (publishDate) {
-        const relativeTime = formatRelativeTime(publishDate);
+        const relativeTime = formatRelativeTime(publishDate, t);
         if (relativeTime) {
-          rows.push({ label: 'Added', value: relativeTime });
+          rows.push({ label: t('Added'), value: relativeTime });
         }
       }
 
       if (postedDate) {
         const postedDateValue = postedDate.trim();
-        const relativeTime = formatRelativeTime(postedDateValue);
-        rows.push({ label: 'Posted', value: relativeTime ?? postedDateValue });
+        const relativeTime = formatRelativeTime(postedDateValue, t);
+        rows.push({ label: t('Posted'), value: relativeTime ?? postedDateValue });
       }
 
       if (bitrate) {
         const bitrateValue = bitrate.trim();
         if (bitrateValue) {
-          rows.push({ label: 'Bitrate', value: bitrateValue });
+          rows.push({ label: t('Bitrate'), value: bitrateValue });
         }
       }
 
       // Add torznab attributes if available (MAM, etc.)
       if (torznabAttrs && Object.keys(torznabAttrs).length > 0) {
         const displayAttrs: Array<{ key: string; label: string }> = [
-          { key: 'description', label: 'Description' },
-          { key: 'year', label: 'Year' },
-          { key: 'genre', label: 'Genre' },
-          { key: 'narrator', label: 'Narrator' },
-          { key: 'bitrate', label: 'Bitrate' },
-          { key: 'samplerate', label: 'Sample Rate' },
-          { key: 'runtime', label: 'Runtime' },
-          { key: 'pages', label: 'Pages' },
-          { key: 'publisher', label: 'Publisher' },
-          { key: 'language', label: 'Language' },
+          { key: 'description', label: t('Description') },
+          { key: 'year', label: t('Year') },
+          { key: 'genre', label: t('Genre') },
+          { key: 'narrator', label: t('Narrator') },
+          { key: 'bitrate', label: t('Bitrate') },
+          { key: 'samplerate', label: t('Sample Rate') },
+          { key: 'runtime', label: t('Runtime') },
+          { key: 'pages', label: t('Pages') },
+          { key: 'publisher', label: t('Publisher') },
+          { key: 'language', label: t('Language') },
         ];
 
         for (const attr of displayAttrs) {
@@ -268,10 +270,10 @@ export const ReleaseCell = ({
       const files = toNumberValue(extra?.files);
       const grabs = toNumberValue(extra?.grabs);
       if (files !== undefined && files !== null) {
-        rows.push({ label: 'Files', value: String(files) });
+        rows.push({ label: t('Files'), value: String(files) });
       }
       if (grabs !== undefined && grabs !== null) {
-        rows.push({ label: 'Grabs', value: String(grabs) });
+        rows.push({ label: t('Grabs'), value: String(grabs) });
       }
 
       let sizeTooltipContent: React.ReactNode = null;
@@ -360,11 +362,11 @@ export const ReleaseCell = ({
       // Indexer name with colored dot indicating protocol (torrent/usenet) and peers count
       const protocol = release.protocol as string | undefined;
       const dotColor = getProtocolDotColor(protocol);
-      let protocolLabel = protocol || 'Unknown';
+      let protocolLabel = protocol || t('Unknown');
       if (protocol === 'torrent') {
-        protocolLabel = 'Torrent';
+        protocolLabel = t('Torrent');
       } else if (protocol === 'nzb') {
-        protocolLabel = 'Usenet';
+        protocolLabel = t('Usenet');
       }
       const peers = release.peers;
 
@@ -433,7 +435,7 @@ export const ReleaseCell = ({
       const unrecognizedFormats = primaryFormat ? [] : getUnrecognizedReleaseFormats(release);
       if (unrecognizedFormats.length > 0) {
         const unsupportedLabel = unrecognizedFormats.map((fmt) => fmt.toUpperCase()).join(', ');
-        const unsupportedTitle = `Unsupported format (${unsupportedLabel}) - Shelfmark cannot process this release`;
+        const unsupportedTitle = t('Unsupported format ({format}) - Shelfmark cannot process this release').replace('{format}', unsupportedLabel);
         if (compact) {
           return (
             <span
@@ -452,7 +454,7 @@ export const ReleaseCell = ({
                 {unrecognizedFormats[0].toUpperCase()}
               </span>
               <span className="text-[10px] font-medium whitespace-nowrap text-amber-700 sm:text-[11px] dark:text-amber-400">
-                Unsupported
+                {t('Unsupported')}
               </span>
             </span>
           </div>
@@ -523,7 +525,7 @@ export const ReleaseCell = ({
           return (
             <span
               className="inline-flex items-center text-gray-500"
-              title={isAudiobook ? 'Audiobook' : 'Book'}
+              title={isAudiobook ? t('Audiobook') : t('Book')}
             >
               {icon}
             </span>
@@ -547,7 +549,7 @@ export const ReleaseCell = ({
         return (
           <div
             className="flex items-center justify-start"
-            title={isAudiobook ? 'Audiobook' : 'Book'}
+            title={isAudiobook ? t('Audiobook') : t('Book')}
           >
             <span
               className={`${colorStyle.bg} ${colorStyle.text} inline-flex w-13 items-center justify-center rounded-lg py-0.5 text-[10px] font-semibold sm:text-[11px]`}
@@ -633,7 +635,7 @@ export const ReleaseCell = ({
             <span className="inline-flex items-center gap-1">
               <span
                 className={`h-1.5 w-1.5 shrink-0 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-gray-400'}`}
-                title={isOnline ? 'Online' : 'Offline'}
+                title={isOnline ? t('Online') : t('Offline')}
               />
               {displayValue}
             </span>
@@ -649,7 +651,7 @@ export const ReleaseCell = ({
           {isServerColumn && (
             <span
               className={`mr-1.5 h-2 w-2 shrink-0 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-gray-400'}`}
-              title={isOnline ? 'Online' : 'Offline'}
+              title={isOnline ? t('Online') : t('Offline')}
             />
           )}
           <span className="truncate" title={displayValue || undefined}>

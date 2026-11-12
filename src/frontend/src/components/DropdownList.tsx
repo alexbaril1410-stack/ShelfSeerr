@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { useLanguage } from '../contexts/LanguageContext';
 import { Dropdown } from './Dropdown';
 
 export interface DropdownListOption {
@@ -50,6 +51,8 @@ export const DropdownList = ({
   renderTrigger,
   onOpenChange,
 }: DropdownListProps) => {
+  const { t } = useLanguage();
+  const effectivePlaceholder = t(placeholder);
   const selectedValues = normalizeValue(value, multiple);
   const selectedOptions = options.filter((opt) => selectedValues.includes(opt.value));
   const checkboxEnabled = showCheckboxes ?? multiple;
@@ -57,7 +60,7 @@ export const DropdownList = ({
 
   const renderSummary = () => {
     if (summaryFormatter) {
-      return summaryFormatter(selectedOptions, placeholder);
+      return summaryFormatter(selectedOptions, effectivePlaceholder);
     }
 
     if (selectedOptions.length === 0) {
@@ -68,11 +71,11 @@ export const DropdownList = ({
           return emptyOption.label;
         }
       }
-      return <span className="opacity-60">{placeholder}</span>;
+      return <span className="opacity-60">{effectivePlaceholder}</span>;
     }
 
     if (!multiple) {
-      return selectedOptions[0]?.label ?? placeholder;
+      return selectedOptions[0]?.label ?? effectivePlaceholder;
     }
 
     if (selectedOptions.length === 1) {

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useCallback, useMemo, useState } from 'react';
 
 import { useMountEffect } from '../hooks/useMountEffect';
@@ -40,13 +41,13 @@ const BookmarkIcon = ({ className = 'h-4 w-4' }: { className?: string }) => (
   </svg>
 );
 
-const renderSummary = (selectedOptions: DropdownListOption[]) => {
+const renderSummary = (selectedOptions: DropdownListOption[], t: (value: string) => string) => {
   const count = selectedOptions.length;
 
   return (
     <span className="inline-flex items-center gap-1.5 whitespace-nowrap">
       <BookmarkIcon />
-      <span>Hardcover Lists{count > 0 ? ` (${count})` : ''}</span>
+      <span>{t('Hardcover Lists')}{count > 0 ? ` (${count})` : ''}</span>
     </span>
   );
 };
@@ -104,6 +105,7 @@ const BookTargetDropdownSession = ({
   className,
   onOpenChange,
 }: BookTargetDropdownProps) => {
+  const { t } = useLanguage();
   const [options, setOptions] = useState<BookTargetOption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -120,7 +122,7 @@ const BookTargetDropdownSession = ({
         setLoadError(null);
       } catch (error) {
         if (!isMounted) return;
-        const message = error instanceof Error ? error.message : 'Failed to load Hardcover lists';
+        const message = error instanceof Error ? error.message : t('Failed to load Hardcover lists');
         setOptions([]);
         setLoadError(message);
       } finally {
@@ -155,7 +157,7 @@ const BookTargetDropdownSession = ({
 
   const dropdownOptions = useMemo<DropdownListOption[]>(() => {
     if (isLoading) {
-      return [{ value: '__loading', label: 'Loading…', disabled: true }];
+      return [{ value: '__loading', label: t('Loading…'), disabled: true }];
     }
 
     if (loadError) {
@@ -163,7 +165,7 @@ const BookTargetDropdownSession = ({
     }
 
     if (options.length === 0) {
-      return [{ value: '__empty', label: 'No writable Hardcover targets', disabled: true }];
+      return [{ value: '__empty', label: t('No writable Hardcover targets'), disabled: true }];
     }
 
     return options.map((option) => ({
@@ -173,7 +175,7 @@ const BookTargetDropdownSession = ({
       group: option.group,
       disabled: !option.writable || pendingTargets.has(option.value),
     }));
-  }, [isLoading, loadError, options, pendingTargets]);
+  }, [isLoading, loadError, options, pendingTargets, t]);
 
   const handleChange = useCallback(
     (nextValue: string[] | string) => {
@@ -224,12 +226,12 @@ const BookTargetDropdownSession = ({
               });
             }
             const label = stripCountSuffix(toggledOption.label);
-            onShowToast?.(`${result.selected ? 'Added to' : 'Removed from'} ${label}`, 'success');
+            onShowToast?.(t(result.selected ? 'Added to {list}' : 'Removed from {list}').replace('{list}', label), 'success');
           }
         } catch (error) {
           setOptions((prev) => updateOptionChecked(prev, toggledTarget, !selected));
           const message =
-            error instanceof Error ? error.message : 'Failed to update Hardcover list';
+            error instanceof Error ? error.message : t('Failed to update Hardcover list');
           onShowToast?.(message, 'error');
         } finally {
           setPendingTargets((prev) => {
@@ -240,7 +242,7 @@ const BookTargetDropdownSession = ({
         }
       })();
     },
-    [bookId, onShowToast, options, pendingTargets, provider, selectedValues],
+    [bookId, onShowToast, options, pendingTargets, provider, selectedValues, t],
   );
 
   let customTrigger: ((props: { isOpen: boolean; toggle: () => void }) => ReactNode) | undefined;
@@ -254,16 +256,16 @@ const BookTargetDropdownSession = ({
           className={`inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-100 focus:outline-hidden dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40`}
         >
           <BookmarkIcon className="h-3 w-3" />
-          Hardcover Lists{count > 0 ? ` (${count})` : ''}
+          {t('Hardcover Lists')}{count > 0 ? ` (${count})` : ''}
         </button>
       );
     };
   } else if (variant === 'icon') {
     customTrigger = ({ toggle }: { isOpen: boolean; toggle: () => void }) => {
       const count = selectedValues.length;
-      let title = 'Hardcover Lists';
+      let title = t('Hardcover Lists');
       if (count > 0) {
-        title = `On ${count} Hardcover list${count > 1 ? 's' : ''}`;
+        title = t('On {count} Hardcover list(s)').replace('{count}', String(count));
       }
 
       return (
@@ -274,7 +276,7 @@ const BookTargetDropdownSession = ({
             toggle();
           }}
           className={`flex items-center justify-center rounded-full transition-colors duration-200 focus:outline-hidden ${className ?? 'hover-action p-1.5 text-gray-600 sm:p-2 dark:text-gray-200'}`}
-          aria-label="Hardcover Lists"
+          aria-label={t('Hardcover Lists')}
           title={title}
         >
           <BookmarkIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${count > 0 ? 'fill-current' : ''}`} />
@@ -288,7 +290,7 @@ const BookTargetDropdownSession = ({
       options={dropdownOptions}
       value={selectedValues}
       onChange={handleChange}
-      placeholder={isLoading ? 'Loading…' : 'Hardcover'}
+      placeholder={isLoading ? t('Loading…') : 'Hardcover'}
       widthClassName={variant !== 'default' ? 'w-auto' : widthClassName}
       buttonClassName={variant !== 'default' ? '' : 'py-1.5 leading-none'}
       panelClassName={variant !== 'default' ? 'w-56' : undefined}
@@ -297,7 +299,7 @@ const BookTargetDropdownSession = ({
       showCheckboxes
       keepOpenOnSelect
       positionStrategy={variant === 'icon' ? 'fixed' : 'absolute'}
-      summaryFormatter={(selectedOptions) => renderSummary(selectedOptions)}
+      summaryFormatter={(selectedOptions) => renderSummary(selectedOptions, t)}
       renderTrigger={customTrigger}
       onOpenChange={onOpenChange}
     />
