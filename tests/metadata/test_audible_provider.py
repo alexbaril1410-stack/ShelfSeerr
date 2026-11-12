@@ -200,6 +200,24 @@ def test_parse_audible_product_handles_contributor_objects_and_fallback_fields()
 
 
 
+def test_audible_prefers_book_series_over_broad_franchise_collection():
+    from shelfmark.metadata_providers.audible import _series_fields
+
+    series_id, series_name, position = _series_fields(
+        {
+            "series": [
+                {"asin": "B0WIZARD999", "title": "Le Monde des sorciers", "sequence": "1"},
+                {"asin": "B0HPOTTER99", "title": "Harry Potter", "sequence": "3"},
+            ]
+        },
+        "Harry Potter et la Chambre des secrets",
+    )
+
+    assert series_id == "B0HPOTTER99"
+    assert series_name == "Harry Potter"
+    assert position == 3.0
+
+
 def test_audible_series_parser_handles_hardcover_like_nested_series():
     from shelfmark.metadata_providers.audible import _series_fields
 
