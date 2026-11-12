@@ -399,6 +399,7 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   Unavailable: 'Indisponible',
   Reset: 'Réinitialiser',
   'Changing this setting requires a container restart to take effect': 'La modification de ce paramètre nécessite le redémarrage du conteneur',
+  'Some settings require a container restart to take effect': 'Certains paramètres nécessitent le redémarrage du conteneur pour être pris en compte',
   'User overridden': 'Remplacé par un paramètre utilisateur',
 };
 
