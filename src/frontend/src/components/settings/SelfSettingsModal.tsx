@@ -113,6 +113,15 @@ const SelfSettingsModalSession = ({
   onSettingsSaved,
 }: SelfSettingsModalSessionProps) => {
   const { t } = useLanguage();
+  const translatedThemeField = useMemo(
+    () => ({
+      ...THEME_FIELD,
+      label: t(THEME_FIELD.label),
+      description: THEME_FIELD.description ? t(THEME_FIELD.description) : undefined,
+      options: THEME_FIELD.options.map((option) => ({ ...option, label: t(option.label) })),
+    }),
+    [t],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -282,7 +291,7 @@ const SelfSettingsModalSession = ({
         className={`absolute inset-0 bg-black/60 transition-opacity duration-150 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         onClick={handleClose}
         tabIndex={-1}
-        aria-label={t("Close account settings")}
+        aria-label={t('Close account settings')}
       />
 
       <div
@@ -306,7 +315,7 @@ const SelfSettingsModalSession = ({
               type="button"
               onClick={handleClose}
               className="hover-action rounded-full p-2 text-gray-500 transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-100"
-              aria-label={t("Close account settings")}
+              aria-label={t('Close account settings')}
               disabled={isSaving}
             >
               <svg
@@ -352,9 +361,9 @@ const SelfSettingsModalSession = ({
             if (editingUser) {
               return (
                 <div className="space-y-5">
-                  <FieldWrapper field={THEME_FIELD}>
+                  <FieldWrapper field={translatedThemeField}>
                     <SelectField
-                      field={THEME_FIELD}
+                      field={translatedThemeField}
                       value={themeValue}
                       onChange={(value) => {
                         setThemeValue(value);
@@ -422,3 +431,4 @@ const SelfSettingsModalSession = ({
     </div>
   );
 };
+

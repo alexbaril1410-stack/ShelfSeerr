@@ -125,8 +125,6 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   Direct: 'Direct',
   'Search web sources for books and download directly. Works out of the box.':
     'Recherche des livres sur les sources en ligne et permet de les télécharger directement. Fonctionne sans configuration préalable.',
-  'Metadata-based search with downloads from all sources. Book and Audiobook support.':
-    'Recherche à partir des métadonnées avec téléchargement depuis toutes les sources. Compatible avec les livres et les livres audio.',
   'Disabled in Settings': 'Désactivé dans les paramètres',
   'Not configured': 'Non configuré',
   'API key required': 'Clé API requise',
@@ -270,6 +268,11 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
 
   'Title shown above the main search box on the homepage.':
     'Titre affiché au-dessus du champ de recherche principal sur la page d’accueil.',
+  Theme: 'Thème',
+  'Choose your preferred color scheme.': 'Choisissez votre thème de couleurs préféré.',
+  Light: 'Clair',
+  Dark: 'Sombre',
+  'Auto (System)': 'Automatique (système)',
   'Adds a navigation button to your book library (Calibre-Web Automated, Grimmory, etc).':
     'Ajoute un bouton de navigation vers votre bibliothèque de livres (Calibre-Web Automated, Grimmory, etc.).',
   'Adds a separate navigation button for your audiobook library (Audiobookshelf, Plex, etc). When both URLs are set, icons are shown instead of text.':
@@ -459,7 +462,6 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Request Book': 'Demander un livre',
   Blocked: 'Bloqué',
   Download: 'Télécharger',
-  'Default Content Type': 'Type de contenu par défaut',
   Close: 'Fermer',
 
   'Direct Download': 'Téléchargement direct',
@@ -480,6 +482,12 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
     'Signaler les livres déjà présents dans votre bibliothèque Calibre',
   'Calibre metadata.db path': 'Chemin du fichier metadata.db de Calibre',
   'Test Calibre library': 'Tester la bibliothèque Calibre',
+  'Read the Calibre metadata.db and mark search results you already own, so you do not download a second copy. Read only, nothing is written to the library.':
+    'Consulte la base metadata.db de Calibre et signale les résultats que vous possédez déjà afin d’éviter les doublons. Lecture seule : aucune donnée n’est écrite dans la bibliothèque.',
+  'Path to metadata.db as seen from inside the Shelfmark container. Mount the Calibre library folder read-only, e.g. /path/to/calibre-library:/calibre-library:ro.':
+    'Chemin vers metadata.db tel qu’il est vu depuis le conteneur Shelfmark. Montez le dossier de la bibliothèque Calibre en lecture seule, par exemple /path/to/calibre-library:/calibre-library:ro.',
+  'Check that Shelfmark can read the Calibre database and count the books.':
+    'Vérifie que Shelfmark peut lire la base de données Calibre et compter les livres.',
   'Mark audiobooks already in your Audiobookshelf library':
     'Signaler les livres audio déjà présents dans Audiobookshelf',
   'Audiobookshelf URL': 'URL d’Audiobookshelf',
@@ -487,18 +495,53 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Audiobookshelf Library IDs (optional)':
     'Identifiants des bibliothèques Audiobookshelf (facultatif)',
   'Test Audiobookshelf library': 'Tester la bibliothèque Audiobookshelf',
+  'Ask your Audiobookshelf server which audiobooks you already own, so synced and automatic downloads skip them. Read only, nothing is written to Audiobookshelf.':
+    'Demande à votre serveur Audiobookshelf quels livres audio vous possédez déjà afin que les synchronisations et téléchargements automatiques les ignorent. Lecture seule : aucune donnée n’est écrite dans Audiobookshelf.',
+  'Base URL reachable from the Shelfmark container (not the public URL). Often the host LAN IP, e.g. http://10.0.0.91:13378.':
+    'URL de base accessible depuis le conteneur Shelfmark (et non l’URL publique). Il s’agit souvent de l’adresse IP locale du serveur, par exemple http://10.0.0.91:13378.',
+  'API token from Audiobookshelf (Settings > Users > your user > API Token).':
+    'Jeton API Audiobookshelf (Settings > Users > votre utilisateur > API Token).',
+  'Comma-separated library IDs to check. Leave blank for all book libraries.':
+    'Identifiants des bibliothèques à vérifier, séparés par des virgules. Laissez vide pour vérifier toutes les bibliothèques de livres.',
+  'Check that Shelfmark can reach Audiobookshelf and count the items.':
+    'Vérifie que Shelfmark peut accéder à Audiobookshelf et compter les éléments.',
   'Default Search Filters': 'Filtres de recherche par défaut',
   'Supported Book Formats': 'Formats de livres pris en charge',
+  'Book formats to include in search results. ZIP/RAR archives are extracted automatically and book files are used if found.':
+    'Formats de livres à inclure dans les résultats de recherche. Les archives ZIP/RAR sont extraites automatiquement et les fichiers de livres sont utilisés si elles en contiennent.',
   'Supported Audiobook Formats': 'Formats de livres audio pris en charge',
+  'Audiobook formats to include in search results. ZIP/RAR archives are extracted automatically and audiobook files are used if found.':
+    'Formats de livres audio à inclure dans les résultats de recherche. Les archives ZIP/RAR sont extraites automatiquement et les fichiers audio sont utilisés si elles en contiennent.',
   'Default Book Languages': 'Langues des livres par défaut',
+  'Default language filter for searches. Users can override this for their own account.':
+    'Filtre de langue appliqué par défaut aux recherches. Chaque utilisateur peut le remplacer dans son compte.',
+  'Default Content Type': 'Type de contenu par défaut',
+  'Which tab the search page opens on. Users can override this for their own account, and a browser that has already picked a tab keeps its choice.':
+    'Onglet affiché à l’ouverture de la page de recherche. Chaque utilisateur peut choisir son onglet ; le navigateur conserve également son choix précédent.',
   'Default Sort Order': 'Ordre de tri par défaut',
   'Show Release Source Links': 'Afficher les liens des sources de téléchargement',
+  'Show clickable release-source links in release and details modals. Metadata provider links stay enabled.':
+    'Affiche des liens cliquables vers les sources dans les fenêtres des versions et des détails. Les liens des fournisseurs de métadonnées restent activés.',
   'Show Combined Download Selector': 'Afficher le sélecteur de téléchargement combiné',
   'Always Use Combined Search': 'Toujours utiliser la recherche combinée',
+  "Force combined search whenever it's available. Locks the combined toggle on.":
+    'Force la recherche combinée lorsqu’elle est disponible et verrouille son activation.',
   'Universal Mode Settings': 'Paramètres du mode universel',
+  'Direct mode uses the optional Direct Download source. Universal mode uses metadata search with whichever release sources you have enabled.':
+    'Le mode direct utilise la source de téléchargement direct si elle est configurée. Le mode universel recherche des métadonnées avec les sources de téléchargement activées.',
+  'Search with the Direct Download source. Requires enabling the source and adding your own mirror URLs.':
+    'Recherche avec la source de téléchargement direct. Vous devez activer cette source et ajouter vos propres URL de miroirs.',
+  'Metadata-based search with downloads from all sources. Book and Audiobook support.':
+    'Recherche à partir des métadonnées avec téléchargement depuis toutes les sources. Compatible avec les livres et les livres audio.',
   'Combined Mode Metadata Provider': 'Fournisseur de métadonnées du mode combiné',
+  'Metadata provider for combined mode searches. Uses the book provider if not set.':
+    'Fournisseur de métadonnées utilisé pour les recherches combinées. Celui des livres est utilisé si aucun fournisseur n’est défini.',
   'Default Book Release Source': 'Source de téléchargement des livres par défaut',
+  'The release source tab to open by default in the release modal for books. Leave unset to use the first available source.':
+    'Onglet de source affiché par défaut dans la fenêtre des versions de livres. Laissez ce champ vide pour utiliser la première source disponible.',
   'Default Audiobook Release Source': 'Source de téléchargement des livres audio par défaut',
+  'The release source tab to open by default in the release modal for audiobooks. Uses the book release source if not set.':
+    'Onglet de source affiché par défaut dans la fenêtre des versions de livres audio. La source des livres est utilisée si aucune valeur n’est définie.',
   'Release List Columns': 'Colonnes de la liste des résultats',
   'Show Series Column': 'Afficher la colonne Série',
   'Show Narrator Column': 'Afficher la colonne Narrateur',
@@ -920,6 +963,81 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Seed Time (minutes)': 'Durée de partage (minutes)',
   'Rate Limit Delay (seconds)': 'Délai entre les requêtes (secondes)',
   Hostname: 'Nom d’hôte',
+  Chinese: 'Chinois',
+  Russian: 'Russe',
+  Spanish: 'Espagnol',
+  German: 'Allemand',
+  Italian: 'Italien',
+  Portuguese: 'Portugais',
+  Polish: 'Polonais',
+  Bulgarian: 'Bulgare',
+  Dutch: 'Néerlandais',
+  Japanese: 'Japonais',
+  Arabic: 'Arabe',
+  Hebrew: 'Hébreu',
+  Turkish: 'Turc',
+  Hungarian: 'Hongrois',
+  Latin: 'Latin',
+  Czech: 'Tchèque',
+  Korean: 'Coréen',
+  Ukrainian: 'Ukrainien',
+  Indonesian: 'Indonésien',
+  Romanian: 'Roumain',
+  Swedish: 'Suédois',
+  Greek: 'Grec',
+  Lithuanian: 'Lituanien',
+  Bangla: 'Bengali',
+  'Traditional Chinese': 'Chinois traditionnel',
+  Afrikaans: 'Afrikaans',
+  Catalan: 'Catalan',
+  Danish: 'Danois',
+  Thai: 'Thaï',
+  Hindi: 'Hindi',
+  Irish: 'Irlandais',
+  Latvian: 'Letton',
+  Tibetan: 'Tibétain',
+  Kannada: 'Kannada',
+  Serbian: 'Serbe',
+  Persian: 'Persan',
+  Croatian: 'Croate',
+  Slovak: 'Slovaque',
+  Javanese: 'Javanais',
+  Vietnamese: 'Vietnamien',
+  Urdu: 'Ourdou',
+  Finnish: 'Finnois',
+  Norwegian: 'Norvégien',
+  Kinyarwanda: 'Kinyarwanda',
+  Tamil: 'Tamoul',
+  Belarusian: 'Biélorusse',
+  Kazakh: 'Kazakh',
+  Mongolian: 'Mongol',
+  Georgian: 'Géorgien',
+  Slovenian: 'Slovène',
+  Esperanto: 'Espéranto',
+  Galician: 'Galicien',
+  Marathi: 'Marathi',
+  Filipino: 'Filipino',
+  Gujarati: 'Gujarati',
+  Malayalam: 'Malayalam',
+  Kyrgyz: 'Kirghize',
+  Azerbaijani: 'Azerbaïdjanais',
+  Quechua: 'Quechua',
+  Swahili: 'Swahili',
+  Bashkir: 'Bachkir',
+  Punjabi: 'Pendjabi',
+  Malay: 'Malais',
+  Telugu: 'Télougou',
+  Albanian: 'Albanais',
+  Uyghur: 'Ouïghour',
+  Armenian: 'Arménien',
+  Shan: 'Shan',
+  Bosnian: 'Bosniaque',
+  Burmese: 'Birman',
+  Estonian: 'Estonien',
+  Icelandic: 'Islandais',
+  Manx: 'Mannois',
+  'Scottish Gaelic': 'Gaélique écossais',
+  Sanskrit: 'Sanskrit',
 };
 
 interface LanguageContextValue {
