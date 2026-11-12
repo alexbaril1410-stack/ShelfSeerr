@@ -156,7 +156,7 @@ export const RequestPolicyGrid = ({
             disabled={clearOverridesDisabled}
             className="rounded-lg border border-(--border-muted) bg-(--bg) px-3 py-1.5 text-xs font-medium transition-colors hover:bg-(--hover-surface) disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Clear all overrides
+            {t('Clear all overrides')}
           </button>
         </div>
       )}
@@ -258,7 +258,7 @@ export const RequestPolicyGrid = ({
 
                 const mobileLabel = (
                   <span className="mr-2 text-xs font-medium opacity-50 sm:hidden">
-                    {contentType === 'ebook' ? 'Ebook:' : 'Audiobook:'}
+                    {contentType === 'ebook' ? `${t('Ebook')}:` : `${t('Audiobook')}:`}
                   </span>
                 );
 
@@ -340,7 +340,7 @@ export const RequestPolicyGrid = ({
                         className="shrink-0 text-xs text-sky-500 transition-colors hover:text-sky-400"
                         aria-label={`${t("Reset")} ${sourceRow.displayName} ${t(contentType === "ebook" ? "Ebook" : "Audiobook")} ${t("override")}`}
                       >
-                        Reset
+                        {t('Reset')}
                       </button>
                     )}
                   </div>
