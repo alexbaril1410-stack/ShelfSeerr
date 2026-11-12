@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 export type AppLanguage = 'fr' | 'en';
 
@@ -443,14 +443,14 @@ const getInitialLanguage = (): AppLanguage => {
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<AppLanguage>(getInitialLanguage);
 
-  const setLanguage = (nextLanguage: AppLanguage) => {
+  const setLanguage = useCallback((nextLanguage: AppLanguage) => {
     setLanguageState(nextLanguage);
     try {
       window.localStorage.setItem(LANGUAGE_STORAGE_KEY, nextLanguage);
     } catch {
       // Keep the in-memory preference when browser storage is unavailable.
     }
-  };
+  }, []);
 
   const value = useMemo<LanguageContextValue>(
     () => ({
@@ -459,7 +459,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
       t: (englishText: string) =>
         language === 'fr' ? (FRENCH_TRANSLATIONS[englishText] ?? englishText) : englishText,
     }),
-    [language],
+    [language, setLanguage],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
