@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import type { RequestRecord } from '../../types';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { withBasePath } from '../../utils/basePath';
 import { Tooltip } from '../shared/Tooltip';
 import type { ActivityCardAction } from './activityCardModel';
@@ -430,7 +431,7 @@ const ReviewInlinePanel = ({
           disabled={isSubmitting}
           className="rounded-md bg-green-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-green-700 disabled:opacity-60"
         >
-          {isSubmitting ? 'Working...' : approveLabel}
+          {isSubmitting ? t('Working...') : t(approveLabel)}
         </button>
         {canMarkAsApprovedWithoutRelease && (
           <button
@@ -439,7 +440,7 @@ const ReviewInlinePanel = ({
             disabled={isSubmitting}
             className="rounded-md border border-(--border-muted) px-2.5 py-1.5 text-xs transition-colors hover:bg-(--hover-surface) disabled:opacity-50"
           >
-            {isSubmitting ? 'Working...' : 'Manually Mark as Approved'}
+            {isSubmitting ? t('Working...') : t('Manually Mark as Approved')}
           </button>
         )}
         {canBrowseAlternatives && hasAttachedRelease && (
@@ -513,7 +514,7 @@ const RejectInlinePanel = ({
             disabled={isSubmitting}
             className="rounded-md px-2.5 py-1.5 text-xs transition-colors hover:bg-(--hover-surface) disabled:opacity-50"
           >
-            Cancel
+            {t('Cancel')}
           </button>
           <button
             type="button"
@@ -521,7 +522,7 @@ const RejectInlinePanel = ({
             disabled={isSubmitting}
             className="rounded-md bg-red-600 px-2.5 py-1.5 text-xs font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-60"
           >
-            {isSubmitting ? 'Rejecting...' : 'Reject'}
+            {isSubmitting ? t('Rejecting...') : t('Reject')}
           </button>
         </div>
       </div>
@@ -553,6 +554,7 @@ export const ActivityCard = ({
   onRequestRejectClose,
   isSelected = false,
 }: ActivityCardProps) => {
+  const { t } = useLanguage();
   const model = useMemo(() => buildActivityCardModel(item, isAdmin), [item, isAdmin]);
   const noteLine = model.noteLine;
   const formatPill = item.formatPill;
@@ -767,7 +769,7 @@ export const ActivityCard = ({
 
   const titleNode =
     canShowDownloadLink && item.downloadBookId ? (
-      <Tooltip content="Download file" position="top" delay={0}>
+      <Tooltip content={t('Download file')} position="top" delay={0}>
         <a
           href={withBasePath(`/api/localdownload?id=${encodeURIComponent(item.downloadBookId)}`)}
           className="text-sky-600 hover:underline"
@@ -824,7 +826,7 @@ export const ActivityCard = ({
                 const icon =
                   action.kind === 'request-approve' && isRetryAfterFailure ? 'retry' : config.icon;
                 const actionTitle =
-                  action.kind === 'request-approve' && isRetryAfterFailure ? 'Retry' : config.title;
+                  t(action.kind === 'request-approve' && isRetryAfterFailure ? 'Retry' : config.title);
                 return (
                   <Tooltip
                     key={actionKey(action)}
@@ -844,7 +846,7 @@ export const ActivityCard = ({
               })}
               {showRequestDetailsToggle && onRequestDetailsToggle && (
                 <IconButton
-                  title={isDetailsExpanded ? 'Hide details' : 'Show details'}
+                  title={t(isDetailsExpanded ? 'Hide details' : 'Show details')}
                   className="hover-action text-gray-500"
                   onClick={onRequestDetailsToggle}
                 >
@@ -873,7 +875,7 @@ export const ActivityCard = ({
               {item.reattached && (
                 <span
                   className={`shrink-0 rounded px-1.5 py-px font-medium ${REATTACHED_PILL_CLASSES}`}
-                  title="Picked up where it left off instead of starting again"
+                  title={t('Picked up where it left off instead of starting again')}
                 >
                   Reattached
                 </span>
@@ -889,7 +891,7 @@ export const ActivityCard = ({
               {item.reattached && (
                 <span
                   className={`shrink-0 rounded px-1.5 py-px font-medium ${REATTACHED_PILL_CLASSES}`}
-                  title="Picked up where it left off instead of starting again"
+                  title={t('Picked up where it left off instead of starting again')}
                 >
                   Reattached
                 </span>
@@ -919,7 +921,7 @@ export const ActivityCard = ({
               return (
                 <Tooltip
                   key={badgeId}
-                  content={badgeOverflow[badgeId] ? badge.text : undefined}
+                  content={badgeOverflow[badgeId] ? t(badge.text) : undefined}
                   delay={0}
                   position="bottom"
                   unstyled
@@ -955,7 +957,7 @@ export const ActivityCard = ({
                         />
                       </span>
                     )}
-                    <span className="relative">{badge.text}</span>
+                    <span className="relative">{t(badge.text)}</span>
                   </span>
                 </Tooltip>
               );
