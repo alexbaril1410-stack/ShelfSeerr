@@ -27,11 +27,26 @@ def _entry(
     *words: str,
     isbns: frozenset[str] = frozenset(),
     external_ids: frozenset[tuple[str, str]] = frozenset(),
+    asins: frozenset[str] = frozenset(),
 ) -> LibraryEntry:
-    return LibraryEntry(frozenset(words), isbns, frozenset(), external_ids)
+    return LibraryEntry(frozenset(words), isbns, asins, external_ids)
 
 
 _DCC_ENTRY = _entry("dungeon", "crawler", "carl", "matt", "dinniman")
+
+
+def test_audible_asin_matches_audiobookshelf_entry_without_title_match() -> None:
+    book = _book(provider="audible", provider_id="b08bkgyqxw", title="A completely different title")
+    entry = _entry("unrelated", asins=frozenset({"B08BKGYQXW"}))
+
+    assert library_index.match_entries(book, [entry]) == "owned"
+
+
+def test_non_audible_provider_id_is_not_compared_to_asins() -> None:
+    book = _book(provider="hardcover", provider_id="B08BKGYQXW")
+    entry = _entry("unrelated", asins=frozenset({"B08BKGYQXW"}))
+
+    assert library_index.match_entries(book, [entry]) is None
 
 
 class _Provider:
