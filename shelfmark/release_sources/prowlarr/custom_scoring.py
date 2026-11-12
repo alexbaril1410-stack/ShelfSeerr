@@ -105,8 +105,8 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
         if width == 1 and wanted[0].isdigit() and len(wanted[0]) == 4:
             raw = str(release.extra.get("book_title") or release.title or "")
             year_only = re.search(
-                rf"(?:\\(\\s*{re.escape(wanted[0])}\\s*\\)|"
-                rf"\\[\\s*{re.escape(wanted[0])}\\s*\\])",
+                rf"(?:\(\s*{re.escape(wanted[0])}\s*\)|"
+                rf"\[\s*{re.escape(wanted[0])}\s*\])",
                 raw,
                 re.I,
             )
