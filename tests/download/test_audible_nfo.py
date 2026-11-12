@@ -2,6 +2,7 @@ from pathlib import Path
 
 from shelfmark.core.models import DownloadTask
 from shelfmark.download.postprocess.transfer import (
+    _maybe_write_audible_nfo,
     _write_audible_nfo_file,
     build_audible_nfo_content,
 )
@@ -70,3 +71,24 @@ def test_write_audible_nfo_updates_its_own_generated_file(tmp_path: Path):
     assert _write_audible_nfo_file(tmp_path, first) is True
     assert _write_audible_nfo_file(tmp_path, second) is True
     assert (tmp_path / "metadata.nfo").read_text(encoding="utf-8") == second
+
+
+
+def test_transfer_sidecar_is_written_next_to_final_audio_file(tmp_path: Path):
+    audio_file = tmp_path / "Le livre des étoiles.m4b"
+    audio_file.touch()
+
+    _maybe_write_audible_nfo([audio_file], _audible_task())
+
+    nfo = tmp_path / "metadata.nfo"
+    assert nfo.exists()
+    assert "ASIN: B08BKGYQXW" in nfo.read_text(encoding="utf-8")
+
+
+def test_multi_book_task_does_not_get_one_shared_audible_nfo(tmp_path: Path):
+    audio_file = tmp_path / "pack.m4b"
+    audio_file.touch()
+
+    _maybe_write_audible_nfo([audio_file], _audible_task(multi_book=True))
+
+    assert not (tmp_path / "metadata.nfo").exists()
