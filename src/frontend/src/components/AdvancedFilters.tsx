@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 import { CONTENT_OPTIONS } from '../data/filterOptions';
 import type {
   AdvancedFilterState,
@@ -78,6 +80,7 @@ export const AdvancedFilters = ({
   isAdmin = false,
   onClose,
 }: AdvancedFiltersProps) => {
+  const { t } = useLanguage();
   const { lang, content, formats } = filters;
 
   const handleLangChange = (next: string[]) => {
@@ -107,9 +110,9 @@ export const AdvancedFilters = ({
 
   const providerOptions = metadataProviders.map((provider) => {
     const details: string[] = [];
-    if (!provider.enabled) details.push('Disabled in Settings');
-    if (provider.enabled && !provider.available) details.push('Not configured');
-    if (provider.requires_auth) details.push('API key required');
+    if (!provider.enabled) details.push(t('Disabled in Settings'));
+    if (provider.enabled && !provider.available) details.push(t('Not configured'));
+    if (provider.requires_auth) details.push(t('API key required'));
 
     return {
       value: provider.name,
@@ -138,8 +141,8 @@ export const AdvancedFilters = ({
             type="button"
             onClick={onClose}
             className="hover-action rounded-full p-1 transition-colors"
-            aria-label="Close filters"
-            title="Close filters"
+            aria-label={t('Close filters')}
+            title={t('Close filters')}
           >
             <svg
               className="h-4 w-4"
@@ -158,14 +161,14 @@ export const AdvancedFilters = ({
       {isAdmin && (
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <DropdownList
-            label="Search Mode"
+            label={t('Search Mode')}
             options={SEARCH_MODE_OPTIONS}
             value={searchMode}
             onChange={(value) => {
               const next = Array.isArray(value) ? (value[0] ?? 'direct') : value;
               onSearchModeChange(next === 'universal' ? 'universal' : 'direct');
             }}
-            placeholder="Choose a mode"
+            placeholder={t('Choose a mode')}
             widthClassName="w-full"
           />
 
@@ -178,7 +181,7 @@ export const AdvancedFilters = ({
                 const next = Array.isArray(value) ? (value[0] ?? '') : value;
                 onMetadataProviderChange?.(next);
               }}
-              placeholder="Choose a provider"
+              placeholder={t('Choose a provider')}
               widthClassName="w-full"
             />
           )}
@@ -196,18 +199,18 @@ export const AdvancedFilters = ({
               value={lang}
               onChange={handleLangChange}
               defaultLanguageCodes={defaultLanguage}
-              label="Language"
+              label={t('Language')}
             />
             <DropdownList
-              label="Content"
+              label={t('Content')}
               options={CONTENT_OPTIONS}
               value={content}
               onChange={handleContentChange}
-              placeholder="All"
+              placeholder={t('All')}
             />
             <DropdownList
-              label="Formats"
-              placeholder="Any"
+              label={t('Formats')}
+              placeholder={t('Any')}
               options={formatOptions}
               value={formats}
               onChange={handleFormatsChange}
