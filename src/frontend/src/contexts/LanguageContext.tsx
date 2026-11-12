@@ -587,6 +587,22 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   "Without this volume, settings changes will not persist across container restarts.": "Sans ce volume, les modifications des paramètres ne seront pas conservées après le redémarrage du conteneur.",
   "This allows you to configure settings through the UI and persist them across container restarts.": "Cela vous permet de configurer les paramètres depuis l’interface et de les conserver après le redémarrage du conteneur.",
   "Continue to Settings": "Accéder aux paramètres",
+  "Unsupported onboarding field type": "Type de champ non pris en charge dans l’assistant",
+  "Failed to load setup wizard": "Impossible de charger l’assistant de configuration",
+  "Setup skipped - using defaults": "Configuration ignorée : utilisation des valeurs par défaut",
+  "Failed to skip setup": "Impossible d’ignorer la configuration",
+  "Setup complete!": "Configuration terminée !",
+  "Failed to save settings": "Impossible d’enregistrer les paramètres",
+  "No current step": "Aucune étape en cours",
+  "Loading setup wizard...": "Chargement de l’assistant de configuration…",
+  "Close setup wizard": "Fermer l’assistant de configuration",
+  "Setup Wizard": "Assistant de configuration",
+  Setup: "Configuration",
+  "Step {current} of {total}": "Étape {current} sur {total}",
+  "Skip setup": "Ignorer la configuration",
+  Back: "Retour",
+  "Finish Setup": "Terminer la configuration",
+  Next: "Suivant",
 };
 
 interface LanguageContextValue {
