@@ -64,6 +64,33 @@ def test_numeric_title_does_not_match_parenthesized_publication_year():
         _release("Robert Van Gulik - Meurtre sur un bateau de fleurs - (1984) FR epub"), book
     )
 
+def test_numeric_one_word_title_requires_matching_author():
+    book = _book("1984", "George Orwell")
+
+    assert release_title_matches_book(
+        _release("1984.George.Orwell.2013.FR.[EPUB]"), book
+    )
+    assert not release_title_matches_book(
+        _release("1984 (Derrien) - One Shot - Bds - Fr - EPUB"), book
+    )
+    assert not release_title_matches_book(
+        _release("1984 - Fido Nesti - BD - FR - PDF"), book
+    )
+
+
+def test_dune_one_word_title_requires_matching_author():
+    book = _book("Dune", "Frank Herbert")
+
+    assert release_title_matches_book(
+        _release("Dune.Tome.1.Frank.Herbert.FR.[EPUB]"), book
+    )
+    assert not release_title_matches_book(
+        _release("Dune, le Roman graphique (T01 à T03) - 2021-2024 [PDF & CBZ] Fr"), book
+    )
+    assert not release_title_matches_book(
+        _release("Dune - Maison Harkonnen (T01 à T03) - 2023-2025 [PDF & CBZ] Fr"), book
+    )
+
 
 def test_release_title_matching_uses_enriched_book_title_when_available():
     book = _book("Dune", "Frank Herbert")
