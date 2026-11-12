@@ -6,6 +6,7 @@ import type {
   OrderableListOption,
 } from '../../../types/settings';
 import { ToggleSwitch } from '../../shared';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface OrderableListFieldProps {
   field: OrderableListFieldConfig;
@@ -54,6 +55,7 @@ export const OrderableListField = ({
   onChange,
   disabled,
 }: OrderableListFieldProps) => {
+  const { t } = useLanguage();
   const isDisabled = disabled ?? false;
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dropPosition, setDropPosition] = useState<DropPosition>(null);
@@ -259,7 +261,7 @@ export const OrderableListField = ({
                         ? 'cursor-not-allowed text-gray-300 dark:text-gray-600'
                         : 'text-gray-400 hover:text-gray-600 sm:hover:bg-gray-100 dark:hover:text-gray-300 sm:dark:hover:bg-gray-700'
                     } `}
-                    aria-label="Move up"
+                    aria-label={t("Move up")}
                   >
                     <svg
                       className="h-5 w-5 sm:h-4 sm:w-4"
@@ -283,7 +285,7 @@ export const OrderableListField = ({
                         ? 'cursor-not-allowed text-gray-300 dark:text-gray-600'
                         : 'text-gray-400 hover:text-gray-600 sm:hover:bg-gray-100 dark:hover:text-gray-300 sm:dark:hover:bg-gray-700'
                     } `}
-                    aria-label="Move down"
+                    aria-label={t("Move down")}
                   >
                     <svg
                       className="h-5 w-5 sm:h-4 sm:w-4"
