@@ -11,6 +11,7 @@ import { getAdminSettingsOverridesSummary, getSettingsTab } from '../../services
 import { SettingsContent } from './SettingsContent';
 import { SettingsHeader } from './SettingsHeader';
 import { SettingsSidebar } from './SettingsSidebar';
+import { LanguageSelector } from '../LanguageSelector';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -528,6 +529,7 @@ const SettingsModalSession = ({
         <SettingsHeader title={t("Settings")} onClose={handleClose} />
 
         <div className="flex min-h-0 flex-1">
+          <div className="flex min-h-0 w-full flex-col md:flex-row">
           <SettingsSidebar
             tabs={tabs}
             groups={groups}
@@ -536,11 +538,17 @@ const SettingsModalSession = ({
             mode="sidebar"
           />
 
-          {currentTabContent ?? (
-            <div className="flex flex-1 items-center justify-center text-sm opacity-60">
-              {t("Select a category to configure")}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            <div className="flex justify-end border-b border-(--border-muted) px-6 py-3">
+              <LanguageSelector compact />
             </div>
-          )}
+            {currentTabContent ?? (
+              <div className="flex flex-1 items-center justify-center text-sm opacity-60">
+                {t("Select a category to configure")}
+              </div>
+            )}
+          </div>
+          </div>
         </div>
       </div>
     </div>
