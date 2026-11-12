@@ -182,7 +182,7 @@ export const RequestPolicyGrid = ({
 
             const mobileLabel = (
               <span className="mr-2 text-xs font-medium opacity-50 sm:hidden">
-                {contentType === 'ebook' ? 'Ebook:' : 'Audiobook:'}
+                {contentType === 'ebook' ? `${t('Ebook')}:` : `${t('Audiobook')}:`}
               </span>
             );
 
@@ -191,7 +191,7 @@ export const RequestPolicyGrid = ({
                 {mobileLabel}
                 {isDisabled ? (
                   <div className="w-full cursor-not-allowed rounded-lg border border-(--border-muted) bg-(--bg) px-3 py-2 text-sm opacity-60">
-                    {REQUEST_POLICY_MODE_LABELS[mode]}
+                    {t(REQUEST_POLICY_MODE_LABELS[mode])}
                   </div>
                 ) : (
                   <div
@@ -200,7 +200,7 @@ export const RequestPolicyGrid = ({
                     }`}
                   >
                     <DropdownList
-                      options={REQUEST_POLICY_DEFAULT_OPTIONS}
+                      options={REQUEST_POLICY_DEFAULT_OPTIONS.map((option) => ({ ...option, label: t(option.label), description: t(option.description) }))}
                       value={mode}
                       onChange={(value) => {
                         const nextMode = normalizeRequestPolicyMode(getDropdownValue(value));
@@ -220,7 +220,7 @@ export const RequestPolicyGrid = ({
                     disabled={isDisabled}
                     className="shrink-0 text-xs text-sky-500 transition-colors hover:text-sky-400 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    Reset
+                    {t('Reset')}
                   </button>
                 )}
               </div>
@@ -276,7 +276,7 @@ export const RequestPolicyGrid = ({
                     <div key={key} className="flex min-h-[36px] items-center justify-center">
                       {mobileLabel}
                       <span className="text-xs opacity-40">
-                        {REQUEST_POLICY_MODE_LABELS[effectiveMode]}
+                        {t(REQUEST_POLICY_MODE_LABELS[effectiveMode])}
                       </span>
                     </div>
                   );
@@ -292,8 +292,8 @@ export const RequestPolicyGrid = ({
                     ? [
                         {
                           value: effectiveMode,
-                          label: REQUEST_POLICY_MODE_LABELS[effectiveMode],
-                          description: modeDescriptions[effectiveMode],
+                          label: t(REQUEST_POLICY_MODE_LABELS[effectiveMode]),
+                          description: t(modeDescriptions[effectiveMode]),
                         },
                       ]
                     : [];
@@ -301,8 +301,8 @@ export const RequestPolicyGrid = ({
                   ...effectiveModeOption,
                   ...allowedModes.map((mode) => ({
                     value: mode,
-                    label: REQUEST_POLICY_MODE_LABELS[mode],
-                    description: modeDescriptions[mode],
+                    label: t(REQUEST_POLICY_MODE_LABELS[mode]),
+                    description: t(modeDescriptions[mode]),
                   })),
                 ];
 
@@ -316,7 +316,7 @@ export const RequestPolicyGrid = ({
                     >
                       {rulesDisabled ? (
                         <div className="w-full cursor-not-allowed rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm opacity-60">
-                          {REQUEST_POLICY_MODE_LABELS[effectiveMode]}
+                          {t(REQUEST_POLICY_MODE_LABELS[effectiveMode])}
                         </div>
                       ) : (
                         <DropdownList
