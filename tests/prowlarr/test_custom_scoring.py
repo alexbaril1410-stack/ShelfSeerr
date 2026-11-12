@@ -84,10 +84,13 @@ def test_dune_one_word_title_requires_matching_author():
     assert release_title_matches_book(
         _release("Dune.Tome.1.Frank.Herbert.FR.[EPUB]"), book
     )
-    assert not release_title_matches_book(
+    assert release_title_matches_book(
         _release("Dune, le Roman graphique (T01 à T03) - 2021-2024 [PDF & CBZ] Fr"), book
     )
-    assert not release_title_matches_book(
+    assert not release_author_matches_book(
+        _release("Dune, le Roman graphique (T01 à T03) - 2021-2024 [PDF & CBZ] Fr"), book
+    )
+    assert not release_author_matches_book(
         _release("Dune - Maison Harkonnen (T01 à T03) - 2023-2025 [PDF & CBZ] Fr"), book
     )
 
@@ -101,3 +104,16 @@ def test_release_title_matching_uses_enriched_book_title_when_available():
     assert not release_title_matches_book(
         _release("Random release title", book_title="The Martian"), book
     )
+
+
+
+def test_author_match_works_for_long_titles_and_falls_back_when_missing():
+    book = _book("Projet Dernière Chance", "Andy Weir")
+
+    assert release_author_matches_book(
+        _release("Projet Dernière Chance - Andy Weir - EPUB"), book
+    )
+    assert not release_author_matches_book(
+        _release("Projet Dernière Chance.epub"), book
+    )
+    assert release_title_matches_book(_release("Projet Dernière Chance.epub"), book)
