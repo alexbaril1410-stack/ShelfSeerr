@@ -41,7 +41,7 @@ export const SettingsSaveBar = ({ onSave, isSaving }: SettingsSaveBarProps) => {
           {t("Saving...")}
         </span>
       ) : (
-        {t('Save Changes')}
+        t('Save Changes')
       )}
     </button>
   </div>
