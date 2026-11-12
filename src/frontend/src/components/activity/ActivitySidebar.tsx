@@ -469,8 +469,8 @@ export const ActivitySidebar = ({
     return visibleCategoryOrder
       .map((key) => ({
         key,
-        label: getCategoryLabel(key, isAdmin),
-        hint: getCategoryHint(key, isAdmin),
+        label: t(getCategoryLabel(key, isAdmin)),
+        hint: getCategoryHint(key, isAdmin) ? t(getCategoryHint(key, isAdmin)!) : undefined,
         items: (grouped.get(key) ?? []).toSorted((left, right) => right.timestamp - left.timestamp),
       }))
       .filter((group) => group.items.length > 0);
