@@ -347,8 +347,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   settingsEnabled ? 'hover-surface' : 'cursor-not-allowed opacity-40'
                 }`
           }
-          aria-label="Settings"
-          title={isNav ? 'Settings' : undefined}
+          aria-label={t("Settings")}
+          title={isNav ? t('Settings') : undefined}
         >
           <svg
             className="h-5 w-5"
@@ -518,6 +518,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               }}
             >
               <div className="py-1">
+                <LanguageSelector compact />
                 <a
                   href="https://github.com/calibrain/shelfmark/issues"
                   target="_blank"
