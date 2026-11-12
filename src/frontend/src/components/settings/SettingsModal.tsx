@@ -264,7 +264,7 @@ const SettingsModalSession = ({
         }, 500);
       }
     } else {
-      onShowToast?.(result.message, 'error');
+      onShowToast?.(t(result.message), 'error');
     }
   }, [selectedTab, saveTab, onShowToast, onSettingsSaved, refreshOverrideSummaryForTab]);
 
@@ -360,7 +360,7 @@ const SettingsModalSession = ({
   const currentTabContent = currentTab ? (
     selectedTab === 'security' && securityAccessError ? (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
-        <p className="text-sm opacity-60">{securityAccessError}</p>
+        <p className="text-sm opacity-60">{t(securityAccessError)}</p>
       </div>
     ) : (
       <SettingsContent
@@ -457,7 +457,7 @@ const SettingsModalSession = ({
                 />
               </svg>
             </div>
-            <p className="text-sm">{error}</p>
+            <p className="text-sm">{t(error)}</p>
             <button
               type="button"
               onClick={handleClose}
