@@ -1,5 +1,9 @@
 from shelfmark.release_sources import Release
-from shelfmark.release_sources.prowlarr.custom_scoring import (\n    _release_language_signal,\n    release_title_matches_book,\n)\nfrom shelfmark.metadata_providers import BookMetadata
+from shelfmark.release_sources.prowlarr.custom_scoring import (
+    _release_language_signal,
+    release_title_matches_book,
+    release_author_matches_book,
+)\nfrom shelfmark.metadata_providers import BookMetadata
 
 
 def test_release_language_signal_detects_french_markers():
