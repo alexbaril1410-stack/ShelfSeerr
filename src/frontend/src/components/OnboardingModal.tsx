@@ -94,6 +94,7 @@ const renderField = (
   onChange: (value: unknown) => void,
   onAction: () => Promise<ActionResult>,
   isDisabled: boolean,
+  t: (value: string) => string,
 ) => {
   switch (field.type) {
     case 'TextField':
@@ -297,7 +298,7 @@ const OnboardingModalSession = ({
     } finally {
       setIsSaving(false);
     }
-  }, [handleClose, onComplete, onShowToast]);
+  }, [handleClose, onComplete, onShowToast, t]);
 
   // Handle finish (save and complete)
   const handleFinish = useCallback(async () => {
@@ -317,7 +318,7 @@ const OnboardingModalSession = ({
     } finally {
       setIsSaving(false);
     }
-  }, [values, handleClose, onComplete, onShowToast]);
+  }, [values, handleClose, onComplete, onShowToast, t]);
 
   // Handle action button (e.g., test connection)
   const handleAction = useCallback(
@@ -488,6 +489,7 @@ const OnboardingModalSession = ({
                     (v) => handleChange(field.key, v),
                     () => handleAction(field.key),
                     isDisabled,
+                    t,
                   )}
                 </FieldWrapper>
               );
