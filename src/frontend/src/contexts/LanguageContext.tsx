@@ -707,6 +707,17 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   "Open User Preferences": "Ouvrir les préférences utilisateur",
   "Customise delivery and request settings for this user.": "Personnalisez les paramètres de livraison et de demande de cet utilisateur.",
   Inactive: "Inactif",
+  "No users yet.": "Aucun utilisateur pour le moment.",
+  "Create a local admin account before enabling OIDC to avoid getting locked out.": "Créez un compte administrateur local avant d’activer OIDC afin d’éviter de perdre l’accès à l’application.",
+  "Collapse user editor": "Réduire l’éditeur utilisateur",
+  "Expand {user} editor": "Développer l’éditeur de {user}",
+  "Loading user details...": "Chargement des informations utilisateur…",
+  "Syncing with CWA...": "Synchronisation avec CWA…",
+  "Sync with CWA": "Synchroniser avec CWA",
+  "Built-in": "Intégré",
+  OIDC: "OIDC",
+  CWA: "CWA",
+  LDAP: "LDAP",
 };
 
 interface LanguageContextValue {

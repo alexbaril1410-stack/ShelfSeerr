@@ -1,4 +1,5 @@
 import type { AdminUser } from '../../../services/api';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { AUTH_SOURCE_BADGE_CLASSES, AUTH_SOURCE_LABEL } from './types';
 
 interface UserAuthSourceBadgeProps {
@@ -7,6 +8,7 @@ interface UserAuthSourceBadgeProps {
 }
 
 export const UserAuthSourceBadge = ({ user, showInactive = true }: UserAuthSourceBadgeProps) => {
+  const { t } = useLanguage();
   const authSource = user.auth_source;
   const active = user.is_active;
   const badgeBase =
@@ -15,10 +17,10 @@ export const UserAuthSourceBadge = ({ user, showInactive = true }: UserAuthSourc
   return (
     <>
       <span className={`${badgeBase} ${AUTH_SOURCE_BADGE_CLASSES[authSource]}`}>
-        {AUTH_SOURCE_LABEL[authSource]}
+        {t(AUTH_SOURCE_LABEL[authSource])}
       </span>
       {showInactive && !active && (
-        <span className={`${badgeBase} bg-zinc-500/10 opacity-80`}>Inactive</span>
+        <span className={`${badgeBase} bg-zinc-500/10 opacity-80`}>{t('Inactive')}</span>
       )}
     </>
   );
