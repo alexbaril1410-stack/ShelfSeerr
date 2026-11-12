@@ -566,11 +566,11 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 type="checkbox"
                 checked={Boolean(value)}
                 onChange={(e) => onChange(e.target.checked)}
-                aria-label={activeQueryField.label}
+                aria-label={t(activeQueryField.label)}
                 className="h-4 w-4 rounded-sm border-(--border-muted) text-emerald-500 focus:ring-emerald-500/50"
               />
               <span className="truncate text-sm" style={{ color: 'var(--text)' }}>
-                {activeQueryField.label}
+                {t(activeQueryField.label)}
               </span>
             </label>
           );
@@ -683,8 +683,8 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                     type="button"
                     key={target.key}
                     onClick={() => handleQueryTargetSelect(target.key)}
-                    title={target.description || target.label}
-                    aria-label={target.label}
+                    title={t(target.description || target.label)}
+                    aria-label={t(target.label)}
                     className={optionClasses(isActive)}
                   >
                     {isActive && <CheckIcon />}
@@ -764,7 +764,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 {selectorIcon}
                 {showActiveTargetLabel && (
                   <span className="hidden max-w-24 truncate text-sm font-medium sm:inline">
-                    {activeTarget?.label}
+                    {activeTarget?.label ? t(activeTarget.label) : null}
                   </span>
                 )}
                 <svg
