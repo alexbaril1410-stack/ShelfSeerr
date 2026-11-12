@@ -312,6 +312,7 @@ def _parse_product(product: dict[str, Any], marketplace: str) -> BookMetadata | 
         title=title,
         provider_display_name="Audible",
         authors=authors,
+        narrators=narrators,
         cover_url=_cover_url(product),
         description=description,
         publisher=publisher,
