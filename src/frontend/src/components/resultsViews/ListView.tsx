@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { useSearchMode } from '../../contexts/SearchModeContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import type { Book, ButtonStateInfo, DisplayField } from '../../types';
 import { getDownloadsCount } from '../../types';
 import { bookSupportsTargets } from '../../utils/bookTargetLoader';
@@ -53,7 +54,7 @@ const ListViewThumbnail = ({
     return (
       <div
         className={`${sizeClass} flex items-center justify-center rounded-sm bg-gray-200 text-[8px] font-medium text-gray-500 sm:text-[9px] dark:bg-gray-700 dark:text-gray-300`}
-        aria-label="No cover available"
+        aria-label={t('No cover available')}
       >
         No Cover
       </div>
@@ -69,7 +70,7 @@ const ListViewThumbnail = ({
       )}
       <img
         src={preview}
-        alt={title || 'Book cover'}
+        alt={title || t('Book cover')}
         className={`h-full w-full object-cover ${isSquare ? 'object-center' : 'object-top'}`}
         loading="lazy"
         onLoad={() => setImageLoaded(true)}
@@ -91,6 +92,7 @@ export const ListView = ({
   onShowToast,
 }: ListViewProps) => {
   const { searchMode } = useSearchMode();
+  const { t } = useLanguage();
   const [detailsLoadingId, setDetailsLoadingId] = useState<string | null>(null);
   const [releasesLoadingId, setReleasesLoadingId] = useState<string | null>(null);
   const [openDropdownBookId, setOpenDropdownBookId] = useState<string | null>(null);
@@ -184,7 +186,7 @@ export const ListView = ({
                 <div className="flex min-w-0 flex-col justify-center sm:pl-3">
                   <h3
                     className="line-clamp-1 flex items-center gap-2 text-xs leading-tight font-semibold min-[400px]:text-sm sm:line-clamp-2 sm:text-base"
-                    title={book.title || 'Untitled'}
+                    title={book.title || t('Untitled')}
                   >
                     {showSeriesPosition && book.series_position != null && (
                       <span
@@ -197,10 +199,10 @@ export const ListView = ({
                         #{book.series_position}
                       </span>
                     )}
-                    <span className="truncate">{book.title || 'Untitled'}</span>
+                    <span className="truncate">{book.title || t('Untitled')}</span>
                   </h3>
                   <p className="truncate text-[10px] text-gray-600 min-[400px]:text-xs sm:text-sm dark:text-gray-300">
-                    {book.author || 'Unknown author'}
+                    {book.author || t('Unknown author')}
                     {book.year && <span className="sm:hidden"> • {book.year}</span>}
                   </p>
                   <LibraryBadge library={book.library} className="mt-0.5" />

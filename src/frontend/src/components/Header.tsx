@@ -518,7 +518,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               }}
             >
               <div className="py-1">
-                <LanguageSelector compact />
                 <a
                   href="https://github.com/calibrain/shelfmark/issues"
                   target="_blank"
@@ -765,26 +764,27 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           )}
 
           <nav
-            aria-label="Navigation principale"
+            aria-label={t('Main navigation')}
             className="shelfseerr-primary-nav mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
             style={{ borderColor: 'var(--border-muted)' }}
           >
-            <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label="Accueil" aria-current={!showSearch ? 'page' : undefined}>
-              Accueil
+            <LanguageSelector compact />
+            <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label={t('Home')} aria-current={!showSearch ? 'page' : undefined}>
+              {t('Home')}
             </button>
             {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
               <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>
-                Livres
+                {t('Books')}
               </button>
             )}
             {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && (
               <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>
-                Livres audio
+                {t('Audiobooks')}
               </button>
             )}
             {onDownloadsClick && (
               <button type="button" onClick={onDownloadsClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface">
-                Demandes et activité
+                {t('Requests and activity')}
                 {statusCounts.pendingRequests > 0 && <span className="ml-2 rounded-full bg-sky-600 px-1.5 py-0.5 text-xs text-white">{statusCounts.pendingRequests}</span>}
               </button>
             )}

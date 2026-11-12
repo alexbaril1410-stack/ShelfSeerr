@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useLanguage } from '../contexts/LanguageContext';
+
 import type { PackBook, PackPlan, Release } from '../types';
 import {
   applyIgnoredFiles,
@@ -34,7 +36,8 @@ export const PackReviewPanel = ({
   onConfirm,
   isSubmitting,
 }: PackReviewPanelProps) => {
-  const [singleBook, setSingleBook] = useState(false);
+  const { t } = useLanguage();
+  const [singleBook, setSingleBook = useState(false);
   const [expandedFiles, setExpandedFiles] = useState<number | null>(null);
   const [showIgnored, setShowIgnored] = useState(false);
   const [userIgnored, setUserIgnored] = useState<ReadonlySet<string>>(new Set());
@@ -51,14 +54,14 @@ export const PackReviewPanel = ({
   const payloadBooks = toBookPlanPayload(applyIgnoredFiles(books, userIgnored));
   const canConfirm = !isSubmitting && (singleBook || payloadBooks.length > 0);
   const confirmLabel = singleBook
-    ? 'Download as one book'
-    : `Download ${payloadBooks.length} ${payloadBooks.length === 1 ? 'book' : 'books'}`;
+    ? t('Download as one book')
+    : t(payloadBooks.length === 1 ? 'Download {count} book' : 'Download {count} books').replace('{count}', String(payloadBooks.length));
 
   return (
     <div className="flex flex-col gap-4 px-5 py-4" data-testid="pack-review-panel">
       <div>
         <h3 className="text-base font-semibold text-(--text)">
-          This release contains several books
+          {t('This release contains several books')}
         </h3>
         <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
           <span className="font-medium text-(--text)">{release.title}</span> ·{' '}
@@ -68,16 +71,15 @@ export const PackReviewPanel = ({
           ])}
         </p>
         <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-          Each book below is filed separately with its own title. Fix any titles before downloading
-          — the author and series come from the book you searched.
+          {t('Each book below is filed separately with its own title. Fix any titles before downloading — the author and series come from the book you searched.')}
         </p>
       </div>
 
       <div className="flex items-center justify-between rounded-lg border border-(--border-muted) px-3 py-2">
         <div>
-          <p className="text-sm font-medium text-(--text)">Treat as a single book</p>
+          <p className="text-sm font-medium text-(--text)">{t('Treat as a single book')}</p>
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Use this if the split is wrong and the files are really one audiobook.
+            {t('Use this if the split is wrong and the files are really one audiobook.')}
           </p>
         </div>
         <ToggleSwitch
@@ -95,10 +97,10 @@ export const PackReviewPanel = ({
         }`}
       >
         <div className="grid grid-cols-[minmax(0,1fr)_72px_72px_80px] gap-2 pb-1 text-xs font-medium tracking-wide text-zinc-500 uppercase dark:text-zinc-400">
-          <span>Title</span>
-          <span>Series #</span>
-          <span>Year</span>
-          <span className="text-right">Files</span>
+          <span>{t('Title')}</span>
+          <span>{t('Series #')}</span>
+          <span>{t('Year')}</span>
+          <span className="text-right">{t('Files')}</span>
         </div>
         {books.map((book, index) => {
           const skipped = book.files.every((file) => userIgnored.has(file));
@@ -118,7 +120,7 @@ export const PackReviewPanel = ({
                   onChange={(e) =>
                     onChange(updateReviewBook(books, index, { title: e.target.value }))
                   }
-                  aria-label={`Title for book ${index + 1}`}
+                  aria-label={t('Title for book {number}').replace('{number}', String(index + 1))}
                   className={inputClassName}
                   disabled={isSubmitting}
                 />
@@ -133,7 +135,7 @@ export const PackReviewPanel = ({
                       }),
                     )
                   }
-                  aria-label={`Series position for book ${index + 1}`}
+                  aria-label={t('Series position for book {number}').replace('{number}', String(index + 1))}
                   className={inputClassName}
                   disabled={isSubmitting}
                 />
@@ -149,7 +151,7 @@ export const PackReviewPanel = ({
                       }),
                     );
                   }}
-                  aria-label={`Year for book ${index + 1}`}
+                  aria-label={t('Year for book {number}').replace('{number}', String(index + 1))}
                   className={inputClassName}
                   disabled={isSubmitting}
                 />
@@ -176,10 +178,10 @@ export const PackReviewPanel = ({
                   checked={skipped}
                   onChange={(checked) => setUserIgnored(setBookIgnored(userIgnored, book, checked))}
                   color="emerald"
-                  ariaLabel={`Skip book ${index + 1}`}
+                  ariaLabel={t('Skip book {number}').replace('{number}', String(index + 1))}
                   disabled={isSubmitting}
                 />
-                Skip this book
+                {t('Skip this book')}
               </div>
               {expandedFiles === index && (
                 <ul className="mt-2 max-h-40 overflow-y-auto rounded-md bg-(--bg-soft) px-3 py-2 font-mono text-xs break-all text-zinc-600 dark:text-zinc-300">
@@ -190,7 +192,7 @@ export const PackReviewPanel = ({
                           checked={!userIgnored.has(file)}
                           onChange={() => toggleFile(file)}
                           color="emerald"
-                          ariaLabel={`Include ${file}`}
+                          ariaLabel={t('Include {file}').replace('{file}', file)}
                           disabled={isSubmitting}
                         />
                         <span className={userIgnored.has(file) ? 'line-through opacity-60' : ''}>
@@ -234,7 +236,7 @@ export const PackReviewPanel = ({
           disabled={isSubmitting}
           className="hover-surface rounded-lg px-3 py-1.5 text-sm font-medium text-(--text) transition-colors disabled:opacity-50"
         >
-          &larr; Back
+          &larr; {t('Back')}
         </button>
         <button
           type="button"
@@ -242,7 +244,7 @@ export const PackReviewPanel = ({
           disabled={!canConfirm}
           className="rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {isSubmitting ? 'Queuing…' : confirmLabel}
+          {isSubmitting ? t('Queuing…') : confirmLabel}
         </button>
       </div>
     </div>

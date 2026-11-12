@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 export type AppLanguage = 'fr' | 'en';
 
@@ -617,6 +617,34 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   "Request Both": "Demander les deux",
   "Download & Request": "Télécharger et demander",
   "Download Both": "Télécharger les deux",
+  Home: "Accueil",
+  "Requests and activity": "Demandes et activité",
+  "Main navigation": "Navigation principale",
+  "Choose formats to download": "Choisissez les formats à télécharger",
+  "comes in several formats. Switch off any you don’t want; they won’t be filed.": "est disponible dans plusieurs formats. Désactivez ceux que vous ne souhaitez pas conserver.",
+  "Include {format} format": "Inclure le format {format}",
+  file: "fichier",
+  files: "fichiers",
+  "This release contains several books": "Cette version contient plusieurs livres",
+  "Each book below is filed separately with its own title. Fix any titles before downloading — the author and series come from the book you searched.": "Chaque livre ci-dessous sera classé séparément sous son propre titre. Corrigez les titres avant le téléchargement : l’auteur et la série proviennent du livre recherché.",
+  "Treat as a single book": "Traiter comme un seul livre",
+  "Use this if the split is wrong and the files are really one audiobook.": "Utilisez cette option si le découpage est incorrect et que les fichiers correspondent en réalité à un seul livre audio.",
+  "Title for book {number}": "Titre du livre {number}",
+  "Series position for book {number}": "Position dans la série du livre {number}",
+  "Year for book {number}": "Année du livre {number}",
+  "Skip book {number}": "Ignorer le livre {number}",
+  "Skip this book": "Ignorer ce livre",
+  "Include {file}": "Inclure {file}",
+  "of {total} files skipped": "sur {total} fichiers ignorés",
+  "ignored (not a book format)": "ignorés (pas un format de livre)",
+  "Download as one book": "Télécharger comme un seul livre",
+  "Download {count} book": "Télécharger {count} livre",
+  "Download {count} books": "Télécharger {count} livres",
+  "Download {count} file": "Télécharger {count} fichier",
+  "Download {count} files": "Télécharger {count} fichiers",
+  "Queuing…": "Mise en file d’attente…",
+  Details: "Détails",
+  "Book details": "Détails du livre",
 };
 
 interface LanguageContextValue {
@@ -638,6 +666,10 @@ const getInitialLanguage = (): AppLanguage => {
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguageState] = useState<AppLanguage>(getInitialLanguage);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const setLanguage = useCallback((nextLanguage: AppLanguage) => {
     setLanguageState(nextLanguage);
