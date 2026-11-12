@@ -3,6 +3,7 @@ import { useState, useCallback, useMemo } from 'react';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useMountEffect } from '../hooks/useMountEffect';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { OnboardingStep, OnboardingStepCondition } from '../services/api';
 import {
   getOnboarding,
@@ -24,6 +25,7 @@ import {
   ActionButton,
 } from './settings/fields';
 import { FieldWrapper } from './settings/shared';
+import { translateSettingsField } from './settings/translateSettingsField';
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -164,9 +166,9 @@ const renderField = (
     case 'OrderableListField':
     case 'TableField':
     case 'CustomComponentField':
-      return <div>Unsupported onboarding field type: {field.type}</div>;
+      return <div>{t('Unsupported onboarding field type')}: {field.type}</div>;
     default:
-      return <div>Unknown field type</div>;
+      return <div>{t('Unknown field type')}</div>;
   }
 };
 
@@ -217,6 +219,7 @@ const OnboardingModalSession = ({
   onComplete,
   onShowToast,
 }: OnboardingModalSessionProps) => {
+  const { t } = useLanguage();
   const [steps, setSteps] = useState<OnboardingStep[]>([]);
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -234,7 +237,7 @@ const OnboardingModalSession = ({
         setValues(config.values);
       } catch (err) {
         console.error('Failed to fetch onboarding config:', err);
-        setError('Failed to load setup wizard');
+        setError(t('Failed to load setup wizard'));
       } finally {
         setIsLoading(false);
       }
@@ -285,12 +288,12 @@ const OnboardingModalSession = ({
     try {
       setIsSaving(true);
       await skipOnboarding();
-      onShowToast?.('Setup skipped - using defaults', 'info');
+      onShowToast?.(t('Setup skipped - using defaults'), 'info');
       handleClose();
       onComplete();
     } catch (err) {
       console.error('Failed to skip onboarding:', err);
-      onShowToast?.('Failed to skip setup', 'error');
+      onShowToast?.(t('Failed to skip setup'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -302,15 +305,15 @@ const OnboardingModalSession = ({
       setIsSaving(true);
       const result = await saveOnboarding(values);
       if (result.success) {
-        onShowToast?.('Setup complete!', 'success');
+        onShowToast?.(t('Setup complete!'), 'success');
         handleClose();
         onComplete();
       } else {
-        onShowToast?.(result.message || 'Failed to save settings', 'error');
+        onShowToast?.(t(result.message || 'Failed to save settings'), 'error');
       }
     } catch (err) {
       console.error('Failed to save onboarding:', err);
-      onShowToast?.('Failed to save settings', 'error');
+      onShowToast?.(t('Failed to save settings'), 'error');
     } finally {
       setIsSaving(false);
     }
@@ -358,7 +361,7 @@ const OnboardingModalSession = ({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            <span>Loading setup wizard...</span>
+            <span>{t('Loading setup wizard...')}</span>
           </div>
         </div>
       </div>
@@ -374,7 +377,7 @@ const OnboardingModalSession = ({
           className="absolute inset-0 bg-black/60"
           onClick={handleClose}
           tabIndex={-1}
-          aria-label="Close setup wizard"
+          aria-label={t('Close setup wizard')}
         />
         <div
           className="relative max-w-md rounded-xl p-8 shadow-2xl"
@@ -397,13 +400,13 @@ const OnboardingModalSession = ({
                 />
               </svg>
             </div>
-            <p className="text-sm">{error}</p>
+            <p className="text-sm">{t(error)}</p>
             <button
               type="button"
               onClick={handleClose}
               className="rounded-lg border border-(--border-muted) bg-(--bg-soft) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface)"
             >
-              Close
+              {t('Close')}
             </button>
           </div>
         </div>
@@ -428,7 +431,7 @@ const OnboardingModalSession = ({
         style={{ background: 'var(--bg)' }}
         role="dialog"
         aria-modal="true"
-        aria-label="Setup Wizard"
+        aria-label={t('Setup Wizard')}
       >
         <div className="flex-shrink-0">
           {/* Header */}
@@ -438,9 +441,9 @@ const OnboardingModalSession = ({
                 {clampedStepIndex + 1}
               </div>
               <div>
-                <h2 className="text-lg font-semibold">{currentStep?.title || 'Setup'}</h2>
+                <h2 className="text-lg font-semibold">{t(currentStep?.title || 'Setup')}</h2>
                 <p className="text-xs opacity-60">
-                  Step {clampedStepIndex + 1} of {visibleSteps.length}
+                  {t('Step {current} of {total}').replace('{current}', String(clampedStepIndex + 1)).replace('{total}', String(visibleSteps.length))}
                 </p>
               </div>
             </div>
@@ -448,7 +451,7 @@ const OnboardingModalSession = ({
               type="button"
               onClick={handleClose}
               className="rounded-lg p-1.5 transition-colors hover:bg-(--hover-surface)"
-              aria-label="Close"
+              aria-label={t('Close')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -478,9 +481,9 @@ const OnboardingModalSession = ({
             {visibleFields.map((field) => {
               const isDisabled = 'fromEnv' in field ? (field.fromEnv ?? false) : false;
               return (
-                <FieldWrapper key={field.key} field={field}>
+                <FieldWrapper key={field.key} field={translateSettingsField(field, t)}>
                   {renderField(
-                    field,
+                    translateSettingsField(field, t),
                     values[field.key],
                     (v) => handleChange(field.key, v),
                     () => handleAction(field.key),
@@ -503,7 +506,7 @@ const OnboardingModalSession = ({
               disabled={isSaving || !isFirstStep}
               className={`rounded-lg px-4 py-2 text-sm font-medium ${isFirstStep ? 'opacity-60 transition-opacity hover:opacity-100' : 'invisible'}`}
             >
-              Skip setup
+              {t('Skip setup')}
             </button>
           </div>
 
@@ -515,7 +518,7 @@ const OnboardingModalSession = ({
                 disabled={isSaving}
                 className="rounded-lg border border-(--border-muted) bg-(--bg-soft) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface) disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Back
+                {t('Back')}
               </button>
             )}
 
@@ -546,10 +549,10 @@ const OnboardingModalSession = ({
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                       />
                     </svg>
-                    Saving...
+                    {t('Saving...')}
                   </>
                 ) : (
-                  'Finish Setup'
+                  t('Finish Setup')
                 )}
               </button>
             ) : (
@@ -559,7 +562,7 @@ const OnboardingModalSession = ({
                 disabled={isSaving}
                 className="flex items-center gap-1 rounded-lg bg-sky-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Next
+                {t('Next')}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
