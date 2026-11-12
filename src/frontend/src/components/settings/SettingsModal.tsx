@@ -344,7 +344,7 @@ const SettingsModalSession = ({
 
   if (!isOpen && !isClosing) return null;
 
-  const currentTab = tabs.find((t) => t.name === selectedTab);
+  const currentTab = tabs.find((tabEntry) => tabEntry.name === selectedTab);
   const currentTabDisplayName = currentTab ? t(currentTab.displayName) : t('Settings');
   const selectedTabSyncKey = isOpen && selectedTab ? selectedTab : null;
   const tabSync = selectedTabSyncKey ? (
