@@ -1,8 +1,8 @@
 import type { ComponentType, InputHTMLAttributes, ReactNode } from 'react';
 import { forwardRef, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
-import { useSearchMode } from '../contexts/SearchModeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useSearchMode } from '../contexts/SearchModeContext';
 import { useSearchBarAutocomplete } from '../hooks/searchBar/useSearchBarAutocomplete';
 import { useDismiss } from '../hooks/useDismiss';
 import { useLatestCallback } from '../hooks/useLatestCallback';
@@ -938,7 +938,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
               <div className="max-h-72 overflow-y-auto py-1.5">
                 {isAutocompleteLoading && (
                   <div className="px-5 py-3 text-sm opacity-70" style={{ color: 'var(--text)' }}>
-                    Searching…
+                    {t('Searching…')}
                   </div>
                 )}
 
@@ -987,3 +987,4 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
     );
   },
 );
+

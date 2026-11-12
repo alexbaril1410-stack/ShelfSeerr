@@ -1,14 +1,14 @@
 import { useState, useCallback, useMemo, useRef, type KeyboardEventHandler } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useLanguage } from '../contexts/LanguageContext';
 import { useDescriptionOverflow } from '../hooks/releaseModal/useDescriptionOverflow';
 import { useHeaderThumbOnScroll } from '../hooks/releaseModal/useHeaderThumbOnScroll';
 import { useReleaseSearchSession } from '../hooks/releaseModal/useReleaseSearchSession';
-import { useSettings } from '../hooks/useSettings';
-import { useLanguage } from '../contexts/LanguageContext';
 import { useTabIndicator } from '../hooks/ui/useTabIndicator';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useSettings } from '../hooks/useSettings';
 import { inspectRelease } from '../services/api';
 import type {
   Book,
@@ -729,6 +729,8 @@ function EmptyState({ message }: { message: string }) {
 
 // Error state component
 function ErrorState({ message }: { message: string }) {
+  const { t } = useLanguage();
+
   return (
     <div className="px-4 py-12 text-center">
       <div className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
@@ -747,7 +749,7 @@ function ErrorState({ message }: { message: string }) {
         </svg>
       </div>
       <h4 className="mb-2 text-base font-semibold text-zinc-900 dark:text-zinc-100">
-        Error Loading Releases
+        {t('Error Loading Releases')}
       </h4>
       <p className="mx-auto max-w-xs text-sm text-zinc-500 dark:text-zinc-400">{message}</p>
     </div>
@@ -827,8 +829,7 @@ const ReleaseModalSession = ({
   const hideZeroSeedersByDefault =
     settingsValues.prowlarr_config?.PROWLARR_HIDE_ZERO_SEEDERS === true;
   const [showZeroSeedersOverride, setShowZeroSeedersOverride] = useState<boolean | null>(null);
-  const showZeroSeederReleases =
-    showZeroSeedersOverride ?? !hideZeroSeedersByDefault;
+  const showZeroSeederReleases = showZeroSeedersOverride ?? !hideZeroSeedersByDefault;
 
   const {
     sourcesLoading,
@@ -965,7 +966,7 @@ const ReleaseModalSession = ({
       options.push({ value: fmt, label: fmt.toUpperCase() });
     });
     return options;
-  }, [availableFormats]);
+  }, [availableFormats, t]);
 
   // Get available indexers for filter dropdown
   // Prefer available_indexers from column config (all enabled Prowlarr indexers),
@@ -1446,9 +1447,15 @@ const ReleaseModalSession = ({
   const nextCombinedPhaseLabel = t(combinedPhase === 'ebook' ? 'Audiobook' : 'Book');
   let emptyStateMessage = t('No releases found for this book.');
   if (formatFilter) {
-    emptyStateMessage = t('No {format} releases found. Try a different format.').replace('{format}', formatFilter.toUpperCase());
+    emptyStateMessage = t('No {format} releases found. Try a different format.').replace(
+      '{format}',
+      formatFilter.toUpperCase(),
+    );
   } else if (isCombinedMode) {
-    emptyStateMessage = t('No {contentType} releases found.').replace('{contentType}', currentCombinedPhaseLabel.toLowerCase());
+    emptyStateMessage = t('No {contentType} releases found.').replace(
+      '{contentType}',
+      currentCombinedPhaseLabel.toLowerCase(),
+    );
   }
   let modalAnimationClassName = '';
   if (isClosing) {
@@ -1757,7 +1764,7 @@ const ReleaseModalSession = ({
                               onClick={() => setDescriptionExpanded(false)}
                               className="inline font-medium text-emerald-600 hover:underline dark:text-emerald-400"
                             >
-                              Show less
+                              {t('Show less')}
                             </button>
                           </>
                         )}
@@ -1768,7 +1775,7 @@ const ReleaseModalSession = ({
                           onClick={() => setDescriptionExpanded(true)}
                           className="absolute right-0 bottom-0 bg-linear-to-r from-transparent via-(--bg) to-(--bg) pl-8 font-medium text-emerald-600 hover:underline sm:via-(--bg-soft) sm:to-(--bg-soft) dark:text-emerald-400"
                         >
-                          more
+                          {t('More')}
                         </button>
                       )}
                     </div>
@@ -1855,7 +1862,9 @@ const ReleaseModalSession = ({
               )}
               {!sourcesLoading && allTabs.length === 0 && (
                 <div className="px-5 py-3 text-sm text-zinc-500 dark:text-zinc-400">
-                  {sourcesError ? t(sourcesError) : t('No release sources are available for this book.')}
+                  {sourcesError
+                    ? t(sourcesError)
+                    : t('No release sources are available for this book.')}
                 </div>
               )}
               {!sourcesLoading && allTabs.length > 0 && (
@@ -1916,7 +1925,7 @@ const ReleaseModalSession = ({
                       if (totalCountNum === 1) {
                         return (
                           <span className="mx-2 shrink-0 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-                            Result 1 (1 Total)
+                            {t('Result 1 (1 Total)')}
                           </span>
                         );
                       }
@@ -1924,7 +1933,9 @@ const ReleaseModalSession = ({
                       const totalStr = isCapped ? '500+' : String(totalCountNum);
                       return (
                         <span className="mx-2 shrink-0 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-                          {t('Results 1–{end} ({total} total)').replace('{end}', String(shownEnd)).replace('{total}', totalStr)}
+                          {t('Results 1–{end} ({total} total)')
+                            .replace('{end}', String(shownEnd))
+                            .replace('{total}', totalStr)}
                         </span>
                       );
                     })()}
@@ -1942,7 +1953,9 @@ const ReleaseModalSession = ({
                         }`}
                         aria-label={t('Multi-book pack')}
                         aria-pressed={multiBook}
-                        title={t('Multi-book pack: file each subfolder (or each file) as a separate book. Only needed when a release can’t be inspected before download.')}
+                        title={t(
+                          'Multi-book pack: file each subfolder (or each file) as a separate book. Only needed when a release can’t be inspected before download.',
+                        )}
                       >
                         <svg
                           className="h-4 w-4"
@@ -1973,7 +1986,9 @@ const ReleaseModalSession = ({
                         }`}
                         aria-label={t('Choose formats')}
                         aria-pressed={chooseFormats}
-                        title={t('Choose formats: when a release has several formats, pick which ones to download.')}
+                        title={t(
+                          'Choose formats: when a release has several formats, pick which ones to download.',
+                        )}
                       >
                         <svg
                           className="h-4 w-4"
@@ -2258,7 +2273,10 @@ const ReleaseModalSession = ({
                             !indexersMatchDefault;
                           const hasZeroSeederFilter = !showZeroSeederReleases;
                           const hasActiveFilter =
-                            formatFilter !== '' || hasLanguageFilter || hasIndexerFilter || hasZeroSeederFilter;
+                            formatFilter !== '' ||
+                            hasLanguageFilter ||
+                            hasIndexerFilter ||
+                            hasZeroSeederFilter;
                           return (
                             <button
                               type="button"
@@ -2398,7 +2416,7 @@ const ReleaseModalSession = ({
                   </button>
                 </form>
                 <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-                  Manual query overrides ISBN/title/author/language expansion.
+                  {t('Manual query overrides ISBN/title/author/language expansion.')}
                 </p>
               </div>
             )}
@@ -2581,7 +2599,7 @@ const ReleaseModalSession = ({
                       }}
                       className="hover-surface rounded-lg px-3 py-1.5 text-sm font-medium text-(--text) transition-colors"
                     >
-                      &larr; Back
+                      {t('← Back')}
                     </button>
                   )}
 
@@ -2691,3 +2709,4 @@ export const ReleaseModal = ({ book, onClose, ...rest }: ReleaseModalProps) => {
     />
   );
 };
+

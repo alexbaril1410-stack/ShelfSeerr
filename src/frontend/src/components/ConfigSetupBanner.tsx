@@ -117,7 +117,9 @@ export const ConfigSetupBanner = ({
           <p className="text-sm opacity-80">
             {showContinueButton
               ? t('To save settings, add a config volume to your Docker Compose file:')
-              : t('Shelfmark now has a settings page! To enable it, add a config volume to your Docker Compose file:')}
+              : t(
+                  'Shelfmark now has a settings page! To enable it, add a config volume to your Docker Compose file:',
+                )}
           </p>
 
           {/* Code snippet */}
@@ -146,8 +148,12 @@ export const ConfigSetupBanner = ({
 
           <p className="text-xs opacity-60">
             {showContinueButton
-              ? t('Without this volume, settings changes will not persist across container restarts.')
-              : t('This allows you to configure settings through the UI and persist them across container restarts.')}
+              ? t(
+                  'Without this volume, settings changes will not persist across container restarts.',
+                )
+              : t(
+                  'This allows you to configure settings through the UI and persist them across container restarts.',
+                )}
           </p>
         </div>
 
@@ -176,7 +182,7 @@ export const ConfigSetupBanner = ({
               onClick={handleClose}
               className="rounded-lg bg-(--primary-color) px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-(--primary-dark)"
             >
-              Got it
+              {t('Got it')}
             </button>
           )}
         </div>
@@ -184,3 +190,4 @@ export const ConfigSetupBanner = ({
     </div>
   );
 };
+

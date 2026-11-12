@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { useSearchMode } from '../../contexts/SearchModeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSearchMode } from '../../contexts/SearchModeContext';
 import type { Book, ButtonStateInfo } from '../../types';
 import { getDownloadsCount } from '../../types';
 import { bookSupportsTargets } from '../../utils/bookTargetLoader';
@@ -129,7 +129,7 @@ export const CardView = ({
               className="flex h-full w-full items-center justify-center text-sm opacity-50"
               style={{ background: 'var(--border-muted)' }}
             >
-              No Cover
+              {t('No Cover')}
             </div>
           )}
 
@@ -238,7 +238,9 @@ export const CardView = ({
             style={{ borderColor: 'var(--border-muted)' }}
             disabled={isLoadingDetails}
           >
-            <span className="details-button-text">{isLoadingDetails ? t('Loading') : t('Details')}</span>
+            <span className="details-button-text">
+              {isLoadingDetails ? t('Loading') : t('Details')}
+            </span>
             <div
               className={`details-spinner h-3 w-3 rounded-full border-2 border-current border-t-transparent ${isLoadingDetails ? '' : 'hidden'}`}
             />
@@ -275,3 +277,4 @@ export const CardView = ({
     </article>
   );
 };
+

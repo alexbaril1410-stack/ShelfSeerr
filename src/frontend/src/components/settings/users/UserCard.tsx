@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { useLanguage } from '../../../contexts/LanguageContext';
 
+import { useLanguage } from '../../../contexts/LanguageContext';
 import type { AdminUser } from '../../../services/api';
 import type {
   PasswordFieldConfig,
@@ -20,7 +20,7 @@ const UserCardShell = ({ title, children }: { title: string; children: ReactNode
   return (
     <div className="space-y-5 rounded-lg border border-(--border-muted) bg-(--bg) p-4">
       <h3 className="text-sm font-medium">{t(title)}</h3>
-    {children}
+      {children}
     </div>
   );
 };
@@ -148,7 +148,10 @@ export const UserRoleControl = ({
     : undefined;
   const roleDisabledReason = rawRoleDisabledReason
     ? oidcAdminGroup && user.edit_capabilities.authSource === 'oidc'
-      ? t('Role is managed by the {group} group in your identity provider.').replace('{group}', oidcAdminGroup)
+      ? t('Role is managed by the {group} group in your identity provider.').replace(
+          '{group}',
+          oidcAdminGroup,
+        )
       : t(rawRoleDisabledReason)
     : undefined;
 
@@ -173,7 +176,10 @@ export const UserRoleControl = ({
 
   if (onUserChange && !user.edit_capabilities.canEditRole) {
     return (
-      <Tooltip content={roleDisabledReason || t('Role cannot be changed')} position={tooltipPosition}>
+      <Tooltip
+        content={roleDisabledReason || t('Role cannot be changed')}
+        position={tooltipPosition}
+      >
         <span className={getRoleBadgeClassName(user.role, true)}>{roleLabel}</span>
       </Tooltip>
     );
@@ -312,7 +318,7 @@ export const UserEditActions = ({
           disabled={cancelDisabled}
           className="rounded-lg border border-(--border-muted) bg-(--bg) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface) disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Cancel
+          {t('Cancel')}
         </button>
       </div>
       {onDelete && (
@@ -441,7 +447,7 @@ export const UserCreateCard = ({
           onClick={onCancel}
           className="rounded-lg border border-(--border-muted) bg-(--bg) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface)"
         >
-          Cancel
+          {t('Cancel')}
         </button>
       </div>
     </UserCardShell>
@@ -689,3 +695,4 @@ export const UserAccountCardContent = ({
     </div>
   );
 };
+

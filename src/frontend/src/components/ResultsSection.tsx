@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { useSearchMode } from '../contexts/SearchModeContext';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useSearchMode } from '../contexts/SearchModeContext';
 import { SORT_OPTIONS } from '../data/filterOptions';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 import type { Book, ButtonStateInfo, SortOption } from '../types';
@@ -134,7 +134,7 @@ export const ResultsSection = ({
             if (totalCount === 1) {
               return (
                 <span className="mx-2 mt-4 px-2 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-                  Result 1 (1 Total)
+                  {t('Result 1 (1 Total)')}
                 </span>
               );
             }
@@ -285,7 +285,9 @@ export const ResultsSection = ({
           })}
         </div>
       )}
-      {books.length === 0 && <div className="mt-4 text-sm opacity-80">{t('No results found.')}</div>}
+      {books.length === 0 && (
+        <div className="mt-4 text-sm opacity-80">{t('No results found.')}</div>
+      )}
 
       {/* Load More button (universal mode pagination) */}
       {searchMode === 'universal' && hasMore && onLoadMore && (
@@ -326,7 +328,9 @@ export const ResultsSection = ({
           </button>
           {totalFound !== undefined && totalFound > 0 && (
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {t('Showing {count} of {total} results').replace('{count}', String(books.length)).replace('{total}', String(totalFound))}
+              {t('Showing {count} of {total} results')
+                .replace('{count}', String(books.length))
+                .replace('{total}', String(totalFound))}
             </span>
           )}
         </div>
@@ -359,7 +363,8 @@ const SortControl = ({ value, onChange, metadataSortOptions }: SortControlProps)
         : DEFAULT_UNIVERSAL_SORT_OPTIONS;
   }
   const localizedSortOptions = sortOptions.map((option) => ({ ...option, label: t(option.label) }));
-  const selected = localizedSortOptions.find((option) => option.value === value) ?? localizedSortOptions[0];
+  const selected =
+    localizedSortOptions.find((option) => option.value === value) ?? localizedSortOptions[0];
 
   return (
     <Dropdown
@@ -438,3 +443,4 @@ const SortControl = ({ value, onChange, metadataSortOptions }: SortControlProps)
     </Dropdown>
   );
 };
+

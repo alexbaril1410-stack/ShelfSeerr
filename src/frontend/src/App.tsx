@@ -18,6 +18,7 @@ import { SearchSection } from './components/SearchSection';
 import { SelfSettingsModal, SettingsModal } from './components/settings';
 import { ToastContainer } from './components/ToastContainer';
 import { UrlSearchBootstrapMount } from './components/UrlSearchBootstrapMount';
+import { useLanguage } from './contexts/LanguageContext';
 import { SearchModeProvider } from './contexts/SearchModeContext';
 import { useSocket } from './contexts/SocketContext';
 import { DEFAULT_LANGUAGES, DEFAULT_SUPPORTED_FORMATS } from './data/languages';
@@ -269,6 +270,7 @@ const AdminSettingsWarmupMount = () => {
 
 /** The application shell: search, results, the release modal, activity and settings. */
 function App() {
+  const { t } = useLanguage();
   const location = useLocation();
   const { toasts, showToast, removeToast } = useToast();
   const { socket } = useSocket();
@@ -2633,8 +2635,9 @@ function App() {
 
         {!isInitialState && effectiveActiveQueryTarget === 'manual' && (
           <p className="px-4 pt-2 text-xs opacity-50 sm:px-6 lg:ml-16 lg:px-8">
-            Manual search queries release sources directly. Some sources may return limited
-            metadata, which can affect file naming templates.
+            {t(
+              'Manual search queries release sources directly. Some sources may return limited metadata, which can affect file naming templates.',
+            )}
           </p>
         )}
 
@@ -3025,7 +3028,7 @@ function App() {
         {metadataConfigSession}
         {urlSearchBootstrapMount}
         <div aria-live="polite" style={visuallyHiddenStyle}>
-          Checking authentication…
+          {t('Checking authentication…')}
         </div>
       </>
     );
@@ -3040,7 +3043,7 @@ function App() {
         {metadataConfigSession}
         {urlSearchBootstrapMount}
         <div aria-live="polite" style={visuallyHiddenStyle}>
-          Loading configuration…
+          {t('Loading configuration…')}
         </div>
       </>
     );
@@ -3086,3 +3089,4 @@ function App() {
 }
 
 export { App };
+

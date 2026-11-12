@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef, useState, type WheelEvent } from 'react';
 
-import { useTabIndicator } from '../../hooks/ui/useTabIndicator';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTabIndicator } from '../../hooks/ui/useTabIndicator';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useRejectedRequests } from '../../hooks/useRejectedRequests';
@@ -369,7 +369,10 @@ export const ActivitySidebar = ({
     if (rejectedLoading) {
       emptyStateMessage = t('Loading rejected requests...');
     } else if (hiddenRejectedCount > 0 && !showHiddenRejected) {
-      emptyStateMessage = t('No rejected requests shown ({count} hidden)').replace('{count}', String(hiddenRejectedCount));
+      emptyStateMessage = t('No rejected requests shown ({count} hidden)').replace(
+        '{count}',
+        String(hiddenRejectedCount),
+      );
     } else {
       emptyStateMessage = t('No rejected requests');
     }
@@ -474,7 +477,7 @@ export const ActivitySidebar = ({
         items: (grouped.get(key) ?? []).toSorted((left, right) => right.timestamp - left.timestamp),
       }))
       .filter((group) => group.items.length > 0);
-  }, [effectiveActiveTab, isAdmin, visibleItems, visibleCategoryOrder]);
+  }, [effectiveActiveTab, isAdmin, t, visibleItems, visibleCategoryOrder]);
 
   const handleTogglePinned = () => {
     const next = !isPinned;
@@ -505,7 +508,9 @@ export const ActivitySidebar = ({
             <h2 className="text-lg font-semibold">
               {effectiveActiveTab === 'history' && t('History')}
               {effectiveActiveTab === 'rejected' && t('Rejected')}
-              {effectiveActiveTab !== 'history' && effectiveActiveTab !== 'rejected' && t('Activity')}
+              {effectiveActiveTab !== 'history' &&
+                effectiveActiveTab !== 'rejected' &&
+                t('Activity')}
             </h2>
             <button
               type="button"
@@ -631,10 +636,14 @@ export const ActivitySidebar = ({
                   effectiveActiveTab === 'rejected' ? 'text-sky-600 dark:text-sky-400' : ''
                 }`}
                 title={
-                  effectiveActiveTab === 'rejected' ? t('Back to activity') : t('Open rejected requests')
+                  effectiveActiveTab === 'rejected'
+                    ? t('Back to activity')
+                    : t('Open rejected requests')
                 }
                 aria-label={
-                  effectiveActiveTab === 'rejected' ? t('Back to activity') : t('Open rejected requests')
+                  effectiveActiveTab === 'rejected'
+                    ? t('Back to activity')
+                    : t('Open rejected requests')
                 }
                 aria-pressed={effectiveActiveTab === 'rejected'}
               >
@@ -658,7 +667,9 @@ export const ActivitySidebar = ({
                 effectiveActiveTab === 'history' ? 'text-sky-600 dark:text-sky-400' : ''
               }`}
               title={effectiveActiveTab === 'history' ? t('Back to activity') : t('Open history')}
-              aria-label={effectiveActiveTab === 'history' ? t('Back to activity') : t('Open history')}
+              aria-label={
+                effectiveActiveTab === 'history' ? t('Back to activity') : t('Open history')
+              }
               aria-pressed={effectiveActiveTab === 'history'}
             >
               <svg
@@ -990,7 +1001,7 @@ export const ActivitySidebar = ({
               onClick={() => onClearCompleted(clearCompletedTargets)}
               className="text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
             >
-              Clear Completed
+              {t('Clear Completed')}
             </button>
           </div>
         )}
@@ -1008,7 +1019,7 @@ export const ActivitySidebar = ({
             onClick={onClearHistory}
             className="text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
           >
-            Clear History
+            {t('Clear History')}
           </button>
         </div>
       )}
@@ -1067,3 +1078,4 @@ export const ActivitySidebar = ({
     </>
   );
 };
+

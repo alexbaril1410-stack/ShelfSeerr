@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { useSearchMode } from '../../contexts/SearchModeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSearchMode } from '../../contexts/SearchModeContext';
 import type { Book, ButtonStateInfo } from '../../types';
 import { getDownloadsCount } from '../../types';
 import { bookSupportsTargets } from '../../utils/bookTargetLoader';
@@ -129,7 +129,7 @@ export const CompactView = ({
               className="flex h-full w-full items-center justify-center text-sm opacity-50"
               style={{ background: 'var(--border-muted)' }}
             >
-              No Cover
+              {t('No Cover')}
             </div>
           )}
 
@@ -192,7 +192,9 @@ export const CompactView = ({
           >
             {book.title || t('Untitled')}
           </h3>
-          <p className="min-w-0 truncate text-xs opacity-80">{book.author || t('Unknown author')}</p>
+          <p className="min-w-0 truncate text-xs opacity-80">
+            {book.author || t('Unknown author')}
+          </p>
           <div className="text-xs opacity-70">
             <span>{book.year || '-'}</span>
           </div>
@@ -285,3 +287,4 @@ export const CompactView = ({
     </article>
   );
 };
+

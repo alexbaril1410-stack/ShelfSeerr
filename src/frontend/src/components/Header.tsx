@@ -1,5 +1,6 @@
 import { useState, useRef, useMemo, forwardRef, useImperativeHandle } from 'react';
 
+import { useLanguage } from '../contexts/LanguageContext';
 import { useDismiss } from '../hooks/useDismiss';
 import { useMountEffect } from '../hooks/useMountEffect';
 import type {
@@ -16,7 +17,6 @@ import { isRecord } from '../utils/objectHelpers';
 import { DropdownList } from './DropdownList';
 import type { SearchBarHandle } from './SearchBar';
 import { SearchBar } from './SearchBar';
-import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeaderHandle {
   submitSearch: () => void;
@@ -285,7 +285,10 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             isRecord(errorData) && typeof errorData.error === 'string'
               ? errorData.error
               : response.statusText;
-          onShowToast?.(t('Debug download failed: {error}').replace('{error}', errorMessage), 'error');
+          onShowToast?.(
+            t('Debug download failed: {error}').replace('{error}', errorMessage),
+            'error',
+          );
           return;
         }
 
@@ -346,7 +349,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   settingsEnabled ? 'hover-surface' : 'cursor-not-allowed opacity-40'
                 }`
           }
-          aria-label={t("Settings")}
+          aria-label={t('Settings')}
           title={isNav ? t('Settings') : undefined}
         >
           <svg
@@ -479,7 +482,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             className={`hover-action relative rounded-full p-2 transition-colors ${
               isDropdownOpen ? 'bg-(--hover-action)' : ''
             }`}
-            aria-label={t("User menu")}
+            aria-label={t('User menu')}
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
           >
@@ -500,7 +503,10 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             {actingAsUser && (
               <span
                 className="absolute top-1 right-1 h-2 w-2 rounded-full border border-(--bg) bg-sky-500"
-                title={t('Downloading as {user}').replace('{user}', formatActingAsUserName(actingAsUser))}
+                title={t('Downloading as {user}').replace(
+                  '{user}',
+                  formatActingAsUserName(actingAsUser),
+                )}
               />
             )}
           </button>
@@ -611,8 +617,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                           type="button"
                           onClick={handleLogout}
                           className="hover-action shrink-0 rounded-full p-2 text-red-600 transition-colors dark:text-red-400"
-                          title={t("Sign Out")}
-                          aria-label={t("Sign Out")}
+                          title={t('Sign Out')}
+                          aria-label={t('Sign Out')}
                         >
                           <svg
                             className="h-5 w-5"
@@ -640,7 +646,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                     style={{ borderColor: 'var(--border-muted)' }}
                   >
                     <div className="text-xs font-medium tracking-wide uppercase opacity-70">
-                      Download as
+                      {t('Download as')}
                     </div>
                     <div className={isAdminUsersLoading ? 'pointer-events-none opacity-60' : ''}>
                       <DropdownList
@@ -665,7 +671,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                           onClick={() => void onLoadAdminUsers?.()}
                           className="text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
                         >
-                          Retry
+                          {t('Retry')}
                         </button>
                       </div>
                     )}
@@ -767,23 +773,47 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             className="shelfseerr-primary-nav mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
             style={{ borderColor: 'var(--border-muted)' }}
           >
-            <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label={t('Home')} aria-current={!showSearch ? 'page' : undefined}>
+            <button
+              type="button"
+              onClick={onHomeClick}
+              className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+              aria-label={t('Home')}
+              aria-current={!showSearch ? 'page' : undefined}
+            >
               {t('Home')}
             </button>
             {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
-              <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>
+              <button
+                type="button"
+                onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')}
+                className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`}
+                aria-pressed={contentType === 'ebook'}
+              >
                 {t('Books')}
               </button>
             )}
             {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && (
-              <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>
+              <button
+                type="button"
+                onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')}
+                className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`}
+                aria-pressed={contentType === 'audiobook'}
+              >
                 {t('Audiobooks')}
               </button>
             )}
             {onDownloadsClick && (
-              <button type="button" onClick={onDownloadsClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface">
+              <button
+                type="button"
+                onClick={onDownloadsClick}
+                className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+              >
                 {t('Requests and activity')}
-                {statusCounts.pendingRequests > 0 && <span className="ml-2 rounded-full bg-sky-600 px-1.5 py-0.5 text-xs text-white">{statusCounts.pendingRequests}</span>}
+                {statusCounts.pendingRequests > 0 && (
+                  <span className="ml-2 rounded-full bg-sky-600 px-1.5 py-0.5 text-xs text-white">
+                    {statusCounts.pendingRequests}
+                  </span>
+                )}
               </button>
             )}
           </nav>
@@ -792,3 +822,4 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
     );
   },
 );
+

@@ -463,7 +463,7 @@ const SettingsModalSession = ({
               onClick={handleClose}
               className="rounded-lg border border-(--border-muted) bg-(--bg-soft) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--hover-surface)"
             >
-              Close
+              {t('Close')}
             </button>
           </div>
         </div>
@@ -548,3 +548,4 @@ const SettingsModalSession = ({
     </div>
   );
 };
+

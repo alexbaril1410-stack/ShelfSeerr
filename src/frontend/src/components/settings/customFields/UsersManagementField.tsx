@@ -1,5 +1,6 @@
 import { useCallback, useLayoutEffect, useRef } from 'react';
 
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { useLatestCallback } from '../../../hooks/useLatestCallback';
 import { useMountEffect } from '../../../hooks/useMountEffect';
 import type { AdminUser } from '../../../services/api';
@@ -25,6 +26,7 @@ export const UsersManagementField = ({
   onRefreshAuth,
   onSettingsSaved,
 }: CustomSettingsFieldRendererProps) => {
+  const { t } = useLanguage();
   const { route, openCreate, openEdit, openEditOverrides, backToList } = useUsersPanelState();
   const activeEditRequestIdRef = useRef(0);
 
@@ -257,7 +259,7 @@ export const UsersManagementField = ({
     if (!editingUser || editingUser.id !== route.userId) {
       return (
         <div className="flex items-center justify-center py-8 text-sm opacity-60">
-          Loading user details...
+          {t('Loading user details...')}
         </div>
       );
     }
@@ -331,3 +333,4 @@ export const UsersManagementField = ({
     />
   );
 };
+

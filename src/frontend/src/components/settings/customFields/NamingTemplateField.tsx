@@ -1,7 +1,7 @@
 import { useMemo, useRef } from 'react';
 
-import type { TextFieldConfig } from '../../../types/settings';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import type { TextFieldConfig } from '../../../types/settings';
 import {
   buildNamingTemplatePreview,
   NAMING_TEMPLATE_TOKENS,
@@ -116,11 +116,15 @@ export const NamingTemplateField = ({
       {(hasPathSeparatorInFilename || preview.unknownTokens.length > 0) && (
         <div className="space-y-1 text-xs text-amber-600 dark:text-amber-400">
           {hasPathSeparatorInFilename && (
-            <p>{t('Rename templates cannot contain folder separators. Use Path Template instead.')}</p>
+            <p>
+              {t('Rename templates cannot contain folder separators. Use Path Template instead.')}
+            </p>
           )}
           {preview.unknownTokens.length > 0 && (
             <p>
-              {preview.unknownTokens.length === 1 ? t('Unknown variable: ') : t('Unknown variables: ')}
+              {preview.unknownTokens.length === 1
+                ? t('Unknown variable: ')
+                : t('Unknown variables: ')}
               {preview.unknownTokens.map((token) => `{${token}}`).join(', ')}
             </p>
           )}
@@ -134,7 +138,7 @@ export const NamingTemplateField = ({
 
       <details className="min-w-0">
         <summary className="cursor-pointer text-xs font-semibold text-sky-500 select-none hover:text-sky-400 dark:text-sky-400 dark:hover:text-sky-300">
-          Insert variable
+          {t('Insert variable')}
         </summary>
         <div className="mt-1.5 space-y-3 rounded-lg border border-(--border-muted) bg-(--bg-soft) p-3">
           {tokenGroups.map((group) => (
@@ -163,3 +167,4 @@ export const NamingTemplateField = ({
     </div>
   );
 };
+

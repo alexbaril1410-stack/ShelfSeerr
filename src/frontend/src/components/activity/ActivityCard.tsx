@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
-import type { RequestRecord } from '../../types';
 import { useLanguage } from '../../contexts/LanguageContext';
+import type { RequestRecord } from '../../types';
 import { withBasePath } from '../../utils/basePath';
 import { Tooltip } from '../shared/Tooltip';
 import type { ActivityCardAction } from './activityCardModel';
@@ -44,11 +44,15 @@ interface ActivityCardProps {
   isSelected?: boolean;
 }
 
-const BookFallback = () => (
-  <div className="flex h-18 w-12 items-center justify-center rounded-sm bg-gray-200 text-[8px] font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
-    No Cover
-  </div>
-);
+const BookFallback = () => {
+  const { t } = useLanguage();
+
+  return (
+    <div className="flex h-18 w-12 items-center justify-center rounded-sm bg-gray-200 text-[8px] font-medium text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+      {t('No Cover')}
+    </div>
+  );
+};
 
 const IconButton = ({
   title,
@@ -451,7 +455,7 @@ const ReviewInlinePanel = ({
             disabled={isSubmitting}
             className="rounded-md border border-(--border-muted) px-2.5 py-1.5 text-xs transition-colors hover:bg-(--hover-surface) disabled:opacity-50"
           >
-            Browse Alternatives
+            {t('Browse Alternatives')}
           </button>
         )}
       </div>
@@ -493,7 +497,8 @@ const RejectInlinePanel = ({
   return (
     <div className="animate-fade-in -mx-4 mt-2 space-y-3 px-4 pb-2">
       <p className="text-xs font-medium">
-        {t('Reject request for')} <span className="opacity-80">{itemTitle || t('Untitled request')}</span>
+        {t('Reject request for')}{' '}
+        <span className="opacity-80">{itemTitle || t('Untitled request')}</span>
       </p>
       <textarea
         aria-label={t('Optional note shown to the user')}
@@ -725,9 +730,11 @@ export const ActivityCard = ({
     toOptionalText(releaseData.extension) ||
     t('Unknown');
   const fileSize = toOptionalText(releaseData.size) || t('Unknown');
-  const sourceLabel = t(toSourceLabel(
-    releaseData.source_display_name || releaseData.source || reviewRecord?.source_hint,
-  ));
+  const sourceLabel = t(
+    toSourceLabel(
+      releaseData.source_display_name || releaseData.source || reviewRecord?.source_hint,
+    ),
+  );
 
   const hasAttachedRelease =
     reviewRecord?.request_level === 'release' && Object.keys(releaseData).length > 0;
@@ -827,8 +834,9 @@ export const ActivityCard = ({
                 const config = actionUiConfig(action);
                 const icon =
                   action.kind === 'request-approve' && isRetryAfterFailure ? 'retry' : config.icon;
-                const actionTitle =
-                  t(action.kind === 'request-approve' && isRetryAfterFailure ? 'Retry' : config.title);
+                const actionTitle = t(
+                  action.kind === 'request-approve' && isRetryAfterFailure ? 'Retry' : config.title,
+                );
                 return (
                   <Tooltip
                     key={actionKey(action)}
@@ -879,7 +887,7 @@ export const ActivityCard = ({
                   className={`shrink-0 rounded px-1.5 py-px font-medium ${REATTACHED_PILL_CLASSES}`}
                   title={t('Picked up where it left off instead of starting again')}
                 >
-                  Reattached
+                  {t('Reattached')}
                 </span>
               )}
               {item.metaLine && (
@@ -895,7 +903,7 @@ export const ActivityCard = ({
                   className={`shrink-0 rounded px-1.5 py-px font-medium ${REATTACHED_PILL_CLASSES}`}
                   title={t('Picked up where it left off instead of starting again')}
                 >
-                  Reattached
+                  {t('Reattached')}
                 </span>
               )}
               <p className="truncate opacity-60" title={item.metaLine}>
@@ -1001,3 +1009,4 @@ export const ActivityCard = ({
     </div>
   );
 };
+

@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 
 import { useLanguage } from '../../../contexts/LanguageContext';
-
 import type { RequestPolicyMode } from '../../../types';
 import { DropdownList } from '../../DropdownList';
 import type {
@@ -200,7 +199,11 @@ export const RequestPolicyGrid = ({
                     }`}
                   >
                     <DropdownList
-                      options={REQUEST_POLICY_DEFAULT_OPTIONS.map((option) => ({ ...option, label: t(option.label), description: t(option.description) }))}
+                      options={REQUEST_POLICY_DEFAULT_OPTIONS.map((option) => ({
+                        ...option,
+                        label: t(option.label),
+                        description: t(option.description),
+                      }))}
                       value={mode}
                       onChange={(value) => {
                         const nextMode = normalizeRequestPolicyMode(getDropdownValue(value));
@@ -338,7 +341,7 @@ export const RequestPolicyGrid = ({
                         type="button"
                         onClick={() => resetCellRule(sourceRow.source, contentType)}
                         className="shrink-0 text-xs text-sky-500 transition-colors hover:text-sky-400"
-                        aria-label={`${t("Reset")} ${sourceRow.displayName} ${t(contentType === "ebook" ? "Ebook" : "Audiobook")} ${t("override")}`}
+                        aria-label={`${t('Reset')} ${sourceRow.displayName} ${t(contentType === 'ebook' ? 'Ebook' : 'Audiobook')} ${t('override')}`}
                       >
                         {t('Reset')}
                       </button>
@@ -351,8 +354,9 @@ export const RequestPolicyGrid = ({
         ) : (
           <div className="px-3 py-3">
             <p className="text-xs opacity-60">
-              Per-source settings become available when a default is set to Download or Request
-              Release.
+              {t(
+                'Per-source settings become available when a default is set to Download or Request Release.',
+              )}
             </p>
           </div>
         )}
@@ -360,3 +364,4 @@ export const RequestPolicyGrid = ({
     </div>
   );
 };
+
