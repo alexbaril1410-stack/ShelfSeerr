@@ -529,7 +529,6 @@ const SettingsModalSession = ({
         <SettingsHeader title={t("Settings")} onClose={handleClose} />
 
         <div className="flex min-h-0 flex-1">
-          <div className="flex min-h-0 w-full flex-col md:flex-row">
           <SettingsSidebar
             tabs={tabs}
             groups={groups}
@@ -547,7 +546,6 @@ const SettingsModalSession = ({
                 {t("Select a category to configure")}
               </div>
             )}
-          </div>
           </div>
         </div>
       </div>
