@@ -90,8 +90,8 @@ export const DetailsModal = ({
   const showBookSourceLink = Boolean(book.source_url) && (isMetadata || showReleaseSourceLinks);
   const metadataActionText =
     isMetadata && buttonState.state === 'download' && buttonState.text === 'Get'
-      ? 'Find Downloads'
-      : buttonState.text;
+      ? t('Find Downloads')
+      : t(buttonState.text);
   const downloadButtonClassName = (() => {
     if (buttonState.state === 'blocked') {
       return 'bg-gray-500';

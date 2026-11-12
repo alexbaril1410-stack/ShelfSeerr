@@ -267,7 +267,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
       closeDropdown();
       // Show persistent toast while gathering logs
       const loadingToastId = onShowToast?.(
-        'Gathering debug logs... This may take a minute.',
+        t('Gathering debug logs... This may take a minute.'),
         'info',
         true,
       );
@@ -286,7 +286,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             isRecord(errorData) && typeof errorData.error === 'string'
               ? errorData.error
               : response.statusText;
-          onShowToast?.(`Debug download failed: ${errorMessage}`, 'error');
+          onShowToast?.(t('Debug download failed: {error}').replace('{error}', errorMessage), 'error');
           return;
         }
 
@@ -311,12 +311,12 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
         window.URL.revokeObjectURL(url);
         a.remove();
 
-        onShowToast?.('Debug logs downloaded successfully', 'success');
+        onShowToast?.(t('Debug logs downloaded successfully'), 'success');
       } catch (error) {
         // Remove the loading toast on error too
         if (loadingToastId) onRemoveToast?.(loadingToastId);
         console.error('Debug download error:', error);
-        onShowToast?.('Debug download failed. Check console for details.', 'error');
+        onShowToast?.(t('Debug download failed. Check console for details.'), 'error');
       }
     };
 

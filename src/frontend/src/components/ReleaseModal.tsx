@@ -1924,7 +1924,7 @@ const ReleaseModalSession = ({
                       const totalStr = isCapped ? '500+' : String(totalCountNum);
                       return (
                         <span className="mx-2 shrink-0 text-xs whitespace-nowrap text-gray-500 dark:text-gray-400">
-                          Results 1-{shownEnd} ({totalStr} Total)
+                          {t('Results 1–{end} ({total} total)').replace('{end}', String(shownEnd)).replace('{total}', totalStr)}
                         </span>
                       );
                     })()}
@@ -1940,9 +1940,9 @@ const ReleaseModalSession = ({
                         className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
                           multiBook ? 'text-emerald-600 dark:text-emerald-400' : ''
                         }`}
-                        aria-label="Multi-book pack"
+                        aria-label={t('Multi-book pack')}
                         aria-pressed={multiBook}
-                        title="Multi-book pack: file each subfolder (or each file) as a separate book. Only needed when a release can't be inspected before download."
+                        title={t('Multi-book pack: file each subfolder (or each file) as a separate book. Only needed when a release can’t be inspected before download.')}
                       >
                         <svg
                           className="h-4 w-4"
@@ -1971,9 +1971,9 @@ const ReleaseModalSession = ({
                         className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
                           chooseFormats ? 'text-emerald-600 dark:text-emerald-400' : ''
                         }`}
-                        aria-label="Choose formats"
+                        aria-label={t('Choose formats')}
                         aria-pressed={chooseFormats}
-                        title="Choose formats: when a release has several formats, pick which ones to download."
+                        title={t('Choose formats: when a release has several formats, pick which ones to download.')}
                       >
                         <svg
                           className="h-4 w-4"
@@ -2001,8 +2001,8 @@ const ReleaseModalSession = ({
                       className={`hover-surface rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
                         manualQuery.trim() ? 'text-emerald-600 dark:text-emerald-400' : ''
                       }`}
-                      aria-label="Manual search query"
-                      title="Manual query"
+                      aria-label={t('Manual search query')}
+                      title={t('Manual query')}
                     >
                       <svg
                         className="h-4 w-4"
@@ -2266,7 +2266,7 @@ const ReleaseModalSession = ({
                               className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
                                 isOpen ? 'bg-(--hover-surface)' : ''
                               }`}
-                              aria-label="Filter releases"
+                              aria-label={t('Filter releases')}
                             >
                               <svg
                                 className="h-4 w-4"
@@ -2293,18 +2293,18 @@ const ReleaseModalSession = ({
                             {columnConfig.supported_filters?.includes('format') &&
                               availableFormats.length > 0 && (
                                 <DropdownList
-                                  label="Format"
+                                  label={t('Format')}
                                   options={formatOptions}
                                   value={formatFilter}
                                   onChange={(val) =>
                                     setFormatFilter(typeof val === 'string' ? val : (val[0] ?? ''))
                                   }
-                                  placeholder="All Formats"
+                                  placeholder={t('All Formats')}
                                 />
                               )}
                             {columnConfig.supported_filters?.includes('language') && (
                               <LanguageMultiSelect
-                                label="Language"
+                                label={t('Language')}
                                 options={bookLanguages}
                                 value={languageFilter}
                                 onChange={setLanguageFilter}
@@ -2314,7 +2314,7 @@ const ReleaseModalSession = ({
                             {columnConfig.supported_filters?.includes('indexer') &&
                               availableIndexers.length > 1 && (
                                 <DropdownList
-                                  label="Indexers"
+                                  label={t('Indexers')}
                                   options={availableIndexers.map((idx) => ({
                                     value: idx,
                                     label: idx,
@@ -2330,7 +2330,7 @@ const ReleaseModalSession = ({
                                     }
                                     setIndexerFilter(nextIndexerFilter);
                                   }}
-                                  placeholder="All Indexers"
+                                  placeholder={t('All Indexers')}
                                 />
                               )}
                             <label className="flex cursor-pointer items-center gap-2 text-sm text-(--text)">
@@ -2342,7 +2342,7 @@ const ReleaseModalSession = ({
                                 }
                                 className="h-4 w-4 rounded border-(--border-muted) accent-emerald-600"
                               />
-                              Afficher les résultats à 0 seeder
+                              {t('Show results with 0 seeders')}
                             </label>
                             {/* Apply button - re-fetch when the source supports server-side filters */}
                             {(columnConfig.supported_filters?.includes('language') ||
@@ -2355,7 +2355,7 @@ const ReleaseModalSession = ({
                                 }}
                                 className="w-full rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700"
                               >
-                                Apply
+                                {t('Apply')}
                               </button>
                             )}
                           </div>
@@ -2381,8 +2381,8 @@ const ReleaseModalSession = ({
                     type="text"
                     value={manualQuery}
                     onChange={(e) => setManualQuery(e.target.value)}
-                    placeholder="Type a custom search query (overrides all sources)"
-                    aria-label="Custom search query"
+                    placeholder={t('Type a custom search query (overrides all sources)')}
+                    aria-label={t('Custom search query')}
                     className="w-full rounded-lg border border-(--border-muted) bg-(--bg) px-3 py-2 text-sm text-(--text)"
                   />
                   <button
@@ -2394,7 +2394,7 @@ const ReleaseModalSession = ({
                         : 'bg-emerald-600 hover:bg-emerald-700'
                     }`}
                   >
-                    {currentTabLoading ? 'Searching…' : 'Search'}
+                    {t(currentTabLoading ? 'Searching…' : 'Search')}
                   </button>
                 </form>
                 <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">

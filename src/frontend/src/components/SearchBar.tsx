@@ -408,9 +408,9 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       combinedSelectionActive,
       t,
     );
-    const effectiveInputAriaLabel = t(activeTarget
-      ? `${inputAriaLabel}: ${activeTarget.label}`
-      : inputAriaLabel);
+    const effectiveInputAriaLabel = activeTarget
+      ? `${t(inputAriaLabel)}: ${t(activeTarget.label)}`
+      : t(inputAriaLabel);
 
     const selectDropdownOpen = isSelectField && isSelectOpen && selectOptions.length > 0;
     const autocompleteDropdownOpen =
