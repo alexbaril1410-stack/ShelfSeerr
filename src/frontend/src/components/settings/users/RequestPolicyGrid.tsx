@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { useLanguage } from '../../../contexts/LanguageContext';
+
 import type { RequestPolicyMode } from '../../../types';
 import { DropdownList } from '../../DropdownList';
 import type {
@@ -77,6 +79,7 @@ export const RequestPolicyGrid = ({
   onClearOverrides,
   clearOverridesDisabled = false,
 }: RequestPolicyGridProps) => {
+  const { t } = useLanguage();
   const normalizedExplicitRules = useMemo(
     () =>
       normalizeExplicitRulesForPersistence({
@@ -161,15 +164,15 @@ export const RequestPolicyGrid = ({
       <div className="rounded-lg border border-(--border-muted)">
         {/* Header */}
         <div className="hidden gap-3 rounded-t-lg border-b border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-xs font-medium opacity-60 sm:grid sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]">
-          <span>Source</span>
-          <span>Ebook</span>
-          <span>Audiobook</span>
+          <span>{t('Source')}</span>
+          <span>{t('Ebook')}</span>
+          <span>{t('Audiobook')}</span>
         </div>
 
         {/* Default row */}
         <div className="grid grid-cols-1 items-center gap-3 border-b-2 border-(--border-muted) bg-(--bg-soft) px-3 py-2.5 sm:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">Default</p>
+            <p className="truncate text-sm font-semibold">{t('Default')}</p>
           </div>
 
           {CONTENT_TYPES.map((contentType) => {
@@ -263,7 +266,7 @@ export const RequestPolicyGrid = ({
                   return (
                     <div key={key} className="flex min-h-[36px] items-center justify-center">
                       {mobileLabel}
-                      <span className="text-xs opacity-40">Not supported</span>
+                      <span className="text-xs opacity-40">{t('Not supported')}</span>
                     </div>
                   );
                 }
@@ -335,7 +338,7 @@ export const RequestPolicyGrid = ({
                         type="button"
                         onClick={() => resetCellRule(sourceRow.source, contentType)}
                         className="shrink-0 text-xs text-sky-500 transition-colors hover:text-sky-400"
-                        aria-label={`Reset ${sourceRow.displayName} ${contentType} override`}
+                        aria-label={`${t("Reset")} ${sourceRow.displayName} ${t(contentType === "ebook" ? "Ebook" : "Audiobook")} ${t("override")}`}
                       >
                         Reset
                       </button>
