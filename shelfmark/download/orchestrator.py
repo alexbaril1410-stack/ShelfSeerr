@@ -337,12 +337,12 @@ def queue_release(
             metadata_provider_id=normalize_optional_text(release_data.get("metadata_provider_id")),
             metadata_description=normalize_optional_text(release_data.get("metadata_description")),
             metadata_publisher=normalize_optional_text(release_data.get("metadata_publisher")),
-            metadata_genres=[str(value).strip() for value in release_data.get("metadata_genres", []) if isinstance(value, str) and value.strip()] if isinstance(release_data.get("metadata_genres"), list) else [],
+            metadata_genres=_normalize_text_list(release_data.get("metadata_genres")),
             metadata_isbn_10=normalize_optional_text(release_data.get("metadata_isbn_10")),
             metadata_isbn_13=normalize_optional_text(release_data.get("metadata_isbn_13")),
             metadata_language=normalize_optional_text(release_data.get("metadata_language")),
-            metadata_authors=[str(value).strip() for value in release_data.get("metadata_authors", []) if isinstance(value, str) and value.strip()] if isinstance(release_data.get("metadata_authors"), list) else [],
-            metadata_narrators=[str(value).strip() for value in release_data.get("metadata_narrators", []) if isinstance(value, str) and value.strip()] if isinstance(release_data.get("metadata_narrators"), list) else [],
+            metadata_authors=_normalize_text_list(release_data.get("metadata_authors")),
+            metadata_narrators=_normalize_text_list(release_data.get("metadata_narrators")),
             series_name=series_name,
             series_position=series_position,
             subtitle=subtitle,
@@ -518,6 +518,13 @@ def can_retry_download_task(
     return _has_staged_retry_source(task)
 
 
+def _normalize_text_list(value: object) -> list[str]:
+    """Keep non-empty strings from a metadata list."""
+    if not isinstance(value, list):
+        return []
+    return [item.strip() for item in value if isinstance(item, str) and item.strip()]
+
+
 def _normalize_ignored_files(value: object) -> list[str] | None:
     """Keep only non-empty string paths from a user-ignored file list."""
     if not isinstance(value, list):
@@ -654,12 +661,12 @@ def _restore_task_from_retry_payload(payload: object) -> DownloadTask | None:
         metadata_provider_id=normalize_optional_text(payload.get("metadata_provider_id")),
         metadata_description=normalize_optional_text(payload.get("metadata_description")),
         metadata_publisher=normalize_optional_text(payload.get("metadata_publisher")),
-        metadata_genres=[str(value).strip() for value in payload.get("metadata_genres", []) if isinstance(value, str) and value.strip()] if isinstance(payload.get("metadata_genres"), list) else [],
+        metadata_genres=_normalize_text_list(payload.get("metadata_genres")),
         metadata_isbn_10=normalize_optional_text(payload.get("metadata_isbn_10")),
         metadata_isbn_13=normalize_optional_text(payload.get("metadata_isbn_13")),
         metadata_language=normalize_optional_text(payload.get("metadata_language")),
-        metadata_authors=[str(value).strip() for value in payload.get("metadata_authors", []) if isinstance(value, str) and value.strip()] if isinstance(payload.get("metadata_authors"), list) else [],
-        metadata_narrators=[str(value).strip() for value in payload.get("metadata_narrators", []) if isinstance(value, str) and value.strip()] if isinstance(payload.get("metadata_narrators"), list) else [],
+        metadata_authors=_normalize_text_list(payload.get("metadata_authors")),
+        metadata_narrators=_normalize_text_list(payload.get("metadata_narrators")),
         series_name=normalize_optional_text(payload.get("series_name")),
         series_position=_optional_number(payload.get("series_position")),
         subtitle=normalize_optional_text(payload.get("subtitle")),
