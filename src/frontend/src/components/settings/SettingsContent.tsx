@@ -450,6 +450,7 @@ function SettingsContentPanel({
     <div className="space-y-5">
       {visibleFields.map((field) => {
         const disabledState = getDisabledState(field, values);
+        const displayField = translatedFieldsByKey.get(field.key) ?? field;
         const fieldOverrideSummary = overrideSummary?.[field.key];
 
         const renderedField =
@@ -532,10 +533,10 @@ function SettingsContentPanel({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
               />
             </svg>
-            Saving...
+            {t('Saving...')}
           </span>
         ) : (
-          'Save Changes'
+          {t('Save Changes')}
         )}
       </button>
     ) : null;
