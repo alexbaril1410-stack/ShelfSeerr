@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 
 import type { TagListFieldConfig } from '../../../types/settings';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface TagListFieldProps {
   field: TagListFieldConfig;
@@ -56,6 +57,7 @@ export const TagListField = ({
   disabled,
   requiredTags,
 }: TagListFieldProps) => {
+  const { t } = useLanguage();
   const isDisabled = disabled ?? false;
   const required = requiredTags ?? [];
   const inputRef = useRef<HTMLInputElement>(null);
@@ -120,7 +122,7 @@ export const TagListField = ({
                   removeAt(tagIndex);
                 }}
                 className="rounded-sm p-0.5 hover:bg-(--hover-surface)"
-                aria-label={`Remove ${tag}`}
+                aria-label={`${t('Remove')} ${tag}`}
               >
                 <svg
                   className="h-4 w-4"
@@ -143,7 +145,7 @@ export const TagListField = ({
             type="text"
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
-            aria-label={field.label || field.placeholder || 'Add item'}
+            aria-label={field.label || field.placeholder || t('Add item')}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault();
@@ -162,7 +164,7 @@ export const TagListField = ({
         )}
 
         {isDisabled && tags.length === 0 && (
-          <span className="opacity-60">{field.placeholder || 'No values'}</span>
+          <span className="opacity-60">{field.placeholder || t('No values')}</span>
         )}
       </div>
     </div>
