@@ -74,6 +74,8 @@ describe('requestPayload utilities', () => {
     expect(releaseData.source).toBe('prowlarr');
     expect(releaseData.format).toBe('epub');
     expect(releaseData.content_type).toBe('ebook');
+    expect(releaseData.metadata_provider).toBe('openlibrary');
+    expect(releaseData.metadata_provider_id).toBe('ol-1');
     expect(directReleaseData.search_mode).toBe('direct');
     expect(sourceBackedReleaseData.search_mode).toBe('direct');
   });
