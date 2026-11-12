@@ -29,6 +29,7 @@ def test_parse_audible_product_maps_audiobook_metadata():
     assert book.provider_id == "B0ABC12345"
     assert book.title == "Le Hobbit"
     assert book.authors == ["J. R. R. Tolkien"]
+    assert book.narrators == ["Thierry Janssen"]
     assert book.cover_url == "https://example.test/cover.jpg"
     assert book.source_url == "https://www.audible.fr/pd/B0ABC12345"
     assert book.publish_year == 2024
@@ -161,6 +162,7 @@ def test_parse_audible_product_extracts_contributors_series_and_html_description
 
     assert book is not None
     assert book.authors == ["Matt Dinniman"]
+    assert book.narrators == ["Jeff Hays"]
     assert any(
         field.label == "Narrateur" and field.value == "Jeff Hays"
         for field in book.display_fields
@@ -188,6 +190,7 @@ def test_parse_audible_product_handles_contributor_objects_and_fallback_fields()
 
     assert book is not None
     assert book.authors == ["Auteur"]
+    assert book.narrators == ["Narrateur"]
     assert any(
         field.label == "Narrateur" and field.value == "Narrateur"
         for field in book.display_fields
