@@ -1,4 +1,11 @@
-import type { SettingsField } from '../../types/settings';
+import type {
+  SettingsField,
+  SelectFieldConfig,
+  MultiSelectFieldConfig,
+  OrderableListFieldConfig,
+  TableFieldConfig,
+  CustomComponentFieldConfig,
+} from '../../types/settings';
 
 type Translate = (value: string) => string;
 
@@ -49,12 +56,20 @@ export const translateSettingsField = (
 
   switch (field.type) {
     case 'SelectField':
+      return {
+        ...base,
+        options: field.options.map((option) => translateOption(option, t)),
+      } as SelectFieldConfig;
     case 'MultiSelectField':
+      return {
+        ...base,
+        options: field.options.map((option) => translateOption(option, t)),
+      } as MultiSelectFieldConfig;
     case 'OrderableListField':
       return {
         ...base,
         options: field.options.map((option) => translateOption(option, t)),
-      };
+      } as OrderableListFieldConfig;
     case 'TableField':
       return {
         ...base,
@@ -70,15 +85,15 @@ export const translateSettingsField = (
             description: option.description ? t(option.description) : undefined,
           })),
         })),
-      };
+      } as TableFieldConfig;
     case 'CustomComponentField':
       return {
         ...base,
         boundFields: field.boundFields?.map((boundField) =>
           translateSettingsField(boundField, t),
         ),
-      };
+      } as CustomComponentFieldConfig;
     default:
-      return base;
+      return base as SettingsField;
   }
 };
