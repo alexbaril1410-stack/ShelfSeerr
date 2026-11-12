@@ -16,8 +16,8 @@ export const LanguageSelector = ({ compact = false }: LanguageSelectorProps) => 
         aria-label={t('Language')}
         className="rounded-md border border-(--border-muted) bg-(--bg) px-2 py-1 text-sm"
       >
-        <option value="fr">Français</option>
-        <option value="en">English</option>
+        <option value="fr">{t("French")}</option>
+        <option value="en">{t("English")}</option>
       </select>
     </label>
   );
