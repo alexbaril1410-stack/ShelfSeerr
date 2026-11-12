@@ -536,7 +536,7 @@ function SettingsContentPanel({
             {t('Saving...')}
           </span>
         ) : (
-          {t('Save Changes')}
+          t('Save Changes')
         )}
       </button>
     ) : null;
