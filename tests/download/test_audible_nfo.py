@@ -44,7 +44,7 @@ def test_build_audible_nfo_uses_audiobookshelf_supported_fields():
     assert "Publisher: Gallimard Audio" in content
     assert "Genre: Fantasy, Jeunesse" in content
     assert "Language: fr" in content
-    assert "Une aventure\\nfantastique." in content
+    assert "Une aventure\nfantastique." in content
 
 
 def test_build_audible_nfo_only_runs_for_audible_audiobooks():
