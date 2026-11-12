@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 
+import { useLanguage } from '../../contexts/LanguageContext';
 import { useBodyScrollLock } from '../../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { useMountEffect } from '../../hooks/useMountEffect';
@@ -305,7 +306,7 @@ const SelfSettingsModalSession = ({
               type="button"
               onClick={handleClose}
               className="hover-action rounded-full p-2 text-gray-500 transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50 dark:text-gray-400 dark:hover:text-gray-100"
-              aria-label="Close account settings"
+              aria-label={t("Close account settings")}
               disabled={isSaving}
             >
               <svg
