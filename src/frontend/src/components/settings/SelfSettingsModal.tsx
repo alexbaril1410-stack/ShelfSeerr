@@ -243,7 +243,7 @@ const SelfSettingsModalSession = ({
     setIsSaving(true);
     try {
       await updateSelfUser(payload);
-      onShowToast?.('Account updated', 'success');
+      onShowToast?.(t('Account updated'), 'success');
       onSettingsSaved?.();
       await loadEditContext();
     } catch (error) {
