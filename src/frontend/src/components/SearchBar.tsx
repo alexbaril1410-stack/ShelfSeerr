@@ -406,9 +406,9 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       placeholder,
       combinedSelectionActive,
     ));
-    const effectiveInputAriaLabel = activeTarget
+    const effectiveInputAriaLabel = t(activeTarget
       ? `${inputAriaLabel}: ${activeTarget.label}`
-      : inputAriaLabel;
+      : inputAriaLabel);
 
     const selectDropdownOpen = isSelectField && isSelectOpen && selectOptions.length > 0;
     const autocompleteDropdownOpen =
@@ -756,7 +756,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 }}
                 className="hover-action flex cursor-pointer items-center gap-1.5 rounded-l-full pr-2 pl-5 transition-colors"
                 style={{ color: 'var(--text)' }}
-                aria-label={`Searching ${selectorContentTypeLabel} by ${activeTarget?.label ?? 'general'}. Click to change.`}
+                aria-label={t(`Searching ${selectorContentTypeLabel} by ${activeTarget?.label ?? 'general'}. Click to change.`)}
                 aria-expanded={isOptionsOpen}
                 aria-controls={optionsPanelId}
                 aria-haspopup={isPopover ? 'dialog' : undefined}
@@ -809,8 +809,8 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 type="button"
                 onClick={handleClearSearch}
                 className="hover-action flex items-center justify-center rounded-full p-2 transition-colors"
-                aria-label={clearButtonLabel}
-                title={clearButtonTitle}
+                aria-label={t(clearButtonLabel)}
+                title={t(clearButtonTitle)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -835,8 +835,8 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                   ? 'bg-emerald-600 hover:bg-emerald-700'
                   : 'bg-sky-700 hover:bg-sky-800'
               }`}
-              aria-label={searchButtonLabel}
-              title={searchButtonTitle}
+              aria-label={t(searchButtonLabel)}
+              title={t(searchButtonTitle)}
               disabled={isLoading}
             >
               {!isLoading && (
