@@ -198,8 +198,8 @@ export const SearchSection = ({
         </div>
 
         {([
-          { key: 'trending', title: contentType === 'audiobook' ? t('Popular audiobooks') : t('Books trending now'), eyebrow: 'Trends' },
-          { key: 'new_releases', title: contentType === 'audiobook' ? t('Latest audiobook releases') : t('New releases'), eyebrow: 'Coming soon and recently published' },
+          { key: 'trending', title: contentType === 'audiobook' ? t('Popular audiobooks') : t('Books trending now'), eyebrow: t('Trends') },
+          { key: 'new_releases', title: contentType === 'audiobook' ? t('Latest audiobook releases') : t('New releases'), eyebrow: t('Coming soon and recently published') },
         ] as const).map((shelf) => {
           const shelfBooks = discoveryShelves[shelf.key];
           if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
