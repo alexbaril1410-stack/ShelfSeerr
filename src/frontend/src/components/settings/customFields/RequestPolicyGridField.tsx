@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { useLanguage } from '../../../contexts/LanguageContext';
+
 import type { SelectFieldConfig, TableFieldConfig } from '../../../types/settings';
 import type { RequestPolicyContentType, RequestPolicyMode } from '../users';
 import { RequestPolicyGrid } from '../users';
@@ -17,6 +19,7 @@ export const RequestPolicyGridField = ({
   onChange,
   isDisabled,
 }: CustomSettingsFieldRendererProps) => {
+  const { t } = useLanguage();
   const requestRulesField = useMemo(
     () =>
       field.boundFields?.find(
@@ -45,7 +48,7 @@ export const RequestPolicyGridField = ({
   );
 
   if (!requestRulesField) {
-    return <p className="text-xs opacity-60">Request policy schema is unavailable for this tab.</p>;
+    return <p className="text-xs opacity-60">{t('Request policy schema is unavailable for this tab.')}</p>;
   }
 
   const globalRequestDefaults = useMemo(
