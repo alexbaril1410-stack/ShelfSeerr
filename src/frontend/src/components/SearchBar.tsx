@@ -2,6 +2,7 @@ import type { ComponentType, InputHTMLAttributes, ReactNode } from 'react';
 import { forwardRef, useId, useImperativeHandle, useMemo, useRef, useState } from 'react';
 
 import { useSearchMode } from '../contexts/SearchModeContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchBarAutocomplete } from '../hooks/searchBar/useSearchBarAutocomplete';
 import { useDismiss } from '../hooks/useDismiss';
 import { useLatestCallback } from '../hooks/useLatestCallback';
@@ -228,6 +229,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
     ref,
   ) => {
     const { searchMode } = useSearchMode();
+    const { t } = useLanguage();
     const inputRef = useRef<HTMLInputElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
     // Deferred submits below run from a timeout, not an Effect, so this is a latest-value
@@ -398,12 +400,12 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       }
     };
 
-    const effectivePlaceholder = getDefaultPlaceholder(
+    const effectivePlaceholder = t(getDefaultPlaceholder(
       contentType,
       activeTarget,
       placeholder,
       combinedSelectionActive,
-    );
+    ));
     const effectiveInputAriaLabel = activeTarget
       ? `${inputAriaLabel}: ${activeTarget.label}`
       : inputAriaLabel;
@@ -515,7 +517,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
             <span className="truncate opacity-50">{effectivePlaceholder}</span>
           );
           if (isDynamicLoading) {
-            selectTriggerContent = <span className="truncate opacity-50">Loading…</span>;
+            selectTriggerContent = <span className="truncate opacity-50">{t('Loading…')}</span>;
           } else if (selectedOption) {
             selectTriggerContent = <span className="truncate">{selectedOption.label}</span>;
           }
@@ -625,7 +627,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
             d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75"
           />
         </svg>
-        Options
+        {t('Options')}
       </button>
     ) : null;
 
@@ -633,7 +635,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       <div id={optionsPanelId} ref={optionsPanelRef} className={layoutClasses.panel}>
         {showContentTypeSelector && (
           <div className={layoutClasses.group}>
-            <OptionsGroupHeader label="Content" action={optionsButton} />
+            <OptionsGroupHeader label={t('Content')} action={optionsButton} />
             <div className={layoutClasses.options}>
               {CONTENT_TYPE_OPTIONS.map(({ type, label, Icon }) => {
                 const isActive = contentType === type || combinedSelectionActive;
@@ -647,20 +649,20 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                     <span className="flex w-4 justify-center">
                       {isActive ? <CheckIcon /> : <Icon />}
                     </span>
-                    <span>{label}</span>
+                    <span>{t(label)}</span>
                   </button>
                 );
               })}
             </div>
             {combinedToggleAvailable && (
               <div className="flex items-center gap-3 px-1 py-1 text-sm font-medium">
-                Combined
+                {t('Combined')}
                 <ToggleSwitch
                   checked={combinedSelectionActive}
                   onChange={handleCombinedModeToggle}
                   disabled={combinedSelectorLocked}
                   color="emerald"
-                  ariaLabel="Combined search"
+                  ariaLabel={t('Combined search')}
                 />
               </div>
             )}
@@ -670,7 +672,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
         {queryTargets.length > 1 && (
           <div className={layoutClasses.group}>
             <OptionsGroupHeader
-              label="Search by"
+              label={t('Search by')}
               action={showContentTypeSelector ? null : optionsButton}
             />
             <div className={layoutClasses.options}>
@@ -789,7 +791,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                 <div
                   className="animate-fade-in-down absolute top-full left-0 z-50 mt-2 w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-(--border-muted) bg-(--bg) shadow-2xl"
                   role="dialog"
-                  aria-label="Search context"
+                  aria-label={t('Search context')}
                 >
                   <div className="max-h-[min(24rem,calc(100vh-8rem))] overflow-y-auto p-3">
                     {optionsPanel}
