@@ -434,7 +434,7 @@ const SettingsModalSession = ({
           style={{ willChange: 'opacity', contain: 'strict' }}
           onClick={handleClose}
           tabIndex={-1}
-          aria-label="Close settings"
+          aria-label={t("Close settings")}
         />
         <div
           className="relative max-w-md rounded-xl bg-(--bg) p-8 shadow-2xl"
@@ -515,7 +515,7 @@ const SettingsModalSession = ({
         style={{ willChange: 'opacity', contain: 'strict' }}
         onClick={handleClose}
         tabIndex={-1}
-        aria-label="Close settings"
+        aria-label={t("Close settings")}
       />
 
       <div
