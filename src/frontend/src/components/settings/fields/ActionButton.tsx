@@ -98,11 +98,11 @@ export const ActionButton = ({ field, onAction, disabled }: ActionButtonProps) =
               : 'bg-red-500/20 text-red-700 dark:text-red-300'
           }`}
         >
-          <p>{result.message}</p>
+          <p>{t(result.message)}</p>
           {Array.isArray(result.details) && result.details.length > 0 && (
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs opacity-90">
               {createDetailEntries(result.details).map(({ key, detail }) => (
-                <li key={key}>{detail}</li>
+                <li key={key}>{t(detail)}</li>
               ))}
             </ul>
           )}
