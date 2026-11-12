@@ -335,7 +335,7 @@ const SelfSettingsModalSession = ({
             if (showInitialLoadErrorState) {
               return (
                 <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
-                  <p className="text-sm opacity-70">{t(loadError)}</p>
+                  <p className="text-sm opacity-70">{t(loadError ?? '')}</p>
                   <button
                     type="button"
                     onClick={() => {
