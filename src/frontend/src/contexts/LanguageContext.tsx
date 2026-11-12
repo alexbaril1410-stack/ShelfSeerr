@@ -895,6 +895,8 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
     'Créez une destination par URL. Commencez par « Tous », puis ajoutez des destinations spécifiques à chaque événement. Des exemples de formats sont disponibles ici : [Voir les formats d’URL Apprise](https://appriseit.com/services/).',
   'Create one route per URL. Start with All, then add event-specific routes for targeted delivery. Use {User} or {Email} in the path or query to fill in your account details, e.g. ntfys://ntfy.sh/shelfmark-{User}. Personal routes can use ntfy, Gotify, Discord, Slack, Telegram, Pushover and PushBullet. Need format examples? [View Apprise URL formats](https://appriseit.com/services/).':
     'Créez une destination par URL. Commencez par « Tous », puis ajoutez des destinations spécifiques à chaque événement. Utilisez {User} ou {Email} dans le chemin ou la requête pour insérer les informations de votre compte (ex. : ntfys://ntfy.sh/shelfmark-{User}). Les destinations personnelles peuvent utiliser ntfy, Gotify, Discord, Slack, Telegram, Pushover et PushBullet. Des exemples de formats sont disponibles ici : [Voir les formats d’URL Apprise](https://appriseit.com/services/).',
+  "Create one route per URL. Start with All, then add event-specific routes for targeted delivery. Use {User} or {Email} in the path or query to fill in each user's account details, e.g. ntfys://ntfy.sh/shelfmark-{User}, or mailtos://...?to={Email} in the admin default. Need format examples? [View Apprise URL formats](https://appriseit.com/services/).":
+    'Créez une destination par URL. Commencez par « Tous », puis ajoutez des destinations spécifiques à chaque événement. Utilisez {User} ou {Email} dans le chemin ou la requête pour insérer les informations du compte (ex. : ntfys://ntfy.sh/shelfmark-{User} ou mailtos://...?to={Email} dans la destination par défaut). Des exemples de formats sont disponibles ici : [Voir les formats d’URL Apprise](https://appriseit.com/services/).',
   'The routes below replace the default your administrator set.':
     'Les destinations ci-dessous remplacent celle définie par votre administrateur.',
   'Your administrator has set a default route that applies to you until you add your own. Routes added below replace it.':
@@ -947,6 +949,9 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Try another release after a failed download (minutes)':
     'Essayer une autre version après un échec de téléchargement (minutes)',
   'Try a failed release again after (days)': 'Réessayer une version échouée après (jours)',
+  'Look the book up after (unmatched passes)':
+    'Vérifier la disponibilité après (cycles sans correspondance)',
+  'Smallest acceptable audiobook copy (%)': 'Copie de livre audio minimale acceptable (%)',
   'Sync now': 'Synchroniser maintenant',
   'Welcome to Shelfmark': 'Bienvenue sur Shelfmark',
   "Let's configure how you want to search for and download books.":
@@ -1038,6 +1043,364 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   Manx: 'Mannois',
   'Scottish Gaelic': 'Gaélique écossais',
   Sanskrit: 'Sanskrit',
+  'Expand search': 'Élargir la recherche',
+  'Configure where ebooks, comics, and magazines are saved.':
+    'Choisissez où enregistrer les livres numériques, bandes dessinées et magazines.',
+  'Choose where completed book files are sent.':
+    'Choisissez où envoyer les fichiers de livres terminés.',
+  'Save files to the destination folder': 'Enregistrer les fichiers dans le dossier de destination',
+  'Send files as an email attachment': 'Envoyer les fichiers en pièce jointe par e-mail',
+  'Upload files directly to Grimmory': 'Envoyer les fichiers directement vers Grimmory',
+  'Check that Shelfmark can create and write to this destination.':
+    'Vérifie que Shelfmark peut créer ce dossier et y écrire.',
+  'Create folders and rename files using a template. Do not use with ingest folders.':
+    'Crée des dossiers et renomme les fichiers à l’aide d’un modèle. À éviter avec les dossiers d’import de bibliothèque.',
+  'Create folders and rename files using a template. Recommended for Audiobookshelf. Do not use with ingest folders.':
+    'Crée des dossiers et renomme les fichiers à l’aide d’un modèle. Recommandé pour Audiobookshelf. À éviter avec les dossiers d’import de bibliothèque.',
+  'Keep original filename from source': 'Conserver le nom de fichier d’origine',
+  'Rename single-file downloads; multi-file keeps original names.':
+    'Renommer les téléchargements avec un seul fichier ; conserver les noms d’origine pour les téléchargements multiples.',
+  'Rename single-file downloads; keep multi-file downloads grouped in their source folder. Do not use with ingest folders.':
+    'Renommer les téléchargements avec un seul fichier ; conserver les téléchargements multiples ensemble dans leur dossier source. À éviter avec les dossiers d’import de bibliothèque.',
+  "Replaces spaces inside naming template values (e.g. 'Conan Doyle' -> 'Conan.Doyle' with '.'). Applies to books and audiobooks, rename and organize templates alike. Literal characters typed into a template (like the '-' in '{Author} - {Title}') are left as-is. Leave empty to keep spaces as-is.":
+    'Remplace les espaces dans les valeurs du modèle de nommage (par exemple « Conan Doyle » devient « Conan.Doyle » avec « . »). S’applique aux modèles de renommage et d’organisation des livres et livres audio. Les caractères saisis directement dans le modèle (comme le « - » de « {Author} - {Title} ») restent inchangés. Laissez vide pour conserver les espaces.',
+  'Directory where downloaded audiobook files are saved. Leave empty to use the Books destination.':
+    'Dossier où enregistrer les fichiers de livres audio téléchargés. Laissez vide pour utiliser la destination des livres.',
+  'Check that Shelfmark can create and write to this audiobook destination.':
+    'Vérifie que Shelfmark peut créer le dossier de destination des livres audio et y écrire.',
+  'Maximum number of simultaneous downloads. Not used while Max Concurrent Downloads Per Source is above 0.':
+    'Nombre maximal de téléchargements simultanés. Cette limite ne s’applique pas si le nombre maximal de téléchargements simultanés par source est supérieur à 0.',
+  "Simultaneous downloads allowed from each source (Soulseek, AudiobookBay, Direct Download and so on). A source at its limit does not hold the others back, so a Soulseek download waiting in a peer's queue cannot stop a torrent from starting. Above 0 this replaces Max Concurrent Downloads: the total can be this number for every source that has downloads at once. 0 uses the single limit above for all sources together.":
+    'Nombre de téléchargements simultanés autorisés pour chaque source (Soulseek, AudiobookBay, téléchargement direct, etc.). Une source ayant atteint sa limite ne bloque pas les autres : un téléchargement Soulseek en attente chez un pair n’empêche donc pas le démarrage d’un torrent. Au-dessus de 0, cette valeur remplace le nombre maximal global : chaque source peut atteindre cette limite. À 0, la limite globale ci-dessus s’applique à toutes les sources.',
+  'How long to keep completed/failed downloads in the queue display.':
+    'Durée pendant laquelle les téléchargements terminés ou échoués restent affichés dans la file.',
+  'Select the authentication method for accessing Shelfmark. Restart container after changing Calibre-Web passwords.':
+    'Choisissez la méthode d’authentification pour accéder à Shelfmark. Redémarrez le conteneur après toute modification des mots de passe Calibre-Web.',
+  'Authentication is disabled. Anyone can access Shelfmark without signing in.':
+    'L’authentification est désactivée. Tout le monde peut accéder à Shelfmark sans se connecter.',
+  'Choose which personal settings sections are shown in My Account for non-admin users.':
+    'Choisissez les sections de paramètres personnels affichées dans « Mon compte » pour les utilisateurs non administrateurs.',
+  'Turn this off to let everyone download directly without needing approval.':
+    'Désactivez cette option pour autoriser tout le monde à télécharger directement, sans approbation.',
+  'Global notifications send selected events for all users to configured routes. Users can manage personal notifications in User Preferences.':
+    'Les notifications globales envoient les événements sélectionnés pour tous les utilisateurs vers les destinations configurées. Chaque utilisateur peut gérer ses notifications personnelles dans ses préférences.',
+  'Bearer token for your Hardcover account. Leave blank to reuse the token from the Hardcover metadata provider.':
+    'Jeton Bearer de votre compte Hardcover. Laissez vide pour réutiliser le jeton du fournisseur de métadonnées Hardcover.',
+  'Which Hardcover reading shelf to pull from.': 'Étagère de lecture Hardcover à importer.',
+  'Content type for synced requests. "Ebooks and audiobooks" creates one request of each per shelf book; every request is checked against its own library and downloaded with its own format guard and source priority.':
+    'Type de contenu des demandes synchronisées. « Livres numériques et livres audio » crée une demande de chaque type pour chaque livre de l’étagère. Chaque demande est comparée à sa propre bibliothèque et téléchargée selon ses formats et la priorité de ses sources.',
+  'How often the scheduled sync runs (minimum 1 minute).':
+    'Fréquence d’exécution de la synchronisation planifiée (minimum : 1 minute).',
+  'Whether the sync interval is measured in minutes or hours.':
+    'Indique si l’intervalle de synchronisation est exprimé en minutes ou en heures.',
+  Minutes: 'Minutes',
+  Hours: 'Heures',
+  "When enabled, pending Hardcover requests (synced from a shelf, or made by a user whose request policy lets them download directly) are auto-approved and downloaded from the first source in the matching list below that yields a strict title/author/format match for the request's content type (ebook formats for ebook requests, audiobook formats for audiobook requests). If no confident match is found, the request is left pending for manual review.":
+    'Lorsque cette option est activée, les demandes Hardcover en attente (synchronisées depuis une étagère ou créées par un utilisateur autorisé à télécharger directement) sont approuvées automatiquement et téléchargées depuis la première source ci-dessous qui trouve une correspondance exacte pour le titre, l’auteur et le format adapté au type de demande. Sans correspondance suffisamment fiable, la demande reste en attente d’une vérification manuelle.',
+  "Auto-approve and auto-download matching releases for Hardcover requests. Another user's request is only approved this way where their request policy already lets them download directly; the rest wait for an admin.":
+    'Approuve et télécharge automatiquement les versions correspondant aux demandes Hardcover. La demande d’un autre utilisateur n’est approuvée ainsi que si ses règles l’autorisent déjà à télécharger directement ; les autres demandes attendent un administrateur.',
+  'Drag to set which release sources are tried first for audiobook requests. The first source with a strict match wins. Disabled sources are skipped.':
+    'Faites glisser les sources pour définir leur ordre de priorité pour les demandes de livres audio. La première source proposant une correspondance exacte est utilisée. Les sources désactivées sont ignorées.',
+  'Drag to set which release sources are tried first for ebook requests. The first source with a strict match wins. Disabled sources are skipped.':
+    'Faites glisser les sources pour définir leur ordre de priorité pour les demandes de livres numériques. La première source proposant une correspondance exacte est utilisée. Les sources désactivées sont ignorées.',
+  'Skip torrent releases with fewer seeders than this.':
+    'Ignore les versions torrent qui ont moins de seeders que ce nombre.',
+  'A synced request whose download failed, or was interrupted (a restart, say), goes back to pending after this many days and is tried again, a few per pass. A release that failed is not picked again, and a request is given up on after three failed retries. A download the stall timer cancelled counts as failed; one cancelled by a person, and rejected requests, are never retried. 0 turns retries off.':
+    'Une demande synchronisée dont le téléchargement a échoué ou a été interrompu (par exemple par un redémarrage) repasse en attente après ce nombre de jours et est réessayée, quelques-unes par cycle. Une version ayant échoué ne sera pas reprise et la demande est abandonnée après trois tentatives infructueuses. Une annulation par le délai d’inactivité compte comme un échec ; les annulations manuelles et les demandes rejetées ne sont jamais réessayées. 0 désactive les nouvelles tentatives.',
+  'A download that failed, or that was given up on (stalled, no seeders), goes back to pending this many minutes later and another release is chosen, without waiting for the retry days above or the next sync cycle. The release that failed is not picked again, and a request is given up on after three failed attempts. 0 turns this off.':
+    'Un téléchargement échoué ou abandonné (bloqué ou sans seeders) repasse en attente après ce nombre de minutes et une autre version est choisie, sans attendre le délai de réessai ci-dessus ni le prochain cycle de synchronisation. La version échouée ne sera pas reprise et la demande est abandonnée après trois tentatives infructueuses. 0 désactive cette fonction.',
+  'A release that failed or stalled is kept out of the search for this many days, then it may be picked again. A torrent that stalled can be revived by new seeds, so a failure should not shut a book out for good. A request is still given up on after three failed attempts.':
+    'Une version échouée ou bloquée est exclue des recherches pendant ce nombre de jours, puis peut être sélectionnée de nouveau. Un torrent bloqué peut repartir si de nouveaux seeders apparaissent ; un échec ne doit donc pas exclure définitivement un livre. La demande est tout de même abandonnée après trois tentatives infructueuses.',
+  'Longest wait between searches for an unmatched request (days)':
+    'Délai maximal entre les recherches d’une demande sans correspondance (jours)',
+  'A request that no source has a match for is searched every cycle at first. After three passes in a row with no match it is searched once a day, then every two days, and at most this often apart. A match, or Sync now, starts it over. 0 searches every unmatched request every cycle.':
+    'Une demande sans correspondance est d’abord recherchée à chaque cycle. Après trois cycles sans résultat, elle est recherchée une fois par jour, puis tous les deux jours, sans dépasser cet intervalle. Une correspondance ou une synchronisation manuelle remet le compteur à zéro. 0 relance chaque demande sans correspondance à chaque cycle.',
+  'Mark audiobooks no store sells': 'Signaler les livres audio indisponibles en magasin',
+  'An audiobook request that stays unmatched is looked up on Audible (US and UK) through your Audiobookshelf server. Either way it stays pending and its reason says what the store answered (with the ASIN when listed), for you to decline or keep; it is checked again after a week. A lookup that fails decides nothing. Needs the Audiobookshelf URL and token below.':
+    'Une demande de livre audio sans correspondance est vérifiée sur Audible (États-Unis et Royaume-Uni) via votre serveur Audiobookshelf. Elle reste en attente et indique la réponse du magasin (avec l’ASIN s’il est fourni), afin que vous puissiez la conserver ou la refuser ; elle est vérifiée à nouveau une semaine plus tard. Une vérification qui échoue ne conclut rien. Nécessite l’URL et le jeton Audiobookshelf ci-dessous.',
+  'How many consecutive passes with no strict match a request goes through before the store is asked. A pass that matched, or a reopen, starts the count over.':
+    'Nombre de cycles consécutifs sans correspondance exacte avant d’interroger le magasin. Une correspondance ou la réouverture de la demande remet le compteur à zéro.',
+  'A copy of an audiobook smaller than this share of the largest copy found for the same book is probably a lower-bitrate copy. It is tried after the others, and a single m4b that small is not preferred over a fuller set of chapter files. 0 turns the check off.':
+    'Une copie de livre audio dont la taille est inférieure à ce pourcentage de la plus grosse copie trouvée est probablement de qualité inférieure. Elle est essayée après les autres ; un seul fichier m4b de cette taille ne sera pas préféré à un ensemble plus complet de chapitres. 0 désactive cette vérification.',
+  'Run a sync + auto-download pass immediately (uses saved settings).':
+    'Lance immédiatement un cycle de synchronisation et de téléchargement automatique avec les paramètres enregistrés.',
+  'Controls SSL/TLS certificate verification for outbound connections. Disable for self-signed certificates on internal services (e.g. OIDC providers, Prowlarr).':
+    'Contrôle la vérification des certificats SSL/TLS des connexions sortantes. Désactivez cette option pour les certificats autosignés de services internes (par exemple les fournisseurs OIDC ou Prowlarr).',
+  "DNS provider for domain resolution. 'Auto' rotates through providers on failure.":
+    'Fournisseur DNS utilisé pour résoudre les noms de domaine. Le mode « Automatique » essaie d’autres fournisseurs en cas d’échec.',
+  'Use encrypted DNS queries for improved reliability and privacy.':
+    'Utilise des requêtes DNS chiffrées pour améliorer la fiabilité et la confidentialité.',
+  'Route all traffic through Tor for enhanced privacy. Requires root startup.':
+    'Fait transiter tout le trafic par Tor pour renforcer la confidentialité. Le démarrage avec les droits root est nécessaire.',
+  'Set USING_TOR=true env var and restart as root.':
+    'Définissez la variable d’environnement USING_TOR=true et redémarrez avec les droits root.',
+  'Choose proxy type. SOCKS5 handles all traffic through a single proxy.':
+    'Choisissez le type de proxy. SOCKS5 fait passer tout le trafic par un seul proxy.',
+  'All traffic is routed through Tor. Requires container restart to change.':
+    'Tout le trafic transite par Tor. Un redémarrage du conteneur est nécessaire pour modifier ce réglage.',
+  'DNS over HTTPS is not used when Tor routing is enabled.':
+    'DNS over HTTPS n’est pas utilisé lorsque le routage via Tor est activé.',
+  'Auto mode always uses DNS over HTTPS for reliable provider rotation.':
+    'Le mode automatique utilise toujours DNS over HTTPS pour garantir le changement de fournisseur en cas d’échec.',
+  'Tor routing is active. Set USING_TOR=false and restart to disable.':
+    'Le routage via Tor est actif. Définissez USING_TOR=false et redémarrez pour le désactiver.',
+  'Not applicable when Tor routing is enabled.':
+    'Non applicable lorsque le routage via Tor est activé.',
+  'Fine-tune access per source. Source rules can only be the same or more restrictive than the default above.':
+    'Ajustez les autorisations pour chaque source. Les règles ne peuvent être qu’identiques ou plus restrictives que le réglage par défaut ci-dessus.',
+  'Add Rule': 'Ajouter une règle',
+  'Let users who can download also request a book without choosing a release, for a book nobody has released yet or one no source has. The request waits for an admin. Admins can always do this.':
+    'Autorise les utilisateurs pouvant télécharger à demander un livre sans choisir de version, lorsqu’aucune version n’est encore sortie ou disponible. La demande attend l’approbation d’un administrateur. Les administrateurs peuvent toujours le faire.',
+  'Want to Read': 'À lire',
+  'Currently Reading': 'En cours de lecture',
+  Read: 'Lu',
+  'Did Not Finish': 'Abandonné',
+  Ebooks: 'Livres numériques',
+  'Ebooks and audiobooks': 'Livres numériques et livres audio',
+  'Source not configured / unavailable': 'Source non configurée ou indisponible',
+  'A sync is already running. Try again shortly.':
+    'Une synchronisation est déjà en cours. Réessayez dans un instant.',
+  'Sync started. New wishlist books will appear as requests; matching audiobooks auto-download if enabled.':
+    'Synchronisation lancée. Les nouveaux livres de la liste apparaîtront comme demandes ; les livres audio correspondants seront téléchargés automatiquement si l’option est activée.',
+  'Create and manage user accounts directly. Passwords are stored locally and users sign in with their username and password.':
+    'Créez et gérez directement les comptes utilisateurs. Les mots de passe sont stockés localement et les utilisateurs se connectent avec leur nom d’utilisateur et leur mot de passe.',
+  'Users sign in through your identity provider. New accounts can be created automatically on first login when auto-provisioning is enabled, or you can pre-create users here and they’ll be linked by email on first sign-in.':
+    'Les utilisateurs se connectent avec votre fournisseur d’identité. Si la création automatique est activée, les comptes sont créés lors de la première connexion ; vous pouvez aussi créer les utilisateurs ici, puis les comptes seront associés par adresse e-mail.',
+  'Users are authenticated by your reverse proxy. Accounts are automatically created on first sign-in. If a local user with a matching username already exists, it will be linked instead.':
+    'Les utilisateurs sont authentifiés par votre proxy inverse. Les comptes sont créés lors de la première connexion. Si un compte local porte déjà le même nom, il sera associé à la place.',
+  'User accounts are synced from your Calibre-Web database. Users are matched by email, and new accounts are created here when new CWA users are found.':
+    'Les comptes utilisateurs sont synchronisés depuis votre base Calibre-Web. Les utilisateurs sont associés par adresse e-mail et les nouveaux comptes sont créés ici lorsque de nouveaux utilisateurs CWA sont détectés.',
+  'Calibre-Web database not detected. Mount your app.db to /auth/app.db to enable this method. Sign-in fails until the database is available.':
+    'Base de données Calibre-Web introuvable. Montez votre fichier app.db dans /auth/app.db pour activer cette méthode. La connexion échouera tant que la base ne sera pas accessible.',
+  'Choose where to search for book information. You can enable more providers in Settings later.':
+    'Choisissez où rechercher les informations sur les livres. Vous pourrez activer d’autres fournisseurs dans les paramètres.',
+  'Choose the release sources you want to configure now. You can always add or change sources later in Settings.':
+    'Choisissez les sources de téléchargement à configurer maintenant. Vous pourrez toujours en ajouter ou en modifier dans les paramètres.',
+  'Select one or more release sources to configure now.':
+    'Sélectionnez une ou plusieurs sources de téléchargement à configurer maintenant.',
+  "Add at least one Anna's Archive mirror URL to enable Direct Download. If you have an Anna's Archive donator key, you can add it here too. You can configure alternative mirrors later in Settings.":
+    'Ajoutez au moins une URL de miroir Anna’s Archive pour activer le téléchargement direct. Vous pouvez également ajouter ici votre clé donateur Anna’s Archive. Les autres miroirs pourront être configurés plus tard dans les paramètres.',
+  'Add the AudiobookBay domain you want Shelfmark to search.':
+    'Ajoutez le domaine AudiobookBay à utiliser pour les recherches Shelfmark.',
+  'Direct Download Setup': 'Configuration du téléchargement direct',
+  'Google Books Setup': 'Configuration de Google Books',
+  'Hardcover Setup': 'Configuration de Hardcover',
+  'Sources to Set Up': 'Sources à configurer',
+  'Get your free API key from hardcover.app/account/api':
+    'Obtenez gratuitement votre clé API sur hardcover.app/account/api.',
+  'Get your free API key from Google Cloud Console (APIs & Services > Credentials).':
+    'Obtenez gratuitement votre clé API dans Google Cloud Console (APIs & Services > Credentials).',
+  "Access Google's comprehensive book database. Requires a free API key with ~1000 requests/day quota.":
+    'Accédez à la vaste base de données de livres de Google. Une clé API gratuite est nécessaire (environ 1 000 requêtes par jour).',
+  'Enable Google Books as a metadata provider for book searches':
+    'Activer Google Books comme fournisseur de métadonnées pour les recherches de livres',
+  'Get your API key from Google Cloud Console (APIs & Services > Credentials)':
+    'Obtenez votre clé API dans Google Cloud Console (APIs & Services > Credentials).',
+  'Verify your API key works': 'Vérifie que votre clé API fonctionne.',
+  'Default sort order for Google Books search results.':
+    'Ordre de tri par défaut des résultats Google Books.',
+  'Hungarian community book catalog with excellent coverage of Hungarian editions and translations. No API key required.':
+    'Catalogue communautaire hongrois offrant une excellente couverture des éditions et traductions hongroises. Aucune clé API n’est nécessaire.',
+  'Enable Moly.hu as a metadata provider for book searches':
+    'Activer Moly.hu comme fournisseur de métadonnées pour les recherches de livres',
+  'Verify moly.hu is accessible': 'Vérifie que moly.hu est accessible.',
+  Rating: 'Note',
+  'Enable AudiobookBay as a release source for audiobooks.':
+    'Active AudiobookBay comme source de téléchargement de livres audio.',
+  'AudiobookBay domain (e.g., audiobookbay.lu, audiobookbay.is). Required to enable searches.':
+    'Domaine AudiobookBay (par exemple audiobookbay.lu ou audiobookbay.is). Obligatoire pour activer les recherches.',
+  'Maximum number of search result pages to fetch (1-10).':
+    'Nombre maximal de pages de résultats à récupérer (1 à 10).',
+  'Wrap generated queries in quotes for stricter matching. If no results are found, Shelfmark retries without quotes.':
+    'Place les requêtes générées entre guillemets pour une correspondance plus stricte. Sans résultat, Shelfmark réessaie sans guillemets.',
+  "How long a finished AudiobookBay torrent keeps seeding before the client stops it. 0 uses the torrent client's own limit.":
+    'Durée de partage d’un torrent AudiobookBay terminé avant son arrêt par le client. 0 utilise la limite définie dans le client torrent.',
+  "Share ratio an AudiobookBay torrent should reach before the client stops it. 0 uses the torrent client's own limit.":
+    'Ratio de partage qu’un torrent AudiobookBay doit atteindre avant son arrêt par le client. 0 utilise la limite définie dans le client torrent.',
+  'Seed Ratio': 'Ratio de partage',
+  'Delay between requests in seconds to avoid rate limiting (0-10).':
+    'Délai entre les requêtes pour éviter les limitations de débit (0 à 10 secondes).',
+  'Search and download ebook and audiobook releases from IRC channels. This source connects via IRC and uses DCC for file transfers. Configure the connection details below to enable IRC search. Note: DCC requires direct TCP connections to arbitrary ports, which may not work behind strict firewalls or NAT.':
+    'Recherchez et téléchargez des livres numériques et audio depuis des canaux IRC. Cette source utilise IRC et DCC pour transférer les fichiers. Configurez la connexion ci-dessous pour activer la recherche. Remarque : DCC nécessite des connexions TCP directes sur des ports variables, ce qui peut être incompatible avec certains pare-feu stricts ou NAT.',
+  'IRC server hostname': 'Nom d’hôte du serveur IRC',
+  'IRC server port (usually 6697 for TLS, 6667 for plain)':
+    'Port du serveur IRC (généralement 6697 avec TLS ou 6667 sans chiffrement)',
+  "Enable TLS/SSL encryption for the IRC connection. Disable for servers that don't support TLS.":
+    'Active le chiffrement TLS/SSL pour la connexion IRC. Désactivez cette option si le serveur ne prend pas TLS en charge.',
+  'Use TLS': 'Utiliser TLS',
+  'Channel name without the # prefix. Used for all searches unless a separate audiobook channel is configured below.':
+    'Nom du canal sans le préfixe #. Utilisé pour toutes les recherches, sauf si un canal dédié aux livres audio est défini ci-dessous.',
+  Channel: 'Canal',
+  'Your IRC nickname (required). Must be unique on the IRC network.':
+    'Votre pseudonyme IRC (obligatoire). Il doit être unique sur le réseau IRC.',
+  Nickname: 'Pseudonyme',
+  'The search bot to address queries to (required). Searches are sent as "@<bot> <query>".':
+    'Bot de recherche auquel envoyer les requêtes (obligatoire). Les recherches sont envoyées sous la forme « @<bot> <query> ».',
+  'Search bot': 'Bot de recherche',
+  "Optional. Channel name (without the # prefix) for networks that index audiobooks separately, such as Undernet's bookz. Leave blank (the usual setting) to search the main channel above for audiobooks too.":
+    'Facultatif. Nom du canal (sans le préfixe #) pour les réseaux qui indexent les livres audio séparément, comme le canal bookz d’Undernet. Laissez vide (réglage habituel) pour rechercher aussi les livres audio dans le canal principal ci-dessus.',
+  'Audiobook channel': 'Canal de livres audio',
+  'Optional. Search bot for the audiobook channel. Leave blank to reuse the main search bot above. Only used when an audiobook channel is set.':
+    'Facultatif. Bot de recherche du canal de livres audio. Laissez vide pour réutiliser le bot principal ci-dessus. Utilisé uniquement si un canal de livres audio est défini.',
+  'Audiobook search bot': 'Bot de recherche des livres audio',
+  'IRC search results are cached to reduce load on IRC servers. Use the Refresh button in the release modal to force a new search.':
+    'Les résultats IRC sont mis en cache pour réduire la charge des serveurs. Utilisez le bouton Actualiser dans la fenêtre des versions pour relancer une recherche.',
+  'Search Cache': 'Cache de recherche',
+  'How long to keep cached search results before they expire.':
+    'Durée de conservation des résultats en cache avant leur expiration.',
+  'Cache Duration': 'Durée du cache',
+  'Remove all cached IRC search results.': 'Supprime tous les résultats IRC en cache.',
+  'Clear Cache': 'Vider le cache',
+  'Search for books across your torrent indexers via Jackett.':
+    'Recherchez des livres parmi vos indexeurs torrent avec Jackett.',
+  'Jackett Integration': 'Intégration Jackett',
+  'Jackett URL': 'URL de Jackett',
+  'Enable searching for books via Jackett indexers':
+    'Activer la recherche de livres via les indexeurs Jackett',
+  'Enable Jackett source': 'Activer la source Jackett',
+  'Base URL of your Jackett instance': 'URL de base de votre instance Jackett',
+  'Shown at the top right of the Jackett dashboard':
+    'Affichée en haut à droite du tableau de bord Jackett',
+  'Verify your Jackett configuration': 'Vérifie la configuration Jackett.',
+  'Select which indexers to search. Leave empty to search all configured indexers.':
+    'Choisissez les indexeurs à interroger. Laissez vide pour les utiliser tous.',
+  'Indexers to Search': 'Indexeurs à interroger',
+  'How long to wait for Jackett to answer a search. Searching all indexers waits for the slowest one, and indexers behind FlareSolverr can need 90 seconds or more on a cold Cloudflare challenge.':
+    'Délai d’attente maximal d’une recherche Jackett. Une recherche sur tous les indexeurs attend le plus lent ; ceux qui utilisent FlareSolverr peuvent nécessiter 90 secondes ou plus lors d’un nouveau défi Cloudflare.',
+  'Indexer Search Timeout (seconds)': 'Délai de recherche des indexeurs (secondes)',
+  'Enable Libgen Search': 'Activer la recherche Libgen',
+  "Search the Libgen catalogue directly, including CBZ/CBR comics and manga that Anna's Archive does not index. Uses the Libgen mirrors configured under Mirrors for both search and download.":
+    'Recherche directement dans le catalogue Libgen, notamment les bandes dessinées et mangas CBZ/CBR absents d’Anna’s Archive. Utilise les miroirs Libgen définis dans la section Miroirs pour la recherche et le téléchargement.',
+  'Maximum number of results to request per search (1-100).':
+    'Nombre maximal de résultats à demander par recherche (1 à 100).',
+  'Max Results': 'Nombre maximal de résultats',
+  'Search for books via any Newznab-compatible indexer or aggregator (e.g. NZBHydra2, NZBGeek, Drunkenslug).':
+    'Recherchez des livres via n’importe quel indexeur ou agrégateur compatible Newznab (par exemple NZBHydra2, NZBGeek ou Drunkenslug).',
+  'Newznab Integration': 'Intégration Newznab',
+  'Enable searching for books via a Newznab-compatible indexer':
+    'Activer la recherche de livres via un indexeur compatible Newznab',
+  'Enable Newznab source': 'Activer la source Newznab',
+  'Auto-expand search on no results': 'Élargir automatiquement la recherche sans résultat',
+  'Automatically retry search without category filtering if no results are found':
+    'Relance automatiquement la recherche sans filtre de catégorie si aucun résultat n’est trouvé.',
+  'Add each Newznab-compatible indexer separately. The configured name is shown beside every result from that indexer.':
+    'Ajoutez séparément chaque indexeur compatible Newznab. Le nom configuré apparaît à côté de chacun de ses résultats.',
+  'Named Indexers': 'Indexeurs nommés',
+  'No named indexers configured. The legacy single-indexer fields below are used as a fallback.':
+    'Aucun indexeur nommé n’est configuré. Les anciens champs pour un indexeur unique ci-dessous seront utilisés en solution de repli.',
+  'Add Indexer': 'Ajouter un indexeur',
+  'Used only when the named indexer list is empty':
+    'Utilisé uniquement si aucun indexeur nommé n’est configuré',
+  'Used only with the legacy Newznab URL': 'Utilisé uniquement avec l’ancienne URL Newznab',
+  'Verify every named indexer, or the legacy connection when the list is empty':
+    'Vérifie chaque indexeur nommé ou l’ancienne connexion si la liste est vide.',
+  'Test Connections': 'Tester les connexions',
+  'Newznab category IDs searched for ebooks. Most indexers use the standard 7000, but some use custom IDs. Leave empty to use 7000.':
+    'Identifiants de catégories Newznab pour les livres numériques. La plupart des indexeurs utilisent la valeur standard 7000, mais certains ont leurs propres identifiants. Laissez vide pour utiliser 7000.',
+  'Ebook Categories': 'Catégories de livres numériques',
+  'Newznab category IDs searched for audiobooks. Most indexers use the standard 3030, but some use custom IDs. Leave empty to use 3030.':
+    'Identifiants de catégories Newznab pour les livres audio. La plupart des indexeurs utilisent la valeur standard 3030, mais certains ont leurs propres identifiants. Laissez vide pour utiliser 3030.',
+  'Audiobook Categories': 'Catégories de livres audio',
+  'Legacy Newznab URL': 'Ancienne URL Newznab',
+  'Legacy API Key': 'Ancienne clé API',
+  'Search for books across your indexers via Prowlarr.':
+    'Recherchez des livres parmi vos indexeurs avec Prowlarr.',
+  'Prowlarr Integration': 'Intégration Prowlarr',
+  'Prowlarr URL': 'URL de Prowlarr',
+  'Enable searching for books via Prowlarr indexers':
+    'Activer la recherche de livres via les indexeurs Prowlarr',
+  'Enable Prowlarr source': 'Activer la source Prowlarr',
+  'Base URL of your Prowlarr instance': 'URL de base de votre instance Prowlarr',
+  'Found in Prowlarr: Settings > General > API Key':
+    'À trouver dans Prowlarr : Settings > General > API Key',
+  'Verify your Prowlarr configuration': 'Vérifie la configuration Prowlarr.',
+  'Hide a result whose title ends in a file extension that is not in Supported Book Formats, such as a .doc or .rtf file. Titles without an extension, archives and audiobook searches are never hidden.':
+    'Masque les résultats dont le titre se termine par une extension absente des formats de livres pris en charge, comme .doc ou .rtf. Les titres sans extension, les archives et les recherches de livres audio ne sont jamais masqués.',
+  'Hide ebook results larger than this. 0 shows everything, and a result with no reported size is always shown. Audiobook searches are not limited.':
+    'Masque les livres numériques dépassant cette taille. 0 affiche tout ; les résultats sans taille indiquée restent visibles. Les recherches de livres audio ne sont pas limitées.',
+  'Hide ebook results larger than this. Expanded searches and general indexers can return TV series, courses and software next to the books. 0 shows everything, and a result with no reported size is always shown. Audiobook searches are not limited.':
+    'Masque les livres numériques dépassant cette taille. Les recherches élargies et les indexeurs généralistes peuvent aussi renvoyer des séries, des formations ou des logiciels. 0 affiche tout ; les résultats sans taille indiquée restent visibles. Les livres audio ne sont pas limités.',
+  'Maximum Ebook Size (MB)': 'Taille maximale des livres numériques (Mo)',
+  'Hide torrents with no seeders from search results by default. You can temporarily show them from the release filters.':
+    'Masque par défaut les torrents sans seeders. Vous pouvez les afficher temporairement dans les filtres de versions.',
+  'Hide torrent results with 0 seeders': 'Masquer les torrents sans seeders',
+  'Hide results in formats you did not enable': 'Masquer les formats non activés',
+  'How long to wait for a single indexer to answer a search. Indexers behind FlareSolverr can need 90 seconds or more while a cold Cloudflare challenge is solved; raise this if searches come back empty and the Prowlarr log shows the search still running.':
+    'Délai d’attente d’un indexeur pour répondre à une recherche. Les indexeurs utilisant FlareSolverr peuvent nécessiter 90 secondes ou plus lors d’un nouveau défi Cloudflare. Augmentez cette valeur si les recherches restent vides alors que le journal Prowlarr indique qu’elles sont toujours en cours.',
+  'Collapse a release that several indexer entries returned down to a single row, keeping the entry with the best Prowlarr priority. Turn this off to see every entry that carried it, which is what makes results from filter-specific entries (freeleech and the like) visible.':
+    'Regroupe sur une seule ligne les résultats d’une même version renvoyés par plusieurs indexeurs et conserve celui ayant la meilleure priorité Prowlarr. Désactivez cette option pour afficher toutes les entrées, notamment celles provenant de filtres spécifiques comme le freeleech.',
+  'Show one row per release': 'Afficher une seule ligne par version',
+  'Apply per-indexer seed time and ratio preferences from Prowlarr when sending torrents to the download client':
+    'Applique les préférences de durée et de ratio de partage définies par indexeur dans Prowlarr lors de l’envoi des torrents au client de téléchargement.',
+  'Use Prowlarr seed preferences': 'Utiliser les préférences de partage Prowlarr',
+  "Prowlarr drops the narrator and series from MyAnonamouse results. With a MAM session ID, Shelfmark looks them up (plus bitrate, from the uploader's tags) directly from MyAnonamouse. Create the session under Preferences > Security on MyAnonamouse, locked to the IP or ASN Shelfmark connects from. Choose which columns show under Search Mode > Release List Columns.":
+    'Prowlarr ne transmet pas le narrateur ni la série des résultats MyAnonamouse. Avec un identifiant de session MAM, Shelfmark les récupère directement auprès de MyAnonamouse, ainsi que le débit depuis les tags de l’uploader. Créez une session dans Preferences > Security sur MyAnonamouse et limitez-la à l’adresse IP ou à l’ASN utilisé par Shelfmark. Choisissez les colonnes à afficher dans Mode de recherche > Colonnes de la liste des résultats.',
+  'MAM security settings': 'Paramètres de sécurité MAM',
+  "The mam_id value MyAnonamouse shows when you create a session. MAM locks each session to one IP or ASN, so reusing Prowlarr's or another client's session often fails with a 403: you will likely need a separate session for Shelfmark if it reaches MAM from another IP (different host, VPN or proxy) or the existing session is ASN-locked to another network. Leave empty to turn enrichment off.":
+    'Valeur mam_id affichée par MyAnonamouse lors de la création d’une session. MAM limite chaque session à une adresse IP ou un ASN ; la réutilisation de la session Prowlarr ou d’un autre client échoue souvent avec une erreur 403. Une session distincte peut être nécessaire si Shelfmark utilise une autre IP (autre hôte, VPN ou proxy) ou si la session est liée à un autre ASN. Laissez vide pour désactiver l’enrichissement.',
+  'Test MAM Session': 'Tester la session MAM',
+  'MAM Session ID': 'Identifiant de session MAM',
+  'MyAnonamouse Enrichment': 'Enrichissement MyAnonamouse',
+  'Check that MyAnonamouse accepts the session ID. A passing test also resumes enrichment after it stopped on repeated failures.':
+    'Vérifie que MyAnonamouse accepte l’identifiant de session. Une vérification réussie relance aussi l’enrichissement après des échecs répétés.',
+  'Search the Soulseek network and download files through a [slskd](https://github.com/slskd/slskd) instance. slskd must be logged in to Soulseek, and its downloads folder must be visible to Shelfmark.':
+    'Recherchez sur le réseau Soulseek et téléchargez des fichiers via une instance [slskd](https://github.com/slskd/slskd). slskd doit être connecté à Soulseek et son dossier de téléchargements doit être accessible à Shelfmark.',
+  'Soulseek via slskd': 'Soulseek via slskd',
+  'Enable searching and downloading books through slskd':
+    'Activer la recherche et le téléchargement de livres via slskd',
+  'Enable Soulseek source': 'Activer la source Soulseek',
+  'Base URL of the slskd web interface': 'URL de base de l’interface Web slskd',
+  'slskd URL': 'URL de slskd',
+  "An API key from slskd's configuration (web.authentication.api_keys) with the readwrite role":
+    'Clé API définie dans la configuration slskd (web.authentication.api_keys) avec le rôle readwrite.',
+  'Verify the URL and API key, and that slskd is logged in to Soulseek':
+    'Vérifie l’URL, la clé API et la connexion de slskd à Soulseek.',
+  'Downloads Path': 'Chemin des téléchargements',
+  "Where slskd's completed downloads folder is mounted inside Shelfmark. Leave empty when both containers see it at the same path, or use Settings > Advanced > Remote Path Mappings with client 'slskd'.":
+    'Chemin d’accès au dossier des téléchargements terminés de slskd depuis Shelfmark. Laissez vide si les deux conteneurs utilisent le même chemin, ou configurez Settings > Advanced > Remote Path Mappings avec le client « slskd ».',
+  'Give each download its own folder': 'Créer un dossier distinct pour chaque téléchargement',
+  "Download into a folder of its own inside slskd's downloads folder (needs slskd 0.26 or newer). Other apps using the same slskd cannot mix files with it or lose track of it when they clear slskd's list of finished transfers, and Shelfmark confirms a download by the files on disk.":
+    'Télécharge chaque élément dans son propre dossier au sein du dossier de téléchargements slskd (slskd 0.26 ou ultérieur requis). Les autres applications utilisant slskd ne risquent ainsi pas de mélanger les fichiers ou de perdre leur suivi lors du nettoyage des transferts terminés. Shelfmark vérifie la présence des fichiers sur le disque.',
+  'Download Folder': 'Dossier de téléchargement',
+  "The folder, inside slskd's downloads folder, that holds one folder per download. It must not climb out of slskd's downloads folder.":
+    'Dossier situé dans le répertoire de téléchargements slskd, qui contient un sous-dossier par téléchargement. Il doit rester à l’intérieur du dossier slskd.',
+  'Keep finished files in slskd': 'Conserver les fichiers terminés dans slskd',
+  'Leave the finished files (and their transfer records) in slskd after Shelfmark copies them to your library, so they stay shared with other Soulseek users. Turn off to delete them once imported.':
+    'Conserve dans slskd les fichiers terminés et leurs transferts après leur copie dans votre bibliothèque, afin qu’ils restent partagés sur Soulseek. Désactivez cette option pour les supprimer après leur importation.',
+  'Import finished folders an interruption left behind':
+    'Importer les dossiers terminés laissés après une interruption',
+  "A restart can land after the last file arrives and before it is copied to your library. Checked every 15 minutes, independent of the Hardcover sync, a download folder that holds every file asked for, whose download never completed and is still wanted, is imported once without downloading anything again (never one someone cancelled). If that import fails, the folder stays until you retry the download, or, with clean-up on, until it is a day old and its request has the book or was given up on. A transfer Shelfmark queued that no download is watching any more is picked up again if its request still needs it, a few per check, and cancelled otherwise, or when it cannot be picked up. Transfers queued by other apps or by hand in slskd are never touched, including the same file queued again after Shelfmark's download of it ended.":
+    'Après un redémarrage, le dernier fichier peut être arrivé sans avoir encore été copié dans votre bibliothèque. Toutes les 15 minutes, indépendamment de la synchronisation Hardcover, Shelfmark importe une seule fois les dossiers contenant tous les fichiers attendus lorsque le téléchargement n’a pas été terminé mais reste nécessaire, sans rien télécharger à nouveau (sauf s’il a été annulé par un utilisateur). Si l’import échoue, le dossier est conservé jusqu’à une nouvelle tentative ou, si le nettoyage est activé, jusqu’à ce qu’il ait un jour et que la demande soit satisfaite ou abandonnée. Les transferts lancés par Shelfmark qui ne sont plus suivis sont repris s’ils sont encore nécessaires, sinon ils sont annulés. Les transferts lancés par d’autres applications ou manuellement dans slskd ne sont jamais modifiés.',
+  'Remove leftover download folders after (days)':
+    'Supprimer les dossiers de téléchargement restants après (jours)',
+  'Remove the folder of a failed or cancelled download, or one nothing records, once the download is this old, or one day old when its request already has the book or was given up on. A folder that holds every file asked for is never removed while the download is still wanted (you started it yourself, or its request is still open): it is imported once, and after that it waits for you to retry the download. The folder of a running download is never removed. 0 keeps every leftover folder. Folders already imported follow Keep finished files in slskd, not this setting.':
+    'Supprime le dossier d’un téléchargement échoué, annulé ou non répertorié lorsqu’il atteint cet âge, ou après un jour si la demande est déjà satisfaite ou abandonnée. Un dossier contenant tous les fichiers attendus n’est jamais supprimé tant que le téléchargement reste souhaité : il est importé une fois, puis conservé jusqu’à une nouvelle tentative. Le dossier d’un téléchargement en cours n’est jamais supprimé. 0 conserve tous les dossiers restants. Les dossiers déjà importés suivent le réglage « Conserver les fichiers terminés dans slskd ».',
+  'How long a Soulseek search collects peer responses. Longer waits find more peers but make every search slower.':
+    'Durée pendant laquelle une recherche Soulseek recueille les réponses des pairs. Une attente plus longue peut en trouver davantage, mais ralentit chaque recherche.',
+  'Search Wait (seconds)': 'Durée d’attente de la recherche (secondes)',
+  'Stop a search early once this many peers have answered':
+    'Arrête la recherche dès que ce nombre de pairs a répondu.',
+  'Max Peer Responses': 'Nombre maximal de réponses de pairs',
+  'Give up when the peer has not started sending within this long. Set to 0 to wait indefinitely.':
+    'Abandonne si le pair n’a pas commencé à envoyer les données après ce délai. Réglez sur 0 pour attendre indéfiniment.',
+  'Queue Timeout (minutes)': 'Délai d’attente dans la file (minutes)',
+  'Answer anti-leech chat challenges': 'Répondre aux demandes de vérification des uploaders',
+  'Some uploaders block downloads until you type a word in a private message ("please type \'download\' in this chat"). Shelfmark replies with the word the message asks for, at most once per user every 12 hours, and logs each reply. It reads every unread private message in slskd, not only those from the peer of a running download, and marks a conversation it answered as read in slskd. Checked while a download is running.':
+    'Certains uploaders bloquent les téléchargements tant qu’un mot n’est pas envoyé en message privé (par exemple « écrivez “download” dans cette conversation »). Shelfmark répond avec le mot demandé, au plus une fois par utilisateur toutes les 12 heures, et consigne chaque réponse. Il lit tous les messages privés non lus dans slskd et marque comme lus les conversations auxquelles il a répondu. Vérifié pendant un téléchargement.',
+  'Remove completed transfers from slskd': 'Supprimer les transferts terminés de slskd',
+  "Clear the transfer from slskd's download list after Shelfmark imports it. Applies when each download does not get its own folder.":
+    'Retire le transfert de la liste de téléchargements slskd après son importation par Shelfmark. S’applique lorsque les téléchargements ne disposent pas de leur propre dossier.',
+  'Search Webshare.cz by file name and download matching ebooks and audiobooks. Requires a Webshare account; a VIP account is recommended for full download speed.':
+    'Recherchez des livres numériques et audio par nom de fichier sur Webshare.cz, puis téléchargez les résultats correspondants. Un compte Webshare est nécessaire ; un compte VIP est recommandé pour bénéficier de la vitesse maximale.',
+  'Enable Webshare.cz': 'Activer Webshare.cz',
+  'Your Webshare.cz login.': 'Identifiant de votre compte Webshare.cz.',
+  'Username or Email': 'Nom d’utilisateur ou e-mail',
+  'Your Webshare.cz password.': 'Mot de passe de votre compte Webshare.cz.',
+  "Log in to Webshare.cz and show the account's VIP status.":
+    'Se connecte à Webshare.cz et affiche le statut VIP du compte.',
+  'Test Login': 'Tester la connexion',
+  'Maximum number of files to request per search (1-200). Results are then filtered to your supported ebook or audiobook formats.':
+    'Nombre maximal de fichiers à demander par recherche (1 à 200). Les résultats sont ensuite filtrés selon les formats de livres ou livres audio pris en charge.',
 };
 
 interface LanguageContextValue {

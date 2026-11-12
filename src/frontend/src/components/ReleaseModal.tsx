@@ -1745,7 +1745,7 @@ const ReleaseModalSession = ({
                               d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
                             />
                           </svg>
-                          View series
+                          {t('View series')}
                         </button>
                       )}
                     </div>
@@ -1795,7 +1795,7 @@ const ReleaseModalSession = ({
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 text-emerald-600 hover:underline dark:text-emerald-400"
                       >
-                        View on {providerDisplay}
+                        {t('View on')} {providerDisplay}
                         <svg
                           className="h-3 w-3"
                           fill="none"
@@ -2483,7 +2483,7 @@ const ReleaseModalSession = ({
                             }}
                             className="hover-action rounded-full px-3 py-1.5 text-sm text-zinc-500 transition-all duration-200 dark:text-zinc-400"
                           >
-                            {columnConfig.action_button?.label ?? 'Expand search'}
+                            {t(columnConfig.action_button?.label ?? 'Expand search')}
                           </button>
                         </div>
                       )}
@@ -2541,7 +2541,7 @@ const ReleaseModalSession = ({
                             }}
                             className="hover-action rounded-full px-3 py-1.5 text-sm text-zinc-500 transition-all duration-200 dark:text-zinc-400"
                           >
-                            {columnConfig.action_button?.label ?? 'Expand search'}
+                            {t(columnConfig.action_button?.label ?? 'Expand search')}
                           </button>
                         </div>
                       )}
