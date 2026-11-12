@@ -45,6 +45,13 @@ def test_metadata_provider_identity_survives_retry_serialization():
         title="Audible audiobook",
         metadata_provider="audible",
         metadata_provider_id="B08BKGYQXW",
+        metadata_description="Audiobook description",
+        metadata_publisher="Audible Studios",
+        metadata_genres=["Fantasy"],
+        metadata_isbn_13="9781234567890",
+        metadata_language="fr",
+        metadata_authors=["Author One"],
+        metadata_narrators=["Narrator One"],
     )
 
     payload = orchestrator.serialize_task_for_retry(task)
@@ -53,3 +60,10 @@ def test_metadata_provider_identity_survives_retry_serialization():
     assert restored is not None
     assert restored.metadata_provider == "audible"
     assert restored.metadata_provider_id == "B08BKGYQXW"
+    assert restored.metadata_description == "Audiobook description"
+    assert restored.metadata_publisher == "Audible Studios"
+    assert restored.metadata_genres == ["Fantasy"]
+    assert restored.metadata_isbn_13 == "9781234567890"
+    assert restored.metadata_language == "fr"
+    assert restored.metadata_authors == ["Author One"]
+    assert restored.metadata_narrators == ["Narrator One"]
