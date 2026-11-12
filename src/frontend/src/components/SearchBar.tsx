@@ -153,26 +153,27 @@ const OptionsGroupHeader = ({ label, action }: { label: string; action: ReactNod
 const getDefaultPlaceholder = (
   contentType: ContentType,
   activeQueryTarget: QueryTargetOption | undefined,
-  fallback?: string,
-  isCombinedMode?: boolean,
+  fallback: string | undefined,
+  isCombinedMode: boolean | undefined,
+  t: (value: string) => string,
 ): string => {
-  if (fallback) return fallback;
+  if (fallback) return t(fallback);
 
   if (!activeQueryTarget || activeQueryTarget.source === 'general') {
-    if (isCombinedMode) return 'Search Books & Audiobooks';
-    return contentType === 'ebook' ? 'Search Books' : 'Search Audiobooks';
+    if (isCombinedMode) return t('Search Books & Audiobooks');
+    return t(contentType === 'ebook' ? 'Search Books' : 'Search Audiobooks');
   }
 
   if (activeQueryTarget.source === 'manual') {
-    return 'Search releases directly…';
+    return t('Search releases directly…');
   }
 
   const field = activeQueryTarget.field;
   if (field?.placeholder) {
-    return field.placeholder;
+    return t(field.placeholder);
   }
 
-  return `Search by ${activeQueryTarget.label.toLowerCase()}…`;
+  return t('Search by') + ' ' + t(activeQueryTarget.label.toLowerCase()) + '…';
 };
 
 const hasActiveValue = (value: string | number | boolean): boolean => {
@@ -400,12 +401,13 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
       }
     };
 
-    const effectivePlaceholder = t(getDefaultPlaceholder(
+    const effectivePlaceholder = getDefaultPlaceholder(
       contentType,
       activeTarget,
       placeholder,
       combinedSelectionActive,
-    ));
+      t,
+    );
     const effectiveInputAriaLabel = t(activeTarget
       ? `${inputAriaLabel}: ${activeTarget.label}`
       : inputAriaLabel);
