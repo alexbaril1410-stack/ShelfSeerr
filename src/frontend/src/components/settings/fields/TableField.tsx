@@ -8,6 +8,7 @@ import type {
   TableFieldColumn,
 } from '../../../types/settings';
 import { DropdownList } from '../../DropdownList';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { MultiSelectField } from './MultiSelectField';
 
 interface TableFieldProps {
@@ -155,6 +156,7 @@ function getFilteredSelectOptions(
 }
 
 export const TableField = ({ field, value, onChange, disabled }: TableFieldProps) => {
+  const { t } = useLanguage();
   const isDisabled = disabled ?? false;
   const [rowIds, setRowIds] = useState(() => (value ?? []).map((_, index) => `row-${index}`));
   const nextRowIdRef = useRef(rowIds.length);
@@ -231,7 +233,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
           disabled={isDisabled}
           className="hover-action rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {field.addLabel || 'Add'}
+          {field.addLabel || t('Add')}
         </button>
       </div>
     );
@@ -274,7 +276,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
                         checked={Boolean(cellValue)}
                         onChange={(e) => updateCell(rowIndex, col.key, e.target.checked)}
                         disabled={isDisabled}
-                        aria-label={`${col.label || col.key} row ${rowIndex + 1}`}
+                        aria-label={`${col.label || col.key} ${t('Row')} ${rowIndex + 1}`}
                         className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
                       />
                     </div>
@@ -295,7 +297,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
                     {isDisabled ? (
                       <div className="w-full cursor-not-allowed rounded-lg border border-(--border-muted) bg-(--bg-soft) px-3 py-2 text-sm opacity-60 shadow-sm">
                         {options.find((o) => o.value === toPrimitiveString(cellValue))?.label ||
-                          'Select...'}
+                          t('Select...')}
                       </div>
                     ) : (
                       <DropdownList
@@ -373,7 +375,7 @@ export const TableField = ({ field, value, onChange, disabled }: TableFieldProps
                 onClick={() => removeRow(rowIndex)}
                 disabled={isDisabled}
                 className="hover-action rounded-full p-1.5 disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Remove row"
+                aria-label={t('Remove row')}
               >
                 <svg
                   className="h-4 w-4"
