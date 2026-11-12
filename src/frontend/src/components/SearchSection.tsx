@@ -61,9 +61,9 @@ const DISCOVERY_TOPICS = {
     { label: 'Fiction to listen to', query: 'roman', description: 'Let yourself be carried away by a story', icon: '♫' },
     { label: 'Mysteries & thrillers', query: 'thriller', description: 'Suspense in your ears', icon: '⌕' },
     { label: 'Fantasy', query: 'fantasy', description: 'Great adventures to listen to', icon: '✦' },
-    { label: 'Développement personnel', query: 'personal development', description: 'Ideas to take with you', icon: '↗' },
+    { label: 'Personal development', query: 'personal development', description: 'Ideas to take with you', icon: '↗' },
     { label: 'Biographies', query: 'biography', description: 'Inspiring journeys', icon: '◉' },
-    { label: 'Science-fiction', query: 'science fiction', description: 'Somewhere else, in a different way', icon: '◈' },
+    { label: 'Science fiction', query: 'science fiction', description: 'Somewhere else, in a different way', icon: '◈' },
   ],
 } as const;
 
@@ -178,7 +178,7 @@ export const SearchSection = ({
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {topics.map((topic, index) => (
               <button
-                key={t(topic.label)}
+                key={topic.query}
                 type="button"
                 onClick={() => selectTopic(topic.query)}
                 className="group min-h-32 rounded-2xl border border-gray-200/80 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg dark:border-white/10 dark:bg-slate-900 dark:hover:border-indigo-400/50"
@@ -187,7 +187,7 @@ export const SearchSection = ({
                   {topic.icon}
                 </span>
                 <span className="block text-sm font-semibold text-gray-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-300">
-                  {topic.label}
+                  {t(topic.label)}
                 </span>
                 <span className="mt-1 block text-xs leading-5 text-gray-500 dark:text-gray-400">
                   {t(topic.description)}
