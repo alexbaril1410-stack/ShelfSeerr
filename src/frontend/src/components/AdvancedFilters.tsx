@@ -162,7 +162,11 @@ export const AdvancedFilters = ({
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <DropdownList
             label={t('Search Mode')}
-            options={SEARCH_MODE_OPTIONS}
+            options={SEARCH_MODE_OPTIONS.map((option) => ({
+              ...option,
+              label: t(option.label),
+              description: t(option.description),
+            }))}
             value={searchMode}
             onChange={(value) => {
               const next = Array.isArray(value) ? (value[0] ?? 'direct') : value;
@@ -174,7 +178,7 @@ export const AdvancedFilters = ({
 
           {searchMode === 'universal' && (
             <DropdownList
-              label={metadataProviderLabel}
+              label={t(metadataProviderLabel)}
               options={providerOptions}
               value={activeMetadataProvider ?? ''}
               onChange={(value) => {
