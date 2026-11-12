@@ -207,7 +207,7 @@ export const AdvancedFilters = ({
             />
             <DropdownList
               label={t('Content')}
-              options={CONTENT_OPTIONS}
+              options={CONTENT_OPTIONS.map((option) => ({ ...option, label: t(option.label) }))}
               value={content}
               onChange={handleContentChange}
               placeholder={t('All')}
