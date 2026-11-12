@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import { useState } from 'react';
 
 import type { ButtonStateInfo } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 import { CircularProgress } from './shared';
 
 type ButtonSize = 'sm' | 'md';
@@ -55,6 +56,7 @@ export const BookDownloadButton = ({
   variant = 'primary',
   ariaLabel,
 }: BookDownloadButtonProps) => {
+  const { t } = useLanguage();
   const [isQueuing, setIsQueuing] = useState(false);
   const isQueuingVisible = isQueuing && buttonState.state === 'download';
 
@@ -66,7 +68,7 @@ export const BookDownloadButton = ({
   );
   const isDisabled =
     buttonState.state !== 'download' || isQueuingVisible || isCompleted || isBlocked;
-  const displayText = isQueuingVisible ? 'Queuing...' : buttonState.text;
+  const displayText = t(isQueuingVisible ? 'Queuing...' : buttonState.text);
   const showCircularProgress =
     buttonState.state === 'downloading' && buttonState.progress !== undefined;
   const showSpinner = (isInProgress && !showCircularProgress) || isQueuingVisible;
