@@ -655,7 +655,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                       />
                     </div>
                     {isAdminUsersLoading && (
-                      <div className="text-xs opacity-70">{t('Loading users...')}</div>
+                      <div className="text-xs opacity-70">{t('{t('Loading users...')}')}</div>
                     )}
                     {adminUsersError && (
                       <div className="flex items-center justify-between gap-3">
