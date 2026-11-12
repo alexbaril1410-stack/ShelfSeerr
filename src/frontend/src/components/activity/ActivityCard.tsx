@@ -276,11 +276,11 @@ const toOptionalText = (value: unknown): string | undefined => {
 const toSourceLabel = (value: unknown): string => {
   const text = toOptionalText(value);
   if (!text) {
-    return t('Any Source');
+    return 'Any Source';
   }
   const normalized = text.trim().toLowerCase();
   if (normalized === '*' || normalized === 'any' || normalized === 'all') {
-    return t('Any Source');
+    return 'Any Source';
   }
   return text
     .split(/[_\s-]+/)
@@ -410,7 +410,7 @@ const ReviewInlinePanel = ({
       {hasAttachedRelease ? (
         <div className="space-y-2">
           <p className="text-[11px] font-medium tracking-wide uppercase opacity-70">
-            Attached File
+            {t('Attached File')}
           </p>
           <div className="grid grid-cols-1 gap-x-3 gap-y-1">
             <DetailField label={t('Title')} value={fileTitle} />
@@ -421,7 +421,7 @@ const ReviewInlinePanel = ({
           </div>
         </div>
       ) : (
-        <p className="text-xs opacity-70">{missingAttachedReleaseMessage}</p>
+        <p className="text-xs opacity-70">{t(missingAttachedReleaseMessage)}</p>
       )}
 
       <div className="flex flex-wrap items-center gap-2">
@@ -723,9 +723,9 @@ export const ActivityCard = ({
     toOptionalText(releaseData.extension) ||
     t('Unknown');
   const fileSize = toOptionalText(releaseData.size) || t('Unknown');
-  const sourceLabel = toSourceLabel(
+  const sourceLabel = t(toSourceLabel(
     releaseData.source_display_name || releaseData.source || reviewRecord?.source_hint,
-  );
+  ));
 
   const hasAttachedRelease =
     reviewRecord?.request_level === 'release' && Object.keys(releaseData).length > 0;
@@ -973,7 +973,7 @@ export const ActivityCard = ({
               requestType={requestType}
               sourceLabel={sourceLabel}
               hasAttachedRelease={hasAttachedRelease}
-              missingAttachedReleaseMessage={missingAttachedReleaseMessage}
+              missingAttachedReleaseMessage={t(missingAttachedReleaseMessage)}
               approveLabel={approveLabel}
               canMarkAsApprovedWithoutRelease={canMarkAsApprovedWithoutRelease}
               canBrowseAlternatives={canBrowseAlternatives}
