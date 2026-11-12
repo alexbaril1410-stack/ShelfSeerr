@@ -130,7 +130,7 @@ def build_audible_nfo_content(task: DownloadTask) -> str | None:
     add(lines, "ISBN-13", task.metadata_isbn_13)
     if not task.metadata_isbn_13:
         add(lines, "ISBN-10", task.metadata_isbn_10)
-    add(lines, "Language", task.metadata_language or task.language)
+    add(lines, "Language", normalize_language_code(task.metadata_language or task.language))
     add(lines, "Genre", ", ".join(genres))
 
     description = clean(task.metadata_description)
