@@ -603,6 +603,20 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   Back: "Retour",
   "Finish Setup": "Terminer la configuration",
   Next: "Suivant",
+  "No releases found for this book.": "Aucune version disponible pour ce livre.",
+  "No {format} releases found. Try a different format.": "Aucune version au format {format} trouvée. Essayez un autre format.",
+  "No {contentType} releases found.": "Aucune version de type {contentType} trouvée.",
+  "Find Releases": "Trouver des versions",
+  "Manual Query": "Requête manuelle",
+  "Adding...": "Ajout en cours…",
+  "Add to requests": "Ajouter aux demandes",
+  "No release sources are available for this book.": "Aucune source de téléchargement n’est disponible pour ce livre.",
+  "All Formats": "Tous les formats",
+  "Close release modal": "Fermer la fenêtre des versions",
+  "No cover available": "Aucune couverture disponible",
+  "Request Both": "Demander les deux",
+  "Download & Request": "Télécharger et demander",
+  "Download Both": "Télécharger les deux",
 };
 
 interface LanguageContextValue {
