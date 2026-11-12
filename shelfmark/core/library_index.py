@@ -158,8 +158,17 @@ def match_entries(book: BookMetadata, entries: list[LibraryEntry]) -> str | None
 
     external_id = (book.provider, str(book.provider_id)) if book.provider_id else None
     book_isbns = isbn_variants(book.isbn_13) | isbn_variants(book.isbn_10)
+    book_asin = (
+        str(book.provider_id).strip().upper()
+        if book.provider == "audible" and book.provider_id
+        else None
+    )
     for entry in entries:
-        if external_id in entry.external_ids or entry.isbns & book_isbns:
+        if (
+            external_id in entry.external_ids
+            or entry.isbns & book_isbns
+            or (book_asin is not None and book_asin in entry.asins)
+        ):
             return "owned"
 
     surname = author_surname(book.search_author or (book.authors[0] if book.authors else ""))
