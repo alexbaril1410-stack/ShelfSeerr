@@ -203,6 +203,7 @@ const renderField = (
   isDisabled: boolean,
   allValues: Record<string, unknown>, // All form values for cascading dropdown support
   authMode?: string,
+  t: (value: string) => string,
 ) => {
   switch (field.type) {
     case 'TextField':
@@ -315,7 +316,7 @@ const renderField = (
     case 'CustomComponentField':
       return null;
     default:
-      return <div>Unknown field type</div>;
+      return <div>{t('Unknown field type')}</div>;
   }
 };
 
@@ -479,6 +480,7 @@ function SettingsContentPanel({
                 disabledState.disabled,
                 values,
                 customFieldContext?.authMode,
+                t,
               );
 
         const shouldWrapInFieldWrapper = !(
@@ -494,7 +496,7 @@ function SettingsContentPanel({
             key={`${tab.name}-${field.key}`}
             field={displayField}
             disabledOverride={disabledState.disabled}
-            disabledReasonOverride={disabledState.reason}
+            disabledReasonOverride={disabledState.reason ? t(disabledState.reason) : undefined}
             userOverrideCount={fieldOverrideSummary?.count}
             userOverrideDetails={fieldOverrideSummary?.users}
           >
