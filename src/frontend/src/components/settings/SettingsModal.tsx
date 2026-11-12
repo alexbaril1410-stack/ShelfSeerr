@@ -256,17 +256,17 @@ const SettingsModalSession = ({
     const result = await saveTab(selectedTab);
     if (result.success) {
       void refreshOverrideSummaryForTab(selectedTab);
-      onShowToast?.(result.message, 'success');
+      onShowToast?.(t(result.message), 'success');
       onSettingsSaved?.();
       if (result.requiresRestart) {
         setTimeout(() => {
-          onShowToast?.('Some settings require a container restart to take effect', 'info');
+          onShowToast?.(t('Some settings require a container restart to take effect'), 'info');
         }, 500);
       }
     } else {
       onShowToast?.(t(result.message), 'error');
     }
-  }, [selectedTab, saveTab, onShowToast, onSettingsSaved, refreshOverrideSummaryForTab]);
+  }, [selectedTab, saveTab, onShowToast, onSettingsSaved, refreshOverrideSummaryForTab, t]);
 
   const handleAction = useCallback(
     async (actionKey: string) => {
