@@ -5,6 +5,7 @@ from shelfmark.download.postprocess.transfer import (
     _maybe_write_audible_nfo,
     _write_audible_nfo_file,
     build_audible_nfo_content,
+    transfer_book_files,
 )
 
 
@@ -92,3 +93,28 @@ def test_multi_book_task_does_not_get_one_shared_audible_nfo(tmp_path: Path):
     _maybe_write_audible_nfo([audio_file], _audible_task(multi_book=True))
 
     assert not (tmp_path / "metadata.nfo").exists()
+
+
+
+def test_audible_single_file_is_placed_in_folder_with_its_nfo(tmp_path: Path):
+    source_dir = tmp_path / "source"
+    destination = tmp_path / "library"
+    source_dir.mkdir()
+    destination.mkdir()
+    source_file = source_dir / "original.m4b"
+    source_file.write_bytes(b"audio")
+
+    final_paths, error, _counts = transfer_book_files(
+        [source_file],
+        destination,
+        _audible_task(),
+        use_hardlink=False,
+        is_torrent=False,
+        organization_mode="rename",
+    )
+
+    assert error is None
+    assert len(final_paths) == 1
+    assert final_paths[0].parent != destination
+    assert final_paths[0].exists()
+    assert (final_paths[0].parent / "metadata.nfo").exists()
