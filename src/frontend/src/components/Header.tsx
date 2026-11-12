@@ -16,7 +16,6 @@ import { isRecord } from '../utils/objectHelpers';
 import { DropdownList } from './DropdownList';
 import type { SearchBarHandle } from './SearchBar';
 import { SearchBar } from './SearchBar';
-import { LanguageSelector } from './LanguageSelector';
 import { useLanguage } from '../contexts/LanguageContext';
 
 interface HeaderHandle {
@@ -768,7 +767,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             className="shelfseerr-primary-nav mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
             style={{ borderColor: 'var(--border-muted)' }}
           >
-            <LanguageSelector compact />
             <button type="button" onClick={onHomeClick} className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover-surface" aria-label={t('Home')} aria-current={!showSearch ? 'page' : undefined}>
               {t('Home')}
             </button>
