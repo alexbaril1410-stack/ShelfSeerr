@@ -1183,3 +1183,49 @@ input, select, textarea { color-scheme:dark; }
   .shelfseerr-primary-nav { overflow-x:auto; }
 }
 
+
+
+/* Header alignment and full-width embedded settings refinements */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    position: relative;
+    justify-content: center;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    width: min(720px, 70vw);
+    max-width: 720px;
+    margin-inline: auto;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    position: absolute;
+    right: 0;
+    margin-left: 0;
+  }
+  .settings-page-embedded {
+    width: auto;
+    max-width: none;
+    padding-left: clamp(24px, 4vw, 64px);
+    padding-right: clamp(24px, 4vw, 64px);
+  }
+  .settings-page-embedded > .settings-modal-panel {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+}
+.settings-page-embedded > .settings-modal-panel {
+  max-width: none !important;
+  width: 100%;
+}
+.settings-page-embedded > .settings-modal-panel > .flex.min-h-0.flex-1 {
+  width: 100%;
+  min-width: 0;
+}
+.settings-page-embedded .settings-modal-panel [class*="max-w-"] {
+  max-width: none;
+}
+@media (min-width: 768px) {
+  .settings-page-embedded .settings-modal-panel {
+    min-height: calc(100dvh - 124px);
+  }
+}
