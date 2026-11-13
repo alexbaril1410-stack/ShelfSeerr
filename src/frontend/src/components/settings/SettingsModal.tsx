@@ -524,7 +524,7 @@ const SettingsModalSession = ({
       />}
 
       <div
-        className={`settings-modal-panel ${embedded ? 'relative mx-auto flex min-h-[70vh] w-full max-w-7xl flex-col overflow-hidden border-0' : 'relative flex h-[85vh] max-h-[750px] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-(--border-muted) shadow-2xl'} ${isClosing ? 'settings-modal-exit' : embedded ? '' : 'settings-modal-enter'}`}
+        className={`settings-modal-panel ${embedded ? 'relative flex min-h-[70vh] w-full max-w-none flex-col overflow-hidden border-0' : 'relative flex h-[85vh] max-h-[750px] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-(--border-muted) shadow-2xl'} ${isClosing ? 'settings-modal-exit' : embedded ? '' : 'settings-modal-enter'}`}
         style={{ background: 'var(--bg)' }}
         {...(!embedded ? { role: 'dialog', 'aria-modal': true, 'aria-label': t('Settings') } : {})}
       >
