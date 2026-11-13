@@ -439,45 +439,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           </a>
         )}
 
-        {/* Activity Button */}
-        {onDownloadsClick && (
-          <button
-            type="button"
-            onClick={onDownloadsClick}
-            className="hover-action relative flex items-center gap-2 rounded-full px-3 py-2 text-gray-900 transition-all duration-200 dark:text-gray-100"
-            aria-label={t('View activity')}
-            title={t('Activity')}
-          >
-            <div className="relative">
-              <svg
-                className="h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-              {activityBadge && (
-                <span
-                  className={`absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-[0.55rem] font-bold text-white ${activityBadge.colorClass}`}
-                  title={activityBadge.title}
-                >
-                  {activityBadge.total}
-                </span>
-              )}
-            </div>
-            <span className="hidden text-sm font-medium sm:inline">{t('Activity')}</span>
-          </button>
-        )}
-
-        {renderSettingsButton('nav')}
-
         {/* User Menu Dropdown */}
         <div className="relative" ref={dropdownRef}>
           <button
@@ -501,7 +462,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.118a7.5 7.5 0 0115 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.5-1.632z"
               />
             </svg>
             {actingAsUser && (
@@ -527,6 +488,23 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               }}
             >
               <div className="py-1">
+                {onDownloadsClick && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      closeDropdown();
+                      onDownloadsClick();
+                    }}
+                    className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left transition-colors"
+                  >
+                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                    </svg>
+                    <span>{t('Activity')}</span>
+                    {activityBadge && <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold text-white ${activityBadge.colorClass}`}>{activityBadge.total}</span>}
+                  </button>
+                )}
+                {renderSettingsButton('menu')}
                 <a
                   href="https://github.com/calibrain/shelfmark/issues"
                   target="_blank"
@@ -550,9 +528,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   </svg>
                   <span>{t('Report a Bug')}</span>
                 </a>
-
-                {/* Settings Button */}
-                {renderSettingsButton('menu')}
 
                 {/* Debug Buttons */}
                 {debug && (
