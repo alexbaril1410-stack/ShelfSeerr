@@ -137,7 +137,7 @@ def register_system_routes(
         """Serve the original transparent ShelfSeerr desktop logo."""
         return send_from_directory(
             get_frontend_dist(),
-            "shelfseerr-desktop-logo-transparent.png",
+            "shelfseerr-desktop-logo-transparent.png.PNG",
             mimetype="image/png",
         )
 
@@ -146,7 +146,7 @@ def register_system_routes(
         """Serve the original transparent 512px ShelfSeerr app icon."""
         return send_from_directory(
             get_frontend_dist(),
-            "shelfseerr-app-icon-512-transparent.png",
+            "shelfseerr-app-icon-512-transparent.png.PNG",
             mimetype="image/png",
         )
 
