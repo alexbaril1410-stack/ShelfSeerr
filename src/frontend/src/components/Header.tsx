@@ -671,9 +671,9 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
         <div className="shelfseerr-header-inner mx-auto max-w-full px-4 py-4 sm:px-6 lg:px-8">
           {/* When search is active: stack on mobile, side-by-side on desktop */}
           {showSearch && (
-            <div className="animate-pop-up flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="animate-pop-up flex flex-col gap-3 lg:relative lg:flex-row lg:items-center lg:justify-center">
               {/* Logo + Icon buttons - appear first on mobile (above search), last on desktop (right side) */}
-              <div className="flex w-full items-center justify-between lg:order-2 lg:w-auto lg:justify-end">
+              <div className="flex w-full items-center justify-between lg:absolute lg:right-0 lg:top-1/2 lg:w-auto lg:-translate-y-1/2 lg:justify-end">
                 {/* Logo - visible on mobile only, aligned left */}
                 {logoUrl &&
                   (onLogoClick ? (
@@ -697,7 +697,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
               </div>
 
               {/* Search bar - appear second on mobile (below logo+icons), first on desktop (left side) */}
-              <div className="flex flex-1 items-center gap-4 lg:order-1">
+              <div className="flex w-full flex-1 items-center gap-4 lg:mx-auto lg:max-w-[min(720px,70vw)] lg:flex-none">
                 {/* Logo - visible on desktop only, aligned with search */}
                 {logoUrl &&
                   (onLogoClick ? (
@@ -718,7 +718,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   ))}
                 <SearchBar
                   ref={searchBarRef}
-                  className="flex-1 lg:w-[calc(50vw+5rem)] lg:flex-none"
+                  className="w-full flex-1"
                   value={searchInput}
                   valueLabel={searchInputLabel}
                   onChange={handleSearchChange}
