@@ -1229,3 +1229,42 @@ input, select, textarea { color-scheme:dark; }
     min-height: calc(100dvh - 124px);
   }
 }
+
+
+/* Final Seerr-style top bar and settings page layout */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    position: relative;
+    justify-content: center;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: auto;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    width: min(720px, 70vw);
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    width: 100%;
+    max-width: none;
+  }
+  .settings-page-embedded {
+    inset: 76px 0 0 260px;
+    width: auto;
+    padding: 24px clamp(24px, 3vw, 48px);
+  }
+  .settings-page-embedded > .settings-modal-panel {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+  .settings-page-embedded .settings-modal-panel > .flex.min-h-0.flex-1 {
+    width: 100%;
+  }
+}
