@@ -1543,6 +1543,30 @@ const ADDITIONAL_FRENCH_TRANSLATIONS: Record<string, string> = {
   'Choose which usenet client to use': 'Choisissez le client Usenet à utiliser.',
 };
 
+const FINAL_FRENCH_TRANSLATIONS: Record<string, string> = {
+  'Select which indexers to search. 📚 = has book categories. Leave empty to search all.': 'Choisissez les indexeurs à interroger. 📚 = catégories de livres disponibles. Laissez vide pour tous les utiliser.',
+  'Hide a result whose title ends in a file extension that is not in Supported Book Formats, such as a .doc or .rtf file. Downloading it would only fail at post-processing. Titles without an extension, archives and audiobook searches are never hidden.': 'Masque les résultats dont le titre se termine par une extension absente des formats de livres pris en charge, comme .doc ou .rtf. Leur téléchargement échouerait lors du traitement final. Les titres sans extension, les archives et les recherches de livres audio ne sont jamais masqués.',
+  'Use FlareSolverr or similar external service instead of built-in bypasser. Caution: May have limitations with custom DNS, Tor and proxies. You may experience slower downloads and and poorer reliability compared to the internal bypasser.': 'Utilise FlareSolverr ou un service externe similaire à la place du service de contournement intégré. Attention : il peut présenter des limites avec le DNS personnalisé, Tor et les proxys. Les téléchargements peuvent être plus lents et moins fiables qu’avec le service intégré.',
+  'URL of the external bypasser service (e.g., FlareSolverr).': 'URL du service de contournement externe (par exemple FlareSolverr).',
+  'API path for the external bypasser.': 'Chemin API du service de contournement externe.',
+  'Timeout for external bypasser requests in milliseconds.': 'Délai maximal des requêtes au service de contournement externe, en millisecondes.',
+  'How long to wait for a solved page to produce its content before the bypass is retried. Raise it if solves succeed but searches still fail.': 'Durée d’attente du contenu d’une page après la résolution du défi, avant une nouvelle tentative de contournement. Augmentez-la si la résolution réussit mais que les recherches échouent encore.',
+  'How long the bypass helper process may sit unused before it is shut down. Higher keeps more searches fast, lower frees memory sooner.': 'Durée pendant laquelle le processus de contournement peut rester inactif avant son arrêt. Une valeur élevée accélère davantage de recherches ; une valeur basse libère plus rapidement de la mémoire.',
+  "List the Anna's Archive mirror URLs you want Shelfmark to use. Type a URL and press Enter to add it. Order matters when Auto is selected.": 'Listez les URL de miroirs Anna’s Archive que Shelfmark doit utiliser. Saisissez une URL puis appuyez sur Entrée pour l’ajouter. L’ordre compte lorsque le mode automatique est sélectionné.',
+  'Partner servers': 'Serveurs partenaires',
+  'Partner servers with countdown timer': 'Serveurs partenaires avec compte à rebours',
+  'Alternative mirror': 'Miroir alternatif',
+  'Searches and downloads on its own, so its position does not matter': 'Effectue ses propres recherches et téléchargements ; sa position dans la liste est donc sans importance.',
+  "Add at least one Anna's Archive mirror in Mirrors": 'Ajoutez au moins un miroir Anna’s Archive dans l’onglet Miroirs.',
+  'Add at least one LibGen mirror in Mirrors': 'Ajoutez au moins un miroir LibGen dans l’onglet Miroirs.',
+  'Add at least one Z-Library mirror in Mirrors': 'Ajoutez au moins un miroir Z-Library dans l’onglet Miroirs.',
+  'Add at least one Welib mirror in Mirrors': 'Ajoutez au moins un miroir Welib dans l’onglet Miroirs.',
+  'Add at least one OceanofPDF mirror in Mirrors': 'Ajoutez au moins un miroir OceanofPDF dans l’onglet Miroirs.',
+  'Requires Cloudflare bypass': 'Contournement Cloudflare requis',
+  'Found in Prowlarr: Settings > General > API Key': 'Disponible dans Prowlarr : Paramètres > Général > Clé API',
+  "Prowlarr drops the narrator and series from MyAnonamouse results. With a MAM session ID, Shelfmark looks them up (plus bitrate, from the uploader's tags) directly from MyAnonamouse. Create the session under Preferences > Security on MyAnonamouse, locked to the IP or ASN Shelfmark connects from. Choose which columns show under Search Mode > Release List Columns.": 'Prowlarr ne transmet pas le narrateur ni la série des résultats MyAnonamouse. Avec un identifiant de session MAM, Shelfmark les récupère directement auprès de MyAnonamouse, ainsi que le débit depuis les tags de l’uploader. Créez une session dans Préférences > Sécurité sur MyAnonamouse et limitez-la à l’adresse IP ou à l’ASN utilisé par Shelfmark. Choisissez les colonnes à afficher dans Mode de recherche > Colonnes de la liste des résultats.',
+};
+
 interface LanguageContextValue {
   language: AppLanguage;
   setLanguage: (language: AppLanguage) => void;
@@ -1585,7 +1609,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         if (englishText.startsWith('Connected as: ')) {
           return `Connecté en tant que : ${englishText.slice('Connected as: '.length)}`;
         }
-        return ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
+        return FINAL_FRENCH_TRANSLATIONS[englishText] ?? ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
       },
     }),
     [language, setLanguage],
