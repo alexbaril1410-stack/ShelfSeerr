@@ -1,3 +1,4 @@
+import { useLanguage } from '../../contexts/LanguageContext';
 import type { LibraryOwnership } from '../../types';
 
 /** True when the library check reports this book held in any format. */
@@ -21,6 +22,7 @@ interface LibraryBadgeProps {
 
 /** "Already in your library" badge. Renders nothing when the book is not held. */
 export function LibraryBadge({ library, overlay = false, className = '' }: LibraryBadgeProps) {
+  const { t } = useLanguage();
   if (!isInLibrary(library)) return null;
 
   const collectionOnly = isCollectionOnly(library);
@@ -38,13 +40,14 @@ export function LibraryBadge({ library, overlay = false, className = '' }: Libra
     <span
       className={`flex w-fit items-center gap-0.5 ${pill} ${className}`}
       style={style}
-      title={label}
-      aria-label={label}
+      title={t(label)}
+      aria-label={t(label)}
     >
       <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
       </svg>
-      {text}
+      {t(text)}
     </span>
   );
 }
+

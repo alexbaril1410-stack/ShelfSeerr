@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 32240)
+Total output lines: 1601
+
 import {
   createContext,
   useCallback,
@@ -586,12 +589,8 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Max Concurrent Downloads': 'Nombre maximal de téléchargements simultanés',
   'Max Concurrent Downloads Per Source': 'Nombre maximal de téléchargements simultanés par source',
   'Status Timeout (seconds)': 'Durée d’affichage des statuts (secondes)',
-  'Enable Direct Download Source': 'Activer la source de téléchargement direct',
-  'Detect Language From Distant Path': 'Détecter la langue à partir du chemin distant',
-  'Account Donator Key': 'Clé donateur du compte',
   'Source Priority': 'Priorité des sources',
   'Fast downloads': 'Téléchargements rapides',
-  'Slow downloads': 'Téléchargements lents',
   'Max Retries': 'Nombre maximal de tentatives',
   'Retry Delay (seconds)': 'Délai entre les tentatives (secondes)',
   'Release Search Timeout (seconds)': 'Délai maximal de recherche des versions (secondes)',
@@ -950,145 +949,7 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
     'Essayer une autre version après un échec de téléchargement (minutes)',
   'Try a failed release again after (days)': 'Réessayer une version échouée après (jours)',
   'Look the book up after (unmatched passes)':
-    'Vérifier la disponibilité après (cycles sans correspondance)',
-  'Smallest acceptable audiobook copy (%)': 'Copie de livre audio minimale acceptable (%)',
-  'Sync now': 'Synchroniser maintenant',
-  'Welcome to Shelfmark': 'Bienvenue sur Shelfmark',
-  "Let's configure how you want to search for and download books.":
-    'Configurons la recherche et le téléchargement de vos livres.',
-  'Metadata Provider': 'Fournisseur de métadonnées',
-  'Get API Key': 'Obtenir une clé API',
-  'Enable Google Books': 'Activer Google Books',
-  'Enable Moly.hu': 'Activer Moly.hu',
-  'Search by author name': 'Rechercher par nom d’auteur',
-  'Search by book title': 'Rechercher par titre de livre',
-  'Enable AudiobookBay': 'Activer AudiobookBay',
-  'Max Pages to Search': 'Nombre maximal de pages à parcourir',
-  'Prefer Exact-Phrase Search': 'Privilégier la recherche exacte',
-  'Seed Time (minutes)': 'Durée de partage (minutes)',
-  'Rate Limit Delay (seconds)': 'Délai entre les requêtes (secondes)',
-  Hostname: 'Nom d’hôte',
-  Chinese: 'Chinois',
-  Russian: 'Russe',
-  Spanish: 'Espagnol',
-  German: 'Allemand',
-  Italian: 'Italien',
-  Portuguese: 'Portugais',
-  Polish: 'Polonais',
-  Bulgarian: 'Bulgare',
-  Dutch: 'Néerlandais',
-  Japanese: 'Japonais',
-  Arabic: 'Arabe',
-  Hebrew: 'Hébreu',
-  Turkish: 'Turc',
-  Hungarian: 'Hongrois',
-  Latin: 'Latin',
-  Czech: 'Tchèque',
-  Korean: 'Coréen',
-  Ukrainian: 'Ukrainien',
-  Indonesian: 'Indonésien',
-  Romanian: 'Roumain',
-  Swedish: 'Suédois',
-  Greek: 'Grec',
-  Lithuanian: 'Lituanien',
-  Bangla: 'Bengali',
-  'Traditional Chinese': 'Chinois traditionnel',
-  Afrikaans: 'Afrikaans',
-  Catalan: 'Catalan',
-  Danish: 'Danois',
-  Thai: 'Thaï',
-  Hindi: 'Hindi',
-  Irish: 'Irlandais',
-  Latvian: 'Letton',
-  Tibetan: 'Tibétain',
-  Kannada: 'Kannada',
-  Serbian: 'Serbe',
-  Persian: 'Persan',
-  Croatian: 'Croate',
-  Slovak: 'Slovaque',
-  Javanese: 'Javanais',
-  Vietnamese: 'Vietnamien',
-  Urdu: 'Ourdou',
-  Finnish: 'Finnois',
-  Norwegian: 'Norvégien',
-  Kinyarwanda: 'Kinyarwanda',
-  Tamil: 'Tamoul',
-  Belarusian: 'Biélorusse',
-  Kazakh: 'Kazakh',
-  Mongolian: 'Mongol',
-  Georgian: 'Géorgien',
-  Slovenian: 'Slovène',
-  Esperanto: 'Espéranto',
-  Galician: 'Galicien',
-  Marathi: 'Marathi',
-  Filipino: 'Filipino',
-  Gujarati: 'Gujarati',
-  Malayalam: 'Malayalam',
-  Kyrgyz: 'Kirghize',
-  Azerbaijani: 'Azerbaïdjanais',
-  Quechua: 'Quechua',
-  Swahili: 'Swahili',
-  Bashkir: 'Bachkir',
-  Punjabi: 'Pendjabi',
-  Malay: 'Malais',
-  Telugu: 'Télougou',
-  Albanian: 'Albanais',
-  Uyghur: 'Ouïghour',
-  Armenian: 'Arménien',
-  Shan: 'Shan',
-  Bosnian: 'Bosniaque',
-  Burmese: 'Birman',
-  Estonian: 'Estonien',
-  Icelandic: 'Islandais',
-  Manx: 'Mannois',
-  'Scottish Gaelic': 'Gaélique écossais',
-  Sanskrit: 'Sanskrit',
-  'Expand search': 'Élargir la recherche',
-  'Configure where ebooks, comics, and magazines are saved.':
-    'Choisissez où enregistrer les livres numériques, bandes dessinées et magazines.',
-  'Choose where completed book files are sent.':
-    'Choisissez où envoyer les fichiers de livres terminés.',
-  'Save files to the destination folder': 'Enregistrer les fichiers dans le dossier de destination',
-  'Send files as an email attachment': 'Envoyer les fichiers en pièce jointe par e-mail',
-  'Upload files directly to Grimmory': 'Envoyer les fichiers directement vers Grimmory',
-  'Check that Shelfmark can create and write to this destination.':
-    'Vérifie que Shelfmark peut créer ce dossier et y écrire.',
-  'Create folders and rename files using a template. Do not use with ingest folders.':
-    'Crée des dossiers et renomme les fichiers à l’aide d’un modèle. À éviter avec les dossiers d’import de bibliothèque.',
-  'Create folders and rename files using a template. Recommended for Audiobookshelf. Do not use with ingest folders.':
-    'Crée des dossiers et renomme les fichiers à l’aide d’un modèle. Recommandé pour Audiobookshelf. À éviter avec les dossiers d’import de bibliothèque.',
-  'Keep original filename from source': 'Conserver le nom de fichier d’origine',
-  'Rename single-file downloads; multi-file keeps original names.':
-    'Renommer les téléchargements avec un seul fichier ; conserver les noms d’origine pour les téléchargements multiples.',
-  'Rename single-file downloads; keep multi-file downloads grouped in their source folder. Do not use with ingest folders.':
-    'Renommer les téléchargements avec un seul fichier ; conserver les téléchargements multiples ensemble dans leur dossier source. À éviter avec les dossiers d’import de bibliothèque.',
-  "Replaces spaces inside naming template values (e.g. 'Conan Doyle' -> 'Conan.Doyle' with '.'). Applies to books and audiobooks, rename and organize templates alike. Literal characters typed into a template (like the '-' in '{Author} - {Title}') are left as-is. Leave empty to keep spaces as-is.":
-    'Remplace les espaces dans les valeurs du modèle de nommage (par exemple « Conan Doyle » devient « Conan.Doyle » avec « . »). S’applique aux modèles de renommage et d’organisation des livres et livres audio. Les caractères saisis directement dans le modèle (comme le « - » de « {Author} - {Title} ») restent inchangés. Laissez vide pour conserver les espaces.',
-  'Directory where downloaded audiobook files are saved. Leave empty to use the Books destination.':
-    'Dossier où enregistrer les fichiers de livres audio téléchargés. Laissez vide pour utiliser la destination des livres.',
-  'Check that Shelfmark can create and write to this audiobook destination.':
-    'Vérifie que Shelfmark peut créer le dossier de destination des livres audio et y écrire.',
-  'Maximum number of simultaneous downloads. Not used while Max Concurrent Downloads Per Source is above 0.':
-    'Nombre maximal de téléchargements simultanés. Cette limite ne s’applique pas si le nombre maximal de téléchargements simultanés par source est supérieur à 0.',
-  "Simultaneous downloads allowed from each source (Soulseek, AudiobookBay, Direct Download and so on). A source at its limit does not hold the others back, so a Soulseek download waiting in a peer's queue cannot stop a torrent from starting. Above 0 this replaces Max Concurrent Downloads: the total can be this number for every source that has downloads at once. 0 uses the single limit above for all sources together.":
-    'Nombre de téléchargements simultanés autorisés pour chaque source (Soulseek, AudiobookBay, téléchargement direct, etc.). Une source ayant atteint sa limite ne bloque pas les autres : un téléchargement Soulseek en attente chez un pair n’empêche donc pas le démarrage d’un torrent. Au-dessus de 0, cette valeur remplace le nombre maximal global : chaque source peut atteindre cette limite. À 0, la limite globale ci-dessus s’applique à toutes les sources.',
-  'How long to keep completed/failed downloads in the queue display.':
-    'Durée pendant laquelle les téléchargements terminés ou échoués restent affichés dans la file.',
-  'Select the authentication method for accessing Shelfmark. Restart container after changing Calibre-Web passwords.':
-    'Choisissez la méthode d’authentification pour accéder à Shelfmark. Redémarrez le conteneur après toute modification des mots de passe Calibre-Web.',
-  'Authentication is disabled. Anyone can access Shelfmark without signing in.':
-    'L’authentification est désactivée. Tout le monde peut accéder à Shelfmark sans se connecter.',
-  'Choose which personal settings sections are shown in My Account for non-admin users.':
-    'Choisissez les sections de paramètres personnels affichées dans « Mon compte » pour les utilisateurs non administrateurs.',
-  'Turn this off to let everyone download directly without needing approval.':
-    'Désactivez cette option pour autoriser tout le monde à télécharger directement, sans approbation.',
-  'Global notifications send selected events for all users to configured routes. Users can manage personal notifications in User Preferences.':
-    'Les notifications globales envoient les événements sélectionnés pour tous les utilisateurs vers les destinations configurées. Chaque utilisateur peut gérer ses notifications personnelles dans ses préférences.',
-  'Bearer token for your Hardcover account. Leave blank to reuse the token from the Hardcover metadata provider.':
-    'Jeton Bearer de votre compte Hardcover. Laissez vide pour réutiliser le jeton du fournisseur de métadonnées Hardcover.',
-  'Which Hardcover reading shelf to pull from.': 'Étagère de lecture Hardcover à importer.',
-  'Content type for synced requests. "Ebooks and audiobooks" creates one request of each per shelf book; every request is checked against its own library and downloaded with its own format guard and source priority.':
-    'Type de contenu des demandes synchronisées. « Livres numériques et livres audio » crée une demande de chaque type pour chaque livre de l’étagère. Chaque demande est comparée à sa propre bibliothèque et téléchargée selon ses formats et la priorité de ses sources.',
+    '…2240 tokens truncated…ériques et livres audio » crée une demande de chaque type pour chaque livre de l’étagère. Chaque demande est comparée à sa propre bibliothèque et téléchargée selon ses formats et la priorité de ses sources.',
   'How often the scheduled sync runs (minimum 1 minute).':
     'Fréquence d’exécution de la synchronisation planifiée (minimum : 1 minute).',
   'Whether the sync interval is measured in minutes or hours.':
@@ -1205,6 +1066,145 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
     'Activer Moly.hu comme fournisseur de métadonnées pour les recherches de livres',
   'Verify moly.hu is accessible': 'Vérifie que moly.hu est accessible.',
   Rating: 'Note',
+  Ratings: 'Avis',
+  Readers: 'Lecteurs',
+  'In library': 'Dans la bibliothèque',
+  'In a collection': 'Dans une collection',
+  'In your library, inside a collection': 'Dans votre bibliothèque, dans une collection',
+  'Already in your library': 'Déjà dans votre bibliothèque',
+  'Enable Hardcover': 'Activer Hardcover',
+  'Enable Hardcover as a metadata provider for book searches':
+    'Activer Hardcover comme fournisseur de métadonnées pour les recherches de livres',
+  'Get your API key from hardcover.app/account/api (starts with hc_pat_)':
+    'Récupérez votre clé API sur hardcover.app/account/api (elle commence par hc_pat_).',
+  'Default sort order for Hardcover search results.':
+    'Ordre de tri par défaut des résultats Hardcover.',
+  'Most popular': 'Les plus populaires',
+  'Highest rated': 'Les mieux notés',
+  'French Editions Only': 'Éditions françaises uniquement',
+  'Show only books with at least one French-language edition. Uses the French edition title when available.':
+    'Afficher uniquement les livres ayant au moins une édition en français. Le titre de l’édition française est utilisé lorsqu’il est disponible.',
+  'Exclude Compilations': 'Exclure les compilations',
+  'Filter out compilations, anthologies, and omnibus editions from search results':
+    'Exclure des résultats les compilations, anthologies et éditions intégrales.',
+  'Exclude Unreleased Books': 'Exclure les livres pas encore parus',
+  'Filter out books with a release year in the future':
+    'Exclure les livres dont la date de parution est dans le futur.',
+  'Auto-Remove from List on Download': 'Retirer automatiquement de la liste après téléchargement',
+  'Automatically remove a book from the active Hardcover list when you download it':
+    'Retirer automatiquement un livre de la liste Hardcover active après son téléchargement.',
+  'Enable Open Library': 'Activer Open Library',
+  'Enable Open Library as a metadata provider for book searches':
+    'Activer Open Library comme fournisseur de métadonnées pour les recherches de livres.',
+  'An initiative of the Internet Archive. A free, open-source library catalog with millions of books. No API key required.':
+    'Une initiative de l’Internet Archive. Un catalogue de bibliothèque libre et gratuit contenant des millions de livres. Aucune clé API n’est nécessaire.',
+  'Verify Open Library API is accessible': 'Vérifier que l’API Open Library est accessible.',
+  'Default sort order for Open Library search results.':
+    'Ordre de tri par défaut des résultats Open Library.',
+  'Enable Databáze knih': 'Activer Databáze knih',
+  'Enable Databáze knih as a metadata provider for book searches':
+    'Activer Databáze knih comme fournisseur de métadonnées pour les recherches de livres.',
+  'Czech and Slovak community book catalog with excellent coverage of Czech and Slovak editions and translations. No API key required.':
+    'Catalogue communautaire tchèque et slovaque offrant une excellente couverture des éditions et traductions dans ces langues. Aucune clé API n’est nécessaire.',
+  'Verify databazeknih.cz is accessible': 'Vérifier que databazeknih.cz est accessible.',
+  'Enable DNB': 'Activer la Deutsche Nationalbibliothek',
+  'Enable DNB as a metadata provider for book searches':
+    'Activer la Deutsche Nationalbibliothek comme fournisseur de métadonnées pour les recherches de livres.',
+  'The German National Library catalogs every book published in Germany, plus German-language and translated works from abroad. No API key required.':
+    'La Bibliothèque nationale allemande répertorie tous les livres publiés en Allemagne, ainsi que les ouvrages en allemand et les traductions publiés à l’étranger. Aucune clé API n’est nécessaire.',
+  'Verify the DNB catalog is accessible': 'Vérifier que le catalogue de la DNB est accessible.',
+  'Default sort order for DNB search results.': 'Ordre de tri par défaut des résultats de la DNB.',
+  'Only show editions in my book languages':
+    'Afficher uniquement les éditions dans les langues de mes livres',
+  'Enable Direct Download Source': 'Activer la source de téléchargement direct',
+  'Show Direct Download in release-source lists and allow Direct mode searches. Add your own mirror URLs in the Mirrors tab before using it.':
+    'Afficher le téléchargement direct dans les listes de sources et autoriser les recherches en mode direct. Ajoutez vos URL de miroirs dans l’onglet Miroirs avant de l’utiliser.',
+  'Detect Language From Distant Path': 'Détecter la langue à partir du chemin distant',
+  'Account Donator Key': 'Clé donateur du compte',
+  'Enables fast download access on AA. Get this from your donator account page.':
+    'Active le téléchargement rapide sur AA. Récupérez cette clé depuis la page de votre compte donateur.',
+  'Fast downloads for donators': 'Téléchargements rapides pour les donateurs',
+  'Requires Donator Key': 'Clé donateur requise',
+  'Instant downloads, no bypass needed':
+    'Téléchargements immédiats, aucun contournement nécessaire',
+  'Always tried first, no waiting or bypass required.':
+    'Toujours essayé en premier, sans attente ni contournement.',
+  'Slow downloads': 'Téléchargements lents',
+  'Fallback sources, may have waiting. Requires bypasser. Drag to reorder.':
+    'Sources de secours, avec attente possible. Nécessite un service de contournement. Faites glisser pour modifier l’ordre.',
+  'Route downloads to different folders based on content type. Only applies to Direct download source.':
+    'Dirige les téléchargements vers différents dossiers selon le type de contenu. S’applique uniquement à la source de téléchargement direct.',
+  'Override destination based on content type metadata.':
+    'Remplace la destination selon les métadonnées du type de contenu.',
+  'Attempt to bypass Cloudflare protection on download sites.':
+    'Tente de contourner la protection Cloudflare des sites de téléchargement.',
+  'A modern book tracking and discovery platform with a comprehensive API.':
+    'Une plateforme moderne de suivi et de découverte de livres, dotée d’une API complète.',
+  Newest: 'Les plus récents',
+  Oldest: 'Les plus anciens',
+  "Filter DNB results by Default Book Languages: each user's own setting, else the system default. DNB also catalogs translations into many other languages.":
+    'Filtre les résultats de la DNB selon les langues de livres par défaut : le réglage de chaque utilisateur, ou celui du système à défaut. La DNB répertorie aussi des traductions dans de nombreuses autres langues.',
+  'When language metadata is missing or unknown, parse the distant path (file path shown in search results) for language tags like [BD FR] or [En]. Also enables local language filtering so lgli files without AA language metadata are not excluded before the distant path can be checked.':
+    'Lorsque les métadonnées de langue sont absentes ou inconnues, analyse le chemin distant (chemin du fichier affiché dans les résultats) à la recherche d’indications telles que [BD FR] ou [En]. Active aussi le filtrage local par langue afin que les fichiers lgli sans métadonnées de langue AA ne soient pas écartés avant l’analyse du chemin distant.',
+  'How long one release search may run before it gives up and reports why. A first search on a cold start pays for a browser solve, so leave room for one. If you use a reverse proxy, its read timeout should be at least this high or it will cut the search off with a 504 first.':
+    'Durée maximale d’une recherche de version avant son interruption et l’affichage de la raison. La première recherche après un démarrage doit résoudre un défi navigateur : prévoyez suffisamment de temps. Avec un proxy inverse, son délai de lecture doit être au moins aussi long, sinon il interrompra la recherche avec une erreur 504.',
+  "Add your own Anna's Archive mirror URLs here. Auto mode will try them in the order listed below.":
+    'Ajoutez ici vos propres URL de miroirs Anna’s Archive. Le mode automatique les essaiera dans l’ordre indiqué.',
+  'Only the first mirror in the list is used.': 'Seul le premier miroir de la liste est utilisé.',
+  "Searches and downloads directly, without Anna's Archive. Only the first mirror in the list is used. The site is behind Cloudflare, so the bypass must be enabled.":
+    'Recherche et télécharge directement, sans passer par Anna’s Archive. Seul le premier miroir de la liste est utilisé. Le site est protégé par Cloudflare : le contournement doit être activé.',
+  'Select Auto to try mirrors from your list on startup and fail over on errors. Choosing a specific mirror pins Shelfmark to that URL.':
+    'Sélectionnez « Automatique » pour essayer vos miroirs au démarrage et passer au suivant en cas d’erreur. Le choix d’un miroir précis oblige Shelfmark à utiliser cette URL.',
+  'qBittorrent URL': 'URL de qBittorrent',
+  'Web UI URL of your qBittorrent instance':
+    'URL de l’interface Web de votre instance qBittorrent.',
+  'qBittorrent Web UI username': 'Nom d’utilisateur de l’interface Web qBittorrent',
+  'qBittorrent Web UI password': 'Mot de passe de l’interface Web qBittorrent',
+  'Found in qBittorrent: Options > Web UI > API Key (qBittorrent 5.2.0+). Used instead of the username and password when set.':
+    'Disponible dans qBittorrent : Options > Interface Web > Clé API (qBittorrent 5.2.0+). Remplace le nom d’utilisateur et le mot de passe lorsqu’elle est définie.',
+  'Verify your qBittorrent configuration': 'Vérifier la configuration de qBittorrent.',
+  'Server-side directory where torrents are downloaded (optional, uses qBittorrent default if not specified)':
+    'Dossier du serveur où les torrents sont téléchargés (facultatif ; utilise le dossier par défaut de qBittorrent si non renseigné).',
+  'After a successful import, Remove keeps downloaded files in qBittorrent, Transmission, and Deluge; Remove & Delete Files also deletes them. rTorrent cannot delete download data, so this action leaves its torrent untouched. Blackhole does not support removal. Debrid clients delete temporary local files for either Remove action.':
+    'Après une importation réussie, « Retirer » conserve les fichiers téléchargés dans qBittorrent, Transmission et Deluge ; « Retirer et supprimer les fichiers » les efface également. rTorrent ne peut pas supprimer les données téléchargées : son torrent reste donc intact. Blackhole ne permet pas le retrait. Les clients debrid suppriment les fichiers locaux temporaires pour les deux actions de retrait.',
+  'Give up on a torrent when its client sees no seed at all for this long, even while it is still downloading, or fewer seeds than the minimum below while nothing is downloading. The torrent is removed and the download marked failed, so another release can be tried. The card shows the seed count and a countdown while it waits. 0 keeps the default behaviour (only the stall timer ends it). Only qBittorrent reports seed counts.':
+    'Abandonne un torrent si le client ne détecte aucun seeder pendant cette durée, même si le téléchargement est en cours, ou s’il en détecte moins que le minimum ci-dessous lorsqu’aucune donnée ne progresse. Le torrent est retiré et le téléchargement marqué comme échoué afin qu’une autre version puisse être essayée. La fiche affiche le nombre de seeders et un compte à rebours. 0 conserve le comportement par défaut : seul le délai d’inactivité met fin au téléchargement. Seul qBittorrent indique le nombre de seeders.',
+  'Seeds the client must see for a motionless torrent to keep waiting. 0 also turns the no-seed check off. Only qBittorrent reports seed counts.':
+    'Nombre de seeders que le client doit détecter pour continuer d’attendre un torrent sans progression. 0 désactive aussi la vérification des seeders. Seul qBittorrent indique leur nombre.',
+  'How long a torrent can go without any progress before Shelfmark cancels it. Applies from when the torrent starts and restarts each time it moves. Raise it for slow swarms or magnets that take a while to find peers, or lower it to give up on dead torrents sooner.':
+    'Durée sans progression après laquelle Shelfmark annule un torrent. Le délai commence au démarrage et repart à chaque progression. Augmentez-le pour les essaims lents ou les liens magnet qui mettent du temps à trouver des pairs ; réduisez-le pour abandonner plus tôt les torrents inactifs.',
+  'Remove a torrent Shelfmark added when it is stalled or cannot fetch its metadata, has had no activity for this many hours, and no running download owns it. Its partial data goes with it. Only torrents Shelfmark itself added are ever considered, whatever category they are in; torrents still downloading, queued, or finished are never touched. 3 to 72 hours (a value outside that is held to it); 0 keeps them. Checked every 15 minutes, independent of the Hardcover sync; only qBittorrent is supported.':
+    'Supprime un torrent ajouté par Shelfmark s’il est bloqué ou ne parvient pas à récupérer ses métadonnées, n’a eu aucune activité pendant ce nombre d’heures et n’est associé à aucun téléchargement en cours. Ses données partielles sont également supprimées. Seuls les torrents ajoutés par Shelfmark sont concernés, quelle que soit leur catégorie ; ceux en cours, en file d’attente ou terminés ne sont jamais touchés. Valeur de 3 à 72 heures (les valeurs hors limites sont ramenées à cette plage) ; 0 les conserve. Vérification toutes les 15 minutes, indépendamment de la synchronisation Hardcover. Seul qBittorrent est pris en charge.',
+  'Torrent Client': 'Client torrent',
+  'Select and configure a torrent client for downloading torrent releases.':
+    'Sélectionnez et configurez un client torrent pour télécharger les versions torrent.',
+  'Choose which torrent client to use': 'Choisissez le client torrent à utiliser.',
+  'qBittorrent Web UI URL': 'URL de l’interface Web qBittorrent',
+  'Book Category': 'Catégorie des livres',
+  'Category to assign to book downloads in qBittorrent':
+    'Catégorie à attribuer aux téléchargements de livres dans qBittorrent.',
+  'Audiobook Category': 'Catégorie des livres audio',
+  'Category for audiobook downloads. Leave empty to use the book category.':
+    'Catégorie des téléchargements de livres audio. Laissez vide pour utiliser celle des livres.',
+  'Separate Book and Audiobook Directories': 'Séparer les dossiers des livres et des livres audio',
+  'Download books and audiobooks to different directories instead of one shared directory.':
+    'Télécharge les livres et les livres audio dans des dossiers distincts plutôt que dans un dossier commun.',
+  'Download Directory': 'Dossier de téléchargement',
+  Tags: 'Étiquettes',
+  'Tag(s) to assign to qBittorrent downloads. Leave empty for no tags.':
+    'Étiquette(s) à attribuer aux téléchargements qBittorrent. Laissez vide pour n’en attribuer aucune.',
+  'Torrent Completion Action': 'Action après le téléchargement du torrent',
+  Keep: 'Conserver',
+  'Remove & Delete Files': 'Retirer et supprimer les fichiers',
+  'Change Category': 'Modifier la catégorie',
+  'Give Up With No Seeders (minutes)': 'Abandonner sans seeders (minutes)',
+  'Minimum Seeders': 'Nombre minimal de seeders',
+  'Stall Timeout (minutes)': 'Délai avant abandon d’un téléchargement bloqué (minutes)',
+  'Remove dead torrents after (hours)': 'Supprimer les torrents inactifs après (heures)',
+  'Usenet Client': 'Client Usenet',
+  'Select and configure a usenet client for downloading NZB releases.':
+    'Sélectionnez et configurez un client Usenet pour télécharger des versions NZB.',
+  'Choose which usenet client to use': 'Choisissez le client Usenet à utiliser.',
   'Enable AudiobookBay as a release source for audiobooks.':
     'Active AudiobookBay comme source de téléchargement de livres audio.',
   'AudiobookBay domain (e.g., audiobookbay.lu, audiobookbay.is). Required to enable searches.':
@@ -1440,8 +1440,15 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       language,
       setLanguage,
-      t: (englishText: string) =>
-        language === 'fr' ? (FRENCH_TRANSLATIONS[englishText] ?? englishText) : englishText,
+      t: (englishText: string) => {
+        if (language !== 'fr') return englishText;
+        const translation = FRENCH_TRANSLATIONS[englishText];
+        if (translation) return translation;
+        if (englishText.startsWith('Connected as: ')) {
+          return `Connecté en tant que : ${englishText.slice('Connected as: '.length)}`;
+        }
+        return englishText;
+      },
     }),
     [language, setLanguage],
   );

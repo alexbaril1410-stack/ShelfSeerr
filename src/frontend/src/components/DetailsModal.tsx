@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { useLanguage } from '../contexts/LanguageContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useMountEffect } from '../hooks/useMountEffect';
-import { useLanguage } from '../contexts/LanguageContext';
 import type { Book, ButtonStateInfo } from '../types';
 import { isMetadataBook } from '../types';
 import { bookSupportsTargets } from '../utils/bookTargetLoader';
@@ -248,7 +248,7 @@ export const DetailsModal = ({
                   {/* Rating box - Universal mode only */}
                   {ratingField && (
                     <div className={`${infoCardClass} space-y-1`}>
-                      <p className={infoLabelClass}>{ratingField.label}</p>
+                      <p className={infoLabelClass}>{t(ratingField.label)}</p>
                       <p className={`${infoValueClass} flex items-center gap-1.5`}>
                         <svg
                           className="h-4 w-4 text-amber-500"
@@ -265,7 +265,7 @@ export const DetailsModal = ({
                   {/* Readers box - Universal mode only */}
                   {readersField && (
                     <div className={`${infoCardClass} space-y-1`}>
-                      <p className={infoLabelClass}>{readersField.label}</p>
+                      <p className={infoLabelClass}>{t(readersField.label)}</p>
                       <p className={`${infoValueClass} flex items-center gap-1.5`}>
                         <svg
                           className="h-4 w-4 text-gray-500"
@@ -444,3 +444,4 @@ export const DetailsModal = ({
 
   return createPortal(modal, document.body);
 };
+
