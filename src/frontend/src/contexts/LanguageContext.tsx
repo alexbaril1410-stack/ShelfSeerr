@@ -1567,6 +1567,62 @@ const FINAL_FRENCH_TRANSLATIONS: Record<string, string> = {
   "Prowlarr drops the narrator and series from MyAnonamouse results. With a MAM session ID, Shelfmark looks them up (plus bitrate, from the uploader's tags) directly from MyAnonamouse. Create the session under Preferences > Security on MyAnonamouse, locked to the IP or ASN Shelfmark connects from. Choose which columns show under Search Mode > Release List Columns.": 'Prowlarr ne transmet pas le narrateur ni la série des résultats MyAnonamouse. Avec un identifiant de session MAM, Shelfmark les récupère directement auprès de MyAnonamouse, ainsi que le débit depuis les tags de l’uploader. Créez une session dans Préférences > Sécurité sur MyAnonamouse et limitez-la à l’adresse IP ou à l’ASN utilisé par Shelfmark. Choisissez les colonnes à afficher dans Mode de recherche > Colonnes de la liste des résultats.',
 };
 
+const ADVANCED_FRENCH_TRANSLATIONS: Record<string, string> = {
+'Mirrors are tried in the order you add them until one works.':
+    'Les miroirs sont essayés dans l’ordre de leur ajout jusqu’à ce que l’un d’eux fonctionne.',
+  'Optional URL path prefix. Use a path like /shelfmark (no hostname). Leave blank for root.':
+    'Préfixe facultatif du chemin URL. Indiquez un chemin comme /shelfmark (sans nom d’hôte). Laissez vide pour utiliser la racine.',
+  'Enable verbose logging to console and file. Not recommended for normal use.':
+    'Active la journalisation détaillée dans la console et dans un fichier. Déconseillé pour un usage normal.',
+  'Lowest severity written to the console and log file. Ignored while Debug Mode is on, which forces Debug.':
+    'Niveau de gravité minimal enregistré dans la console et le fichier journal. Ignoré lorsque le mode débogage est activé, car celui-ci impose le niveau Débogage.',
+  'How often the download queue is checked for new items.':
+    'Fréquence de vérification de la file d’attente pour détecter de nouveaux éléments.',
+  'How often download progress is broadcast to the UI.':
+    'Fréquence d’envoi de la progression des téléchargements à l’interface.',
+  'Path to a script to run after each successful download. Must be executable.':
+    'Chemin vers un script à exécuter après chaque téléchargement réussi. Le fichier doit être exécutable.',
+  'Pass the path to the custom script as an absolute path or relative to the destination folder.':
+    'Transmet au script personnalisé un chemin absolu ou un chemin relatif au dossier de destination.',
+  'Pass the full destination path (default).': 'Transmet le chemin complet de destination (par défaut).',
+  'Pass the path relative to the destination folder.': 'Transmet le chemin relatif au dossier de destination.',
+  'Send a JSON payload to the script via stdin. Useful for multi-file imports (audiobooks) or richer metadata without relying on path parsing.':
+    'Envoie un objet JSON au script via l’entrée standard. Utile pour les imports de plusieurs fichiers (livres audio) ou pour transmettre davantage de métadonnées sans analyser les chemins.',
+  'Map download client paths to paths inside Shelfmark. Needed when volume mounts differ between containers.':
+    'Associe les chemins du client de téléchargement aux chemins utilisés dans Shelfmark. Nécessaire lorsque les volumes sont montés à des emplacements différents dans les conteneurs.',
+  'How long to wait after a torrent or usenet client reports completion for the completed file path to become visible to Shelfmark. Increase this for seedbox or remote-sync workflows.':
+    'Durée d’attente après que le client torrent ou Usenet signale la fin du téléchargement, afin que Shelfmark puisse accéder au chemin du fichier. Augmentez-la avec une seedbox ou une synchronisation distante.',
+  'Client': 'Client',
+  'Remote Path': 'Chemin distant',
+  'Local Path': 'Chemin local',
+  'Cache book covers on the server for faster loading.':
+    'Met en cache les couvertures sur le serveur pour accélérer leur chargement.',
+  'How long to keep cached covers. Set to 0 to keep forever (recommended for static artwork).':
+    'Durée de conservation des couvertures en cache. Réglez sur 0 pour les conserver indéfiniment (recommandé pour les illustrations qui changent rarement).',
+  'Maximum disk space for cached covers. Oldest images are removed when limit is reached.':
+    'Espace disque maximal réservé aux couvertures en cache. Les images les plus anciennes sont supprimées lorsque cette limite est atteinte.',
+  'Delete all cached cover images.': 'Supprime toutes les couvertures en cache.',
+  'When disabled, all metadata searches hit the provider API directly.':
+    'Lorsque cette option est désactivée, toutes les recherches de métadonnées interrogent directement l’API du fournisseur.',
+  'How long to cache search results. Default: 300 (5 minutes). Max: 604800 (7 days).':
+    'Durée de mise en cache des résultats de recherche. Valeur par défaut : 300 (5 minutes). Maximum : 604800 (7 jours).',
+  'How long to cache individual book details. Default: 600 (10 minutes). Max: 604800 (7 days).':
+    'Durée de mise en cache des fiches de livres. Valeur par défaut : 600 (10 minutes). Maximum : 604800 (7 jours).',
+  'Clear all cached search results and book details.':
+    'Supprime tous les résultats de recherche et toutes les fiches de livres en cache.',
+  Info: 'Infos',
+  Warning: 'Avertissement',
+  Error: 'Erreur',
+  Critical: 'Critique',
+  Absolute: 'Absolu',
+  Relative: 'Relatif',
+  'Everything, very noisy.': 'Tous les messages, très détaillés.',
+  'Normal activity (default).': 'Activité normale (par défaut).',
+  'Warnings and problems.': 'Avertissements et problèmes.',
+  'Failures only.': 'Uniquement les échecs.',
+  'Fatal errors only.': 'Uniquement les erreurs fatales.',
+};
+
 interface LanguageContextValue {
   language: AppLanguage;
   setLanguage: (language: AppLanguage) => void;
@@ -1609,7 +1665,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         if (englishText.startsWith('Connected as: ')) {
           return `Connecté en tant que : ${englishText.slice('Connected as: '.length)}`;
         }
-        return FINAL_FRENCH_TRANSLATIONS[englishText] ?? ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
+        return ADVANCED_FRENCH_TRANSLATIONS[englishText] ?? FINAL_FRENCH_TRANSLATIONS[englishText] ?? ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
       },
     }),
     [language, setLanguage],
