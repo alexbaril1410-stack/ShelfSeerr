@@ -476,7 +476,8 @@ export const SettingsSidebar = ({
             <button
               type="button"
               onClick={() => toggleGroup(item.group.name)}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-(--hover-surface) ${hasSelectedTab && !isExpanded ? 'bg-(--hover-action)/50' : ''}`}
+              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-(--hover-surface) ${hasSelectedTab ? 'bg-(--hover-action)/50' : ''}`}
+              aria-expanded={isExpanded}
             >
               <span className="opacity-60">{getIcon(item.group.icon)}</span>
               <span className="flex-1">{t(item.group.displayName)}</span>
