@@ -34,8 +34,8 @@ def dist(main_module, tmp_path: Path):
     (tmp_path / "index.html").write_text(_INDEX)
     (tmp_path / "logo.png").write_bytes(b"\x89PNG")
     (tmp_path / "favicon.ico").write_bytes(b"ico")
-    (tmp_path / "shelfseerr-desktop-logo-transparent.png").write_bytes(b"PNG")
-    (tmp_path / "shelfseerr-app-icon-512-transparent.png").write_bytes(b"PNG")
+    (tmp_path / "shelfseerr-desktop-logo-transparent.png.PNG").write_bytes(b"PNG")
+    (tmp_path / "shelfseerr-app-icon-512-transparent.png.PNG").write_bytes(b"PNG")
     (tmp_path / "theme-init.js").write_text("// theme")
     with (
         patch.object(main_module, "FRONTEND_DIST", tmp_path),
@@ -95,8 +95,8 @@ def test_a_missing_asset_is_a_404_not_the_app(client, dist):
     ("path", "mimetype"),
     [
         ("/logo.png", "image/png"),
-        ("/shelfseerr-desktop-logo-transparent.png", "image/png"),
-        ("/shelfseerr-app-icon-512-transparent.png", "image/png"),
+        ("/shelfseerr-desktop-logo-transparent.png.PNG", "image/png"),
+        ("/shelfseerr-app-icon-512-transparent.png.PNG", "image/png"),
         ("/favicon.ico", "image/vnd.microsoft.icon"),
         ("/favicon-32.png", "image/vnd.microsoft.icon"),
         ("/theme-init.js", "application/javascript"),
