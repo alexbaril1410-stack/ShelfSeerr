@@ -455,11 +455,8 @@ export const SettingsSidebar = ({
               key={item.tab.name}
               type="button"
               onClick={() => onSelectTab(item.tab.name)}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${
-                selectedTab === item.tab.name
-                  ? 'bg-(--hover-action) font-medium'
-                  : 'hover:bg-(--hover-surface)'
-              }`}
+              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors ${selectedTab === item.tab.name ? 'bg-(--hover-action) font-medium' : 'hover:bg-(--hover-surface)'}`}
+              aria-current={selectedTab === item.tab.name ? 'page' : undefined}
             >
               <span className="opacity-60">{getIcon(item.tab.icon)}</span>
               <span>{t(item.tab.displayName)}</span>
