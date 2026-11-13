@@ -707,13 +707,13 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                       className="hidden shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:block"
                       aria-label={t('Reset search')}
                     >
-                      <img src={logoUrl} alt="" className="h-12 w-12" />
+                      <img src={withBasePath('/shelfseerr-logo.svg')} alt="ShelfSeerr" className="h-12 w-auto max-w-[240px]" />
                     </button>
                   ) : (
                     <img
-                      src={logoUrl}
-                      alt="ShelfSeerr logo"
-                      className="hidden h-12 w-12 shrink-0 lg:block"
+                      src={withBasePath('/shelfseerr-logo.svg')}
+                      alt="ShelfSeerr"
+                      className="hidden h-12 w-auto max-w-[240px] shrink-0 lg:block"
                     />
                   ))}
                 <SearchBar

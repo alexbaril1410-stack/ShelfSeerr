@@ -2024,7 +2024,7 @@ function App() {
     [config?.default_language, bookLanguages],
   );
 
-  const logoUrl = withBasePath('/logo.png');
+  const logoUrl = withBasePath('/shelfseerr-icon.svg');
 
   // Manual search is only allowed when the default policy permits browsing releases
   const universalDefaultMode = getUniversalDefaultPolicyMode();
