@@ -1,10 +1,10 @@
 import { useCallback, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { useLanguage } from '../contexts/LanguageContext';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { useEscapeKey } from '../hooks/useEscapeKey';
 import { useMountEffect } from '../hooks/useMountEffect';
+import { useLanguage } from '../contexts/LanguageContext';
 import type { Book, ButtonStateInfo } from '../types';
 import { isMetadataBook } from '../types';
 import { bookSupportsTargets } from '../utils/bookTargetLoader';
@@ -444,4 +444,3 @@ export const DetailsModal = ({
 
   return createPortal(modal, document.body);
 };
-

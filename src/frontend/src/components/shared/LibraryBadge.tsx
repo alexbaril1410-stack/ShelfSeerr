@@ -50,4 +50,3 @@ export function LibraryBadge({ library, overlay = false, className = '' }: Libra
     </span>
   );
 }
-
