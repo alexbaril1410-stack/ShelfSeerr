@@ -132,7 +132,7 @@ def register_system_routes(
         """Serve logo from built frontend assets."""
         return send_from_directory(get_frontend_dist(), "logo.png", mimetype="image/png")
 
-    @app.route("/shelfseerr-desktop-logo-transparent.png")
+    @app.route("/shelfseerr-desktop-logo-transparent.png.PNG")
     def shelfseerr_desktop_logo() -> Response:
         """Serve the original transparent ShelfSeerr desktop logo."""
         return send_from_directory(
@@ -141,7 +141,7 @@ def register_system_routes(
             mimetype="image/png",
         )
 
-    @app.route("/shelfseerr-app-icon-512-transparent.png")
+    @app.route("/shelfseerr-app-icon-512-transparent.png.PNG")
     def shelfseerr_app_icon() -> Response:
         """Serve the original transparent 512px ShelfSeerr app icon."""
         return send_from_directory(
