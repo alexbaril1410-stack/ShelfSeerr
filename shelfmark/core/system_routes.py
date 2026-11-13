@@ -132,6 +132,20 @@ def register_system_routes(
         """Serve logo from built frontend assets."""
         return send_from_directory(get_frontend_dist(), "logo.png", mimetype="image/png")
 
+    @app.route("/shelfseerr-logo.svg")
+    def shelfseerr_logo() -> Response:
+        """Serve the ShelfSeerr wordmark from the built frontend."""
+        return send_from_directory(
+            get_frontend_dist(), "shelfseerr-logo.svg", mimetype="image/svg+xml"
+        )
+
+    @app.route("/shelfseerr-icon.svg")
+    def shelfseerr_icon() -> Response:
+        """Serve the ShelfSeerr app icon from the built frontend."""
+        return send_from_directory(
+            get_frontend_dist(), "shelfseerr-icon.svg", mimetype="image/svg+xml"
+        )
+
     @app.route("/favicon.ico")
     @app.route("/favico<path:_>")
     def favicon(_: Any = None) -> Response:
