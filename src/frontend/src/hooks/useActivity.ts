@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Socket } from 'socket.io-client';
 
-import type { ActivityDismissTarget, ActivityItem } from '../components/activity';
-import { downloadToActivityItem, requestToActivityItem } from '../components/activity';
+import type { ActivityDismissTarget } from '../components/activity/ActivitySidebar';
+import type { ActivityItem } from '../components/activity/activityTypes';
+import { downloadToActivityItem, requestToActivityItem } from '../components/activity/activityMappers';
 import { dedupeHistoryItems } from '../components/activity/activityHistory.js';
 import type { ActivityHistoryItem, ActivityDismissPayload } from '../services/api';
 import {
@@ -581,3 +582,4 @@ export const useActivity = ({
     handleClearHistory,
   };
 };
+

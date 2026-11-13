@@ -19,6 +19,7 @@ interface SettingsModalProps {
   onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
   onSettingsSaved?: () => void;
   onRefreshAuth?: () => Promise<void>;
+  embedded?: boolean;
 }
 
 function getStringValue(value: unknown, fallback = ''): string {
@@ -40,6 +41,7 @@ export const SettingsModal = ({
   onShowToast,
   onSettingsSaved,
   onRefreshAuth,
+  embedded = false,
 }: SettingsModalProps) => {
   const isMobile = useMediaQuery('(max-width: 767px)');
   const [isClosing, setIsClosing] = useState(false);
@@ -77,8 +79,8 @@ export const SettingsModal = ({
     handleClose();
   }, [handleClose, isMobile]);
 
-  useBodyScrollLock(isOpen);
-  useEscapeKey(isOpen, handleEscape);
+  useBodyScrollLock(isOpen && !embedded);
+  useEscapeKey(isOpen && !embedded, handleEscape);
 
   if (!isOpen && !isClosing) return null;
 
@@ -93,6 +95,7 @@ export const SettingsModal = ({
       onShowToast={onShowToast}
       onSettingsSaved={onSettingsSaved}
       onRefreshAuth={onRefreshAuth}
+      embedded={embedded}
       onMobileDetailChange={registerMobileDetailState}
     />
   );
@@ -108,6 +111,7 @@ interface SettingsModalSessionProps {
   onSettingsSaved?: () => void;
   onRefreshAuth?: () => Promise<void>;
   onMobileDetailChange: (isOpen: boolean, closeDetail: (() => void) | null) => void;
+  embedded: boolean;
 }
 
 interface SettingsModalTabSyncProps {
@@ -168,6 +172,7 @@ const SettingsModalSession = ({
   onSettingsSaved,
   onRefreshAuth,
   onMobileDetailChange,
+  embedded,
 }: SettingsModalSessionProps) => {
   const { t } = useLanguage();
   const {
@@ -386,16 +391,16 @@ const SettingsModalSession = ({
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className={embedded ? 'settings-page-embedded flex items-center justify-center' : 'fixed inset-0 z-50 flex items-center justify-center'}>
         {tabSync}
-        <button
+        {!embedded && <button
           type="button"
           className="absolute inset-0 bg-black/60"
           style={{ willChange: 'opacity', contain: 'strict' }}
           onClick={handleClose}
           tabIndex={-1}
           aria-label={t('Close settings')}
-        />
+        />}
         <div
           className="relative rounded-xl bg-(--bg) p-8 shadow-2xl"
           style={{ background: 'var(--bg)' }}
@@ -426,16 +431,16 @@ const SettingsModalSession = ({
 
   if (error) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className={embedded ? 'settings-page-embedded flex items-center justify-center' : 'fixed inset-0 z-50 flex items-center justify-center'}>
         {tabSync}
-        <button
+        {!embedded && <button
           type="button"
           className="absolute inset-0 bg-black/60"
           style={{ willChange: 'opacity', contain: 'strict' }}
           onClick={handleClose}
           tabIndex={-1}
           aria-label={t('Close settings')}
-        />
+        />}
         <div
           className="relative max-w-md rounded-xl bg-(--bg) p-8 shadow-2xl"
           style={{ background: 'var(--bg)' }}
@@ -476,7 +481,7 @@ const SettingsModalSession = ({
       <>
         {tabSync}
         <div
-          className={`fixed inset-0 z-50 flex flex-col ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
+          className={`${embedded ? 'relative min-h-[70vh]' : 'fixed inset-0 z-50'} flex flex-col ${isClosing ? 'animate-fade-out' : 'animate-fade-in'}`}
           style={{ background: 'var(--bg)' }}
         >
           {!showMobileDetail ? (
@@ -507,25 +512,23 @@ const SettingsModalSession = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className={embedded ? 'settings-page-embedded' : 'fixed inset-0 z-50 flex items-center justify-center p-4'}>
       {tabSync}
-      <button
+      {!embedded && <button
         type="button"
         className={`absolute inset-0 bg-black/60 transition-opacity duration-150 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         style={{ willChange: 'opacity', contain: 'strict' }}
         onClick={handleClose}
         tabIndex={-1}
         aria-label={t('Close settings')}
-      />
+      />}
 
       <div
-        className={`relative flex h-[85vh] max-h-[750px] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-(--border-muted) shadow-2xl ${isClosing ? 'settings-modal-exit' : 'settings-modal-enter'}`}
+        className={`settings-modal-panel ${embedded ? 'relative mx-auto flex min-h-[70vh] w-full max-w-7xl flex-col overflow-hidden border-0' : 'relative flex h-[85vh] max-h-[750px] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-(--border-muted) shadow-2xl'} ${isClosing ? 'settings-modal-exit' : embedded ? '' : 'settings-modal-enter'}`}
         style={{ background: 'var(--bg)' }}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t('Settings')}
+        {...(!embedded ? { role: 'dialog', 'aria-modal': true, 'aria-label': t('Settings') } : {})}
       >
-        <SettingsHeader title={t('Settings')} onClose={handleClose} />
+        {embedded ? <h1 className="px-4 py-5 text-2xl font-bold sm:px-8">{t('Settings')}</h1> : <SettingsHeader title={t('Settings')} onClose={handleClose} />}
 
         <div className="flex min-h-0 flex-1">
           <SettingsSidebar

@@ -43,6 +43,8 @@ interface HeaderProps {
   onLogoClick?: () => void;
   onHomeClick?: () => void;
   onNavigateContentType?: (type: ContentType) => void;
+  onNavigatePage?: (path: string) => void;
+  currentPath?: string;
   authRequired?: boolean;
   isAuthenticated?: boolean;
   username?: string | null;
@@ -115,6 +117,8 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
       onLogoClick,
       onHomeClick,
       onNavigateContentType,
+      onNavigatePage,
+      currentPath = '/',
       authRequired = false,
       isAuthenticated = false,
       username,
@@ -775,12 +779,12 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           >
             <button
               type="button"
-              onClick={onHomeClick}
+              onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }}
               className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-              aria-label={t('Home')}
-              aria-current={!showSearch ? 'page' : undefined}
+              aria-label={t('Discover')}
+              aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined}
             >
-              {t('Home')}
+              {t('Discover')}
             </button>
             {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
               <button
@@ -802,20 +806,11 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                 {t('Audiobooks')}
               </button>
             )}
-            {onDownloadsClick && (
-              <button
-                type="button"
-                onClick={onDownloadsClick}
-                className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-              >
-                {t('Requests and activity')}
-                {statusCounts.pendingRequests > 0 && (
-                  <span className="ml-2 rounded-full bg-sky-600 px-1.5 py-0.5 text-xs text-white">
-                    {statusCounts.pendingRequests}
-                  </span>
-                )}
-              </button>
-            )}
+            <button type="button" onClick={() => onNavigatePage?.('/requests')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Requests')}</button>
+            <button type="button" onClick={() => onNavigatePage?.('/blocks')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Blocklist')}</button>
+            <button type="button" onClick={() => onNavigatePage?.('/issues')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Issues')}</button>
+            <button type="button" onClick={() => onNavigatePage?.('/users')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Users')}</button>
+            <button type="button" onClick={onSettingsClick} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Settings')}</button>
           </nav>
         </div>
       </header>

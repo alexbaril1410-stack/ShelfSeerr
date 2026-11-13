@@ -1,21 +1,12 @@
 import type { CSSProperties } from 'react';
-import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { useState, useCallback, useRef, useMemo, useEffect, lazy, Suspense } from 'react';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
-import { ActivitySidebar } from './components/activity';
 import { AdvancedFilters } from './components/AdvancedFilters';
 import { ConfigSetupBanner } from './components/ConfigSetupBanner';
-import { DetailsModal } from './components/DetailsModal';
 import { Footer } from './components/Footer';
 import { Header } from './components/Header';
 import { MetadataConfigSession } from './components/MetadataConfigSession';
-import { OnBehalfConfirmationModal } from './components/OnBehalfConfirmationModal';
-import { OnboardingModal } from './components/OnboardingModal';
-import { ReleaseModal } from './components/ReleaseModal';
-import { RequestConfirmationModal } from './components/RequestConfirmationModal';
-import { ResultsSection } from './components/ResultsSection';
-import { SearchSection } from './components/SearchSection';
-import { SelfSettingsModal, SettingsModal } from './components/settings';
 import { ToastContainer } from './components/ToastContainer';
 import { UrlSearchBootstrapMount } from './components/UrlSearchBootstrapMount';
 import { useLanguage } from './contexts/LanguageContext';
@@ -44,6 +35,17 @@ import { primeSettingsCache } from './hooks/useSettings';
 import { useToast } from './hooks/useToast';
 import { useExternalHashChange, useSyncUrlSearchHash, useUrlSearch } from './hooks/useUrlSearch';
 import { primeUsersCache } from './hooks/useUsersFetch';
+
+const ActivitySidebar = lazy(() => import('./components/activity').then((module) => ({ default: module.ActivitySidebar })));
+const DetailsModal = lazy(() => import('./components/DetailsModal').then((module) => ({ default: module.DetailsModal })));
+const ReleaseModal = lazy(() => import('./components/ReleaseModal').then((module) => ({ default: module.ReleaseModal })));
+const SettingsModal = lazy(() => import('./components/settings').then((module) => ({ default: module.SettingsModal })));
+const SelfSettingsModal = lazy(() => import('./components/settings').then((module) => ({ default: module.SelfSettingsModal })));
+const OnBehalfConfirmationModal = lazy(() => import('./components/OnBehalfConfirmationModal').then((module) => ({ default: module.OnBehalfConfirmationModal })));
+const OnboardingModal = lazy(() => import('./components/OnboardingModal').then((module) => ({ default: module.OnboardingModal })));
+const RequestConfirmationModal = lazy(() => import('./components/RequestConfirmationModal').then((module) => ({ default: module.RequestConfirmationModal })));
+const ResultsSection = lazy(() => import('./components/ResultsSection').then((module) => ({ default: module.ResultsSection })));
+const SearchSection = lazy(() => import('./components/SearchSection').then((module) => ({ default: module.SearchSection })));
 import { LoginPage } from './pages/LoginPage';
 import {
   getSourceRecordInfo,
@@ -272,6 +274,7 @@ const AdminSettingsWarmupMount = () => {
 function App() {
   const { t } = useLanguage();
   const location = useLocation();
+  const navigate = useNavigate();
   const { toasts, showToast, removeToast } = useToast();
   const { socket } = useSocket();
 
@@ -706,14 +709,22 @@ function App() {
       if (authIsAdmin) {
         void primeUsersCache();
         void primeSettingsCache();
-        setSettingsOpen(true);
+        navigate('/settings');
       } else {
         setSelfSettingsOpen(true);
       }
       return;
     }
     setConfigBannerOpen(true);
-  }, [authIsAdmin, config?.settings_enabled]);
+  }, [authIsAdmin, config?.settings_enabled, navigate]);
+
+  const navigateToContent = useCallback((type: ContentType) => {
+    handleResetSearch(config);
+    setActiveQueryTarget('general');
+    setActiveResultsSort('');
+    setContentType(type);
+    navigate(type === 'audiobook' ? '/audiobooks' : '/books');
+  }, [config, handleResetSearch, navigate, setActiveQueryTarget, setActiveResultsSort, setContentType]);
 
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   useShowOnboardingDebug({
@@ -2539,7 +2550,7 @@ function App() {
           audiobookLibraryUrl={config?.audiobook_library_url || ''}
           debug={(config?.debug || false) && authIsAdmin}
           logoUrl={logoUrl}
-          showSearch={!isInitialState}
+          showSearch={true}
           searchInput={activeQueryValue}
           searchInputLabel={activeQueryValueLabel}
           onSearchChange={handleActiveQueryValueChange}
@@ -2568,11 +2579,30 @@ function App() {
             setActiveResultsSort('');
           }}
           onNavigateContentType={(type) => {
-            handleResetSearch(config);
-            setActiveQueryTarget('general');
-            setActiveResultsSort('');
-            setContentType(type);
+            navigateToContent(type);
           }}
+          onNavigatePage={(path) => {
+            if (path === '/requests') {
+              setDownloadsSidebarOpen(true);
+              return;
+            }
+            if (path === '/blocks' || path === '/issues') {
+              setDownloadsSidebarOpen(true);
+              return;
+            }
+            if (path === '/users') {
+              if (config?.settings_enabled && authIsAdmin) {
+                void primeUsersCache();
+                void primeSettingsCache();
+                navigate('/settings');
+              } else {
+                handleSettingsClick();
+              }
+              return;
+            }
+            navigate(path);
+          }}
+          currentPath={location.pathname}
           authRequired={authRequired}
           isAuthenticated={isAuthenticated}
           onLogout={() => {
@@ -2649,6 +2679,7 @@ function App() {
               : undefined
           }
         >
+          <Suspense fallback={null}>
           <SearchSection
             onSearch={handleSearchDispatch}
             isLoading={isSearching}
@@ -2736,7 +2767,9 @@ function App() {
             onShowToast={showToast}
             resultsSourceUrl={resultsSourceUrl}
           />
+          </Suspense>
 
+          <Suspense fallback={null}>
           {selectedBook && (
             <DetailsModal
               book={selectedBook}
@@ -2841,6 +2874,7 @@ function App() {
               onClose={() => setPendingOnBehalfDownload(null)}
             />
           )}
+          </Suspense>
         </main>
 
         <div className={usePinnedMainScrollContainer ? 'mt-auto' : undefined}>
@@ -2852,6 +2886,7 @@ function App() {
         </div>
       </div>
 
+      <Suspense fallback={null}>
       <ActivitySidebar
         isOpen={downloadsSidebarOpen}
         onClose={() => setDownloadsSidebarOpen(false)}
@@ -2885,24 +2920,31 @@ function App() {
         onPinnedOpenChange={setSidebarPinnedOpen}
         pinnedTopOffset={headerHeight}
       />
+      </Suspense>
 
       <ToastContainer toasts={toasts} />
 
-      <SettingsModal
-        isOpen={settingsOpen}
+      <Suspense fallback={null}>
+      {(settingsOpen || location.pathname.startsWith('/settings')) && <SettingsModal
+        isOpen={settingsOpen || location.pathname.startsWith('/settings')}
+        embedded={location.pathname.startsWith('/settings')}
         authMode={authMode}
-        onClose={() => setSettingsOpen(false)}
+        onClose={() => {
+          setSettingsOpen(false);
+          if (location.pathname.startsWith('/settings')) navigate('/discover');
+        }}
         onShowToast={showToast}
         onSettingsSaved={handleSettingsSaved}
         onRefreshAuth={refreshAuth}
-      />
+      />}
 
-      <SelfSettingsModal
+      {selfSettingsOpen && <SelfSettingsModal
         isOpen={selfSettingsOpen}
         onClose={() => setSelfSettingsOpen(false)}
         onShowToast={showToast}
         onSettingsSaved={handleSettingsSaved}
-      />
+      />}
+      </Suspense>
 
       {/* Auto-show banner on startup for users without config */}
       {config && <ConfigSetupBanner settingsEnabled={config.settings_enabled} />}
@@ -2924,14 +2966,16 @@ function App() {
       />
 
       {/* Onboarding wizard shown on first run */}
-      <OnboardingModal
+      <Suspense fallback={null}>
+      {onboardingOpen && <OnboardingModal
         isOpen={onboardingOpen}
         onClose={() => setOnboardingOpen(false)}
         onComplete={() => {
           void loadConfig('settings-saved');
         }}
         onShowToast={showToast}
-      />
+      />}
+      </Suspense>
     </SearchModeProvider>
   );
 

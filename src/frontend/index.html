@@ -19,10 +19,29 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <link rel="apple-touch-icon" href="logo.png" />
     <title>ShelfSeerr</title>
-    <script src="theme-init.js"></script>
+    <script>
+      // Apply theme before first paint to avoid a light/dark flash on load.
+      (function () {
+        var saved = localStorage.getItem('preferred-theme') || 'auto';
+        var theme = saved === 'auto'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : saved;
+        var dark = theme === 'dark';
+        var bg = dark ? '#121212' : '#f8f8f8';
+        var fg = dark ? '#fff' : '#333';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.colorScheme = theme;
+        var style = document.createElement('style');
+        style.id = 'theme-init';
+        style.textContent = 'html,body,#root{background:' + bg + ';color:' + fg + '}';
+        document.head.appendChild(style);
+        document.documentElement.classList.add('preload');
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
+

@@ -1,4 +1,5 @@
 import path from 'path';
+import { fileURLToPath } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -9,7 +10,7 @@ export default defineConfig(({ command }) => ({
   plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(path.dirname(fileURLToPath(import.meta.url)), './src'),
     },
   },
   server: {
@@ -38,3 +39,4 @@ export default defineConfig(({ command }) => ({
     sourcemap: true,
   },
 }));
+
