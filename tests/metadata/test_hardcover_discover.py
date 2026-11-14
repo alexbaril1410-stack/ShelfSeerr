@@ -50,7 +50,7 @@ def test_discover_trending_uses_hardcover_trending_endpoint_and_preserves_order(
 
     assert isinstance(result, SearchResult)
     assert [book.title for book in result.books] == ["Book Three", "Book One", "Book Two"]
-    assert calls[0][1] == {"duration": "week", "limit": 6, "offset": 0}
+    assert calls[0][1] == {"duration": "month", "limit": 6, "offset": 0}
     assert calls[1][1] == {"bookIds": [3, 1, 2]}
 
 
