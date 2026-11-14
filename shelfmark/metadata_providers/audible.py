@@ -384,6 +384,12 @@ class AudibleProvider(MetadataProvider):
     )
     search_fields = (
         TextSearchField(
+            key="narrator",
+            label="Narrateur",
+            placeholder="Rechercher un narrateur...",
+            description="Filtrer les livres audio par narrateur",
+        ),
+        TextSearchField(
             key="series",
             label="Série",
             placeholder="Rechercher une série Audible...",
@@ -451,6 +457,10 @@ class AudibleProvider(MetadataProvider):
         elif options.search_type == SearchType.TITLE:
             params.pop("keywords")
             params["title"] = query
+
+        narrator = str(options.fields.get("narrator", "")).strip()
+        if narrator:
+            params["narrator"] = narrator
 
         payload = self._request("catalog/products", params)
         return payload if payload and _product_items(payload) else None
@@ -624,8 +634,34 @@ class AudibleProvider(MetadataProvider):
             if not re.fullmatch(r"[A-Z0-9]{10}", series_asin):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
-        books = self.search(options)
-        return SearchResult(books=books, page=options.page, total_found=0, has_more=len(books) >= options.limit)
+        payload = self._search_payload(options)
+        products = _product_items(payload)
+        books = [
+            book
+            for product in products
+            if (book := _parse_product(product, self.marketplace))
+            and (not self.french_only or _is_french_language(book.language))
+        ]
+
+        total_found = 0
+        if isinstance(payload, dict):
+            response = payload.get("response")
+            metadata = response if isinstance(response, dict) else payload
+            raw_total = metadata.get("total_results") or metadata.get("totalResults")
+            with suppress(TypeError, ValueError):
+                total_found = int(raw_total)
+
+        has_more = (
+            options.page * options.limit < total_found
+            if total_found > 0
+            else len(products) >= min(max(options.limit, 1), _MAX_RESULTS)
+        )
+        return SearchResult(
+            books=books,
+            page=options.page,
+            total_found=total_found,
+            has_more=has_more,
+        )
 
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         if options.search_type == SearchType.ISBN:
