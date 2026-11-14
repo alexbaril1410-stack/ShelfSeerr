@@ -404,3 +404,68 @@ def test_parse_audible_product_excludes_translators_from_authors():
     assert book is not None
     assert book.authors == ["Auteur original"]
     assert book.narrators == ["Narrateur"]
+
+
+
+def test_audible_catalogue_supports_narrator_filter(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {"products": [{"asin": "B0NARRATOR1", "title": "Livre audio"}]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    results = provider.search(MetadataSearchOptions(
+        query="Le Hobbit",
+        fields={"narrator": "Thierry Janssen"},
+    ))
+
+    assert [book.provider_id for book in results] == ["B0NARRATOR1"]
+    assert calls[0][0] == "catalog/products"
+    assert calls[0][1]["keywords"] == "Le Hobbit"
+    assert calls[0][1]["narrator"] == "Thierry Janssen"
+
+
+def test_audible_catalogue_pagination_uses_upstream_total(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    monkeypatch.setattr(provider, "_search_payload", lambda _options: {
+        "response": {
+            "total_results": 61,
+            "products": [
+                {"asin": f"B0BOOK{i:04d}", "title": f"Book {i}", "language": "French"}
+                for i in range(40)
+            ],
+        }
+    })
+
+    result = provider.search_paginated(MetadataSearchOptions(
+        query="fantasy",
+        limit=40,
+        page=1,
+    ))
+
+    assert len(result.books) == 40
+    assert result.total_found == 61
+    assert result.has_more is True
+    assert result.page == 1
+
+
+def test_audible_catalogue_pagination_stops_at_last_page(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    monkeypatch.setattr(provider, "_search_payload", lambda _options: {
+        "products": [
+            {"asin": "B0BOOK0001", "title": "Last book", "language": "French"},
+        ],
+        "total_results": 41,
+    })
+
+    result = provider.search_paginated(MetadataSearchOptions(
+        query="fantasy",
+        limit=40,
+        page=2,
+    ))
+
+    assert len(result.books) == 1
+    assert result.total_found == 41
+    assert result.has_more is False
