@@ -890,12 +890,15 @@ body { background-image: radial-gradient(ellipse at 72% -18%, rgba(91,65,180,.13
 .shelfseerr-primary-nav button[aria-label="Utilisateurs"]::before { content:"♙"; }
 .shelfseerr-primary-nav button[aria-label="Settings"]::before { content:"⚙"; }
 .shelfseerr-primary-nav button[aria-label="Paramètres"]::before { content:"⚙"; }
+.shelfseerr-primary-nav button.is-active,
 .shelfseerr-primary-nav button[aria-current="page"] {
-  color:#fff; background:linear-gradient(105deg,#7141e8 0%,#8534e9 100%);
+  color:#fff !important;
+  background:linear-gradient(105deg,#7141e8 0%,#8534e9 100%) !important;
   box-shadow:0 5px 16px rgba(105,55,220,.22);
 }
 .shelfseerr-primary-nav button:hover { background:#252b3a; color:#fff; }
-.shelfseerr-primary-nav button[aria-current="page"]:hover { background:linear-gradient(105deg,#7141e8 0%,#8534e9 100%); }
+.shelfseerr-primary-nav button.is-active:hover,
+.shelfseerr-primary-nav button[aria-current="page"]:hover { background:linear-gradient(105deg,#7141e8 0%,#8534e9 100%) !important; }
 .shelfseerr-header-inner .hover-action { color:#c7cede; }
 .shelfseerr-content-shell {
   margin-left:300px; min-height:100dvh; background:transparent;
