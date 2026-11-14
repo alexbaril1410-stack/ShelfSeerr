@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from shelfmark.metadata_providers import MetadataSearchOptions, SearchType, get_provider
+from shelfmark.metadata_providers import MetadataSearchOptions, SearchType, SortOrder, get_provider
 from shelfmark.metadata_providers.audible import AudibleProvider, _parse_product
 
 
@@ -475,12 +475,12 @@ def test_audible_catalogue_pagination_stops_at_last_page(monkeypatch):
 def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     assert provider.supported_sorts == (
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.RELEVANCE,
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.TRENDING,
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.POPULARITY,
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.RATING,
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.NEWEST,
-        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.SERIES_ORDER,
+        SortOrder.RELEVANCE,
+        SortOrder.TRENDING,
+        SortOrder.POPULARITY,
+        SortOrder.RATING,
+        SortOrder.NEWEST,
+        SortOrder.SERIES_ORDER,
     )
 
     calls = []
@@ -490,8 +490,6 @@ def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
         return {"products": [{"asin": "B0SORT00001", "title": "Livre audio"}]}
 
     monkeypatch.setattr(provider, "_request", fake_request)
-    from shelfmark.metadata_providers import SortOrder
-
     for sort, expected in (
         (SortOrder.TRENDING, "BestSellers"),
         (SortOrder.POPULARITY, "BestSellers"),
