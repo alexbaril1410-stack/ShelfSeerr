@@ -253,7 +253,7 @@ export const SearchSection = ({
                           )}
                           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
                         </div>
-                        <span className="mt-2 block line-clamp-2 text-xs font-semibold leading-4 text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-300 sm:text-sm">
+                        <span className="mt-2 block h-12 line-clamp-3 text-xs font-semibold leading-4 text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-300 sm:text-sm">
                           {book.title}
                         </span>
                         <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:text-xs">
