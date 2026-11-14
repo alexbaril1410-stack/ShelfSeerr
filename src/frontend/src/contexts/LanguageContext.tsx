@@ -1672,7 +1672,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
         if (englishText.startsWith('Connected as: ')) {
           return `Connecté en tant que : ${englishText.slice('Connected as: '.length)}`;
         }
-        return ADVANCED_FRENCH_TRANSLATIONS[englishText] ?? FINAL_FRENCH_TRANSLATIONS[englishText] ?? ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
+        return FINAL_FRENCH_TRANSLATIONS[englishText] ?? ADDITIONAL_FRENCH_TRANSLATIONS[englishText] ?? FRENCH_TRANSLATIONS[englishText] ?? englishText;
       },
     }),
     [language, setLanguage],
