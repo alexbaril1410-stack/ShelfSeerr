@@ -1593,3 +1593,52 @@ input, select, textarea { color-scheme:dark; }
     align-items: center !important;
   }
 }
+
+
+/* Mobile header: put the profile avatar on the same row, immediately after search.
+   The old standalone logo is intentionally hidden on phones. */
+@media (max-width: 1023px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 48px !important;
+    grid-template-rows: auto auto !important;
+    align-items: center !important;
+    column-gap: 10px !important;
+    row-gap: 12px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    display: contents !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child img[alt="ShelfSeerr logo"],
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child button[aria-label="Reset search"] {
+    display: none !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child > .flex {
+    display: flex !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    width: 48px !important;
+    height: 48px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    display: contents !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > button[aria-label="Reset search"],
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child img[alt="ShelfSeerr"] {
+    display: none !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child .search-wrapper {
+    grid-column: 1 / 3 !important;
+    grid-row: 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  .shelfseerr-header-inner button[aria-label="User menu"] {
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+  }
+}
