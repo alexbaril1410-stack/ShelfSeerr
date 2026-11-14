@@ -1461,3 +1461,70 @@ input, select, textarea { color-scheme:dark; }
     align-self: center !important;
   }
 }
+
+
+/* Rebuild the desktop header row in normal flex flow.
+   The profile button must not be absolutely positioned against the whole header,
+   which caused it to drift vertically and become clipped. */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 24px !important;
+    min-height: 80px !important;
+    width: 100% !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    right: auto !important;
+    order: 2 !important;
+    display: flex !important;
+    flex: 0 0 48px !important;
+    width: 48px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    position: relative !important;
+    order: 1 !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    gap: 20px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child img[alt="ShelfSeerr"] {
+    width: 232px !important;
+    max-width: 232px !important;
+    height: 62px !important;
+    flex: 0 0 232px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child .search-wrapper {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    align-self: center !important;
+  }
+}
