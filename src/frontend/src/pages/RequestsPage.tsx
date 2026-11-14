@@ -84,6 +84,7 @@ export const RequestsPage = ({ isAdmin, onApprove, onReject, onReopen, onCancel 
           {STATUS_FILTERS.map((s) => <option key={s.id} value={s.id}>{s.label}</option>)}
         </select>
       </label>
+    </div>
     <div className="flex flex-wrap items-center justify-between gap-3">
       <span className="text-sm opacity-60">{visible.length} {visible.length > 1 ? 'demandes' : 'demande'}</span>
       <div className="flex flex-wrap items-center gap-2">
