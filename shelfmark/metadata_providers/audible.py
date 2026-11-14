@@ -656,6 +656,66 @@ class AudibleProvider(MetadataProvider):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
 
+        if options.sort == SortOrder.NEWEST and options.query.strip() == "*" and not options.fields:
+            # Use Audible's curated storefront for the unfiltered catalogue.
+            # Unlike the JSON catalogue sort, /newreleases excludes preorders
+            # and provides the requested page directly.
+            page_size = 50
+            params = {"pageSize": page_size}
+            if options.page > 1:
+                params["page"] = options.page
+            url = f"https://www.audible.{self.marketplace}/newreleases"
+            try:
+                response = requests.get(
+                    url,
+                    params=params,
+                    headers={
+                        "Accept": "text/html",
+                        "User-Agent": "Mozilla/5.0 (compatible; ShelfSeerr/1.0; audiobook catalogue)",
+                    },
+                    timeout=_TIMEOUT_SECONDS,
+                )
+                response.raise_for_status()
+                parser = _ChartASINParser()
+                parser.feed(response.text)
+                parser.close()
+            except (requests.RequestException, ValueError) as exc:
+                logger.warning("Audible new releases page failed (%s): %s", self.marketplace, exc)
+                return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+
+            asins = parser.asins[:page_size]
+            if not asins:
+                return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+            payload = self._request("catalog/products", {
+                "asins": ",".join(asins),
+                "num_results": len(asins),
+                "response_groups": _RESPONSE_GROUPS,
+            })
+            products_by_asin = {
+                str(product.get("asin") or "").upper(): product
+                for product in _product_items(payload)
+            }
+            books: list[BookMetadata] = []
+            for asin in asins:
+                product = products_by_asin.get(asin.upper())
+                if not product:
+                    continue
+                release_date = _release_date(product)
+                book = _parse_product(product, self.marketplace)
+                if (
+                    release_date
+                    and release_date <= date.today()
+                    and book
+                    and (not self.french_only or _is_french_language(book.language))
+                ):
+                    books.append(book)
+            return SearchResult(
+                books=books,
+                page=options.page,
+                total_found=0,
+                has_more=len(asins) >= page_size,
+            )
+
         if options.sort in {SortOrder.NEWEST, SortOrder.OLDEST}:
             # Audible exposes -ReleaseDate / ReleaseDate, but no server-side
             # released-only filter. Fetch successive pages, then apply the date
