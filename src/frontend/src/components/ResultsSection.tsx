@@ -55,7 +55,6 @@ export const ResultsSection = ({
   hasMore,
   isLoadingMore,
   onLoadMore,
-  totalFound,
   directTotalResults,
   onShowToast,
   resultsSourceUrl,
