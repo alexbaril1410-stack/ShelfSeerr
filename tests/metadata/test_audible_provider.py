@@ -287,10 +287,10 @@ def test_audible_requests_series_response_group_for_search_and_details(monkeypat
     assert all("series" in params["response_groups"].split(",") for _, params in calls)
 
 
-def test_audible_exposes_series_browse_capability():
+def test_audible_keeps_series_search_field_without_series_order_sort():
     provider = AudibleProvider(marketplace="fr")
 
-    assert any(capability.key == "view_series" and capability.field_key == "series" for capability in provider.capabilities)
+    assert provider.capabilities == ()
     assert any(field.key == "series" for field in provider.search_fields)
 
 
@@ -475,12 +475,11 @@ def test_audible_catalogue_pagination_stops_at_last_page(monkeypatch):
 def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     assert provider.supported_sorts == (
-        SortOrder.RELEVANCE,
         SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
-        SortOrder.SERIES_ORDER,
+        SortOrder.OLDEST,
     )
 
     calls = []
@@ -492,9 +491,26 @@ def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
     monkeypatch.setattr(provider, "_request", fake_request)
     for sort, expected in (
         (SortOrder.TRENDING, "BestSellers"),
-        (SortOrder.POPULARITY, "BestSellers"),
+        (SortOrder.POPULARITY, "Popularity"),
         (SortOrder.RATING, "AvgRating"),
         (SortOrder.NEWEST, "-ReleaseDate"),
+        (SortOrder.OLDEST, "ReleaseDate"),
     ):
         provider.search(MetadataSearchOptions(query="fantasy", sort=sort))
         assert calls[-1]["products_sort_by"] == expected
+
+
+def test_audible_catalogue_wildcard_is_sent_to_catalogue_endpoint(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {"products": [{"asin": "B0WILDCARD1", "title": "Livre audio"}]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    result = provider.search_paginated(MetadataSearchOptions(query="*", limit=40, page=1))
+
+    assert [book.provider_id for book in result.books] == ["B0WILDCARD1"]
+    assert calls[0][0] == "catalog/products"
+    assert calls[0][1]["keywords"] == "*"
