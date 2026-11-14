@@ -125,7 +125,8 @@ query GetCatalogueBooks($limit: Int!, $offset: Int!) {
     books(
         where: {
             canonical_id: {_is_null: true},
-            state: {_in: ["normalized", "normalizing"]}
+            state: {_in: ["normalized", "normalizing"]},
+            editions: {language: {code2: {_eq: "fr"}}}
         },
         order_by: [{release_date: desc_nulls_last}, {id: desc}],
         limit: $limit,
@@ -145,6 +146,25 @@ query GetCatalogueBooks($limit: Int!, $offset: Int!) {
         cached_image
         cached_contributors
         cached_tags
+        editions(
+            where: {language: {code2: {_eq: "fr"}}}
+            order_by: [{users_count: desc}, {id: asc}]
+            limit: 100
+        ) {
+            id
+            book_id
+            title
+            edition_format
+            reading_format_id
+            audio_seconds
+            compilation
+            users_count
+            isbn_10
+            isbn_13
+            release_date
+            cached_image
+            language { code2 code3 }
+        }
         contributions(where: {contribution: {_eq: "Author"}}) {
             author { name }
         }
@@ -155,7 +175,8 @@ query GetCatalogueBooks($limit: Int!, $offset: Int!) {
     }
     books_aggregate(where: {
         canonical_id: {_is_null: true},
-        state: {_in: ["normalized", "normalizing"]}
+        state: {_in: ["normalized", "normalizing"]},
+        editions: {language: {code2: {_eq: "fr"}}}
     }) {
         aggregate { count }
     }
@@ -173,7 +194,13 @@ query GetTrendingBooks($duration: TrendingDuration!, $limit: Int!, $offset: Int!
 
 HARDCOVER_BOOKS_BY_IDS_QUERY = """
 query GetBooksByIds($bookIds: [Int!]!) {
-    books(where: {id: {_in: $bookIds}}, limit: 100) {
+    books(
+        where: {
+            id: {_in: $bookIds},
+            editions: {language: {code2: {_eq: "fr"}}}
+        }
+        limit: 100
+    ) {
         id
         title
         subtitle
@@ -188,6 +215,25 @@ query GetBooksByIds($bookIds: [Int!]!) {
         cached_image
         cached_contributors
         cached_tags
+        editions(
+            where: {language: {code2: {_eq: "fr"}}}
+            order_by: [{users_count: desc}, {id: asc}]
+            limit: 100
+        ) {
+            id
+            book_id
+            title
+            edition_format
+            reading_format_id
+            audio_seconds
+            compilation
+            users_count
+            isbn_10
+            isbn_13
+            release_date
+            cached_image
+            language { code2 code3 }
+        }
         contributions(where: {contribution: {_eq: "Author"}}) {
             author {
                 name
@@ -1004,6 +1050,40 @@ def _extract_typesense_hits(result: dict[str, Any]) -> tuple[list[dict[str, Any]
         hits = results_obj if isinstance(results_obj, list) else []
         found_count = 0
     return hits, found_count
+
+
+def _select_french_edition(editions: Any) -> dict[str, Any] | None:
+    """Select the most popular eligible French non-audio edition from nested book data."""
+    if not isinstance(editions, list):
+        return None
+
+    candidates = sorted(
+        (edition for edition in editions if isinstance(edition, dict)),
+        key=lambda edition: (
+            -coerce_int(edition.get("users_count"), 0),
+            coerce_int(edition.get("id"), 0),
+        ),
+    )
+    for edition in candidates:
+        language = edition.get("language") or {}
+        code2 = str(language.get("code2") or "").casefold()
+        code3 = str(language.get("code3") or "").casefold()
+        if code2 != "fr" and code3 not in {"fre", "fra"}:
+            continue
+
+        edition_format = str(edition.get("edition_format") or "").casefold()
+        reading_format_id = coerce_int(edition.get("reading_format_id"), 0)
+        audio_seconds = coerce_int(edition.get("audio_seconds"), 0)
+        is_audio = (
+            reading_format_id in {2, 3}
+            or audio_seconds > 0
+            or any(marker in edition_format for marker in ("audio", "audiobook", "audible"))
+        )
+        if is_audio or edition.get("compilation"):
+            continue
+        if str(edition.get("title") or "").strip():
+            return edition
+    return None
 
 
 def _build_source_url(slug: str) -> str | None:
@@ -2639,9 +2719,6 @@ class HardcoverProvider(MetadataProvider):
         }
 
         french_only = coerce_bool(app_config.get("HARDCOVER_FRENCH_ONLY", True), default=True)
-        french_editions = self._fetch_french_editions(tuple(book_ids)) if french_only else {}
-        if french_only and french_editions is None:
-            return SearchResult(books=[], page=1, total_found=0, has_more=False)
 
         exclude_compilations = coerce_bool(
             app_config.get("HARDCOVER_EXCLUDE_COMPILATIONS", False),
@@ -2666,7 +2743,7 @@ class HardcoverProvider(MetadataProvider):
                 if release_date and release_date.date() > datetime.now(UTC).date():
                     continue
             if french_only:
-                edition = french_editions.get(book_id)
+                edition = _select_french_edition(book_data.get("editions"))
                 if not edition:
                     continue
                 self._apply_french_edition(book_data, edition)
@@ -2736,11 +2813,6 @@ class HardcoverProvider(MetadataProvider):
             has_more = offset + len(raw_books) < total
 
         french_only = coerce_bool(app_config.get("HARDCOVER_FRENCH_ONLY", True), default=True)
-        book_ids = tuple(coerce_int(book.get("id"), 0) for book in raw_books)
-        french_editions = self._fetch_french_editions(book_ids) if french_only else {}
-        if french_only and french_editions is None:
-            logger.warning("Hardcover French-edition lookup failed for catalogue")
-            french_only = False
 
         exclude_compilations = coerce_bool(
             app_config.get("HARDCOVER_EXCLUDE_COMPILATIONS", False), default=False
@@ -2761,7 +2833,7 @@ class HardcoverProvider(MetadataProvider):
                 if release_date and release_date.date() > datetime.now(UTC).date():
                     continue
             if french_only:
-                edition = french_editions.get(book_id)
+                edition = _select_french_edition(item.get("editions"))
                 if not edition:
                     continue
                 self._apply_french_edition(item, edition)
