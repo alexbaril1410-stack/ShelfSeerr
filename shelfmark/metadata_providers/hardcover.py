@@ -1946,7 +1946,7 @@ class HardcoverProvider(MetadataProvider):
             book_data = row.get("book", {})
             if not isinstance(book_data, dict) or not book_data:
                 continue
-            if exclude_compilations and (book_data.get("compilation") or _looks_like_compilation_title(str(book_data.get("title") or ""))):
+            if exclude_compilations and book_data.get("compilation"):
                 continue
             release_date = _parse_release_date(book_data.get("release_date"))
             if exclude_unreleased and (release_date is None or release_date.date() > today):
@@ -2619,7 +2619,10 @@ class HardcoverProvider(MetadataProvider):
             book_data = books_by_id.get(book_id)
             if not book_data:
                 continue
-            if exclude_compilations and book_data.get("compilation"):
+            if exclude_compilations and (
+                book_data.get("compilation")
+                or _looks_like_compilation_title(str(book_data.get("title") or ""))
+            ):
                 continue
             if exclude_unreleased:
                 release_date = _parse_release_date(book_data.get("release_date"))
