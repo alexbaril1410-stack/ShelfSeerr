@@ -379,16 +379,13 @@ class AudibleProvider(MetadataProvider):
     display_name = "Audible"
     requires_auth = False
     supported_sorts = (
-        SortOrder.RELEVANCE,
         SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
-        SortOrder.SERIES_ORDER,
+        SortOrder.OLDEST,
     )
-    capabilities = (
-        MetadataCapability(key="view_series", field_key="series", sort=SortOrder.SERIES_ORDER),
-    )
+    capabilities = ()
     search_fields = (
         TextSearchField(
             key="narrator",
@@ -454,12 +451,16 @@ class AudibleProvider(MetadataProvider):
             "page": max(options.page - 1, 0),
             "response_groups": _RESPONSE_GROUPS,
         }
-        if options.sort in {SortOrder.TRENDING, SortOrder.POPULARITY}:
+        if options.sort == SortOrder.TRENDING:
             params["products_sort_by"] = "BestSellers"
+        elif options.sort == SortOrder.POPULARITY:
+            params["products_sort_by"] = "Popularity"
         elif options.sort == SortOrder.RATING:
             params["products_sort_by"] = "AvgRating"
         elif options.sort == SortOrder.NEWEST:
             params["products_sort_by"] = "-ReleaseDate"
+        elif options.sort == SortOrder.OLDEST:
+            params["products_sort_by"] = "ReleaseDate"
         if options.search_type == SearchType.AUTHOR:
             params.pop("keywords")
             params["author"] = query
@@ -544,6 +545,7 @@ class AudibleProvider(MetadataProvider):
         query = options.query.strip()
         if not query:
             return None
+        # Audible's catalogue wildcard returns the full searchable catalogue.
         return self._search_once(query, options)
 
 
