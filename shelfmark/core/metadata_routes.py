@@ -255,7 +255,7 @@ def register_metadata_routes(
 
             section = request.args.get("section", "").strip()
             content_type = request.args.get("content_type", "ebook").strip()
-            if section not in {"trending", "new_releases"}:
+            if section not in {"trending", "popular", "new_releases"}:
                 return jsonify({"error": "Unsupported discovery section"}), 400
             if content_type not in {"ebook", "audiobook"}:
                 return jsonify({"error": "Unsupported content type"}), 400
