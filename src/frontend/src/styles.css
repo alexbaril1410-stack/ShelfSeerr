@@ -1702,3 +1702,65 @@ input, select, textarea { color-scheme:dark; }
     min-height: 40px !important;
   }
 }
+
+
+/* Desktop header final structure: a single account menu inside the search row.
+   Do not reserve space for the removed, absolutely-positioned duplicate toolbar. */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    display: flex !important;
+    width: 100% !important;
+    min-height: 80px !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child > .flex {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    align-items: center !important;
+    gap: 18px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child img[alt="ShelfSeerr"] {
+    flex: 0 0 232px !important;
+    width: 232px !important;
+    max-width: 232px !important;
+    height: 62px !important;
+    object-fit: contain !important;
+    object-position: left center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child .search-wrapper {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child button[aria-label="User menu"] {
+    position: relative !important;
+    inset: auto !important;
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+}
