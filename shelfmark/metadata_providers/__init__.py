@@ -400,6 +400,7 @@ class MetadataProvider(ABC):
         section: str,
         *,
         limit: int = 20,
+        page: int = 1,
         user_id: int | None = None,
     ) -> SearchResult:
         """Return a provider-backed discovery shelf, when supported.
