@@ -14,7 +14,7 @@ import { SearchBar } from './SearchBar';
 
 interface SearchSectionProps {
   onSearch: () => void;
-  discoveryShelves: { trending: Book[]; popular: Book[] };
+  discoveryShelves: { ebook: { trending: Book[]; popular: Book[] }; audiobook: { trending: Book[]; popular: Book[] } };
   showDiscoveryShelves: boolean;
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
@@ -106,6 +106,12 @@ export const SearchSection = ({
 }: SearchSectionProps) => {
   const { t } = useLanguage();
   const topics = DISCOVERY_TOPICS[contentType];
+  const discoverySections = [
+    { key: 'ebook-trending', title: 'Tendances – Livres', books: discoveryShelves.ebook.trending },
+    { key: 'ebook-popular', title: 'Populaire – Livres', books: discoveryShelves.ebook.popular },
+    { key: 'audiobook-trending', title: 'Tendances – Livres audio', books: discoveryShelves.audiobook.trending },
+    { key: 'audiobook-popular', title: 'Populaire – Livres audio', books: discoveryShelves.audiobook.popular },
+  ] as const;
   const selectTopic = (query: string) => onQueryValueChange(query);
 
   return (
@@ -199,12 +205,8 @@ export const SearchSection = ({
           </div>
         </div>
 
-        {showDiscoveryShelves && ([
-          { key: 'trending', title: 'Tendances' },
-          { key: 'popular', title: 'Populaire' },
-        ] as const).map((shelf) => {
-          const shelfBooks = discoveryShelves[shelf.key];
-          if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
+        {showDiscoveryShelves && discoverySections.map((shelf) => {
+          const shelfBooks = shelf.books;
 
           return (
             <section key={shelf.key} className="min-w-0">
@@ -264,31 +266,7 @@ export const SearchSection = ({
           );
         })}
 
-        <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-cyan-50 p-5 dark:border-white/10 dark:from-indigo-950/50 dark:via-slate-900 dark:to-cyan-950/40 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
-              {contentType === 'audiobook' ? t('Your next listen') : t('Discover next')}
-            </p>
-            <h2 className="mt-1 text-xl font-bold text-gray-900 dark:text-white sm:text-2xl">
-              {contentType === 'audiobook' ? t('An audiobook is waiting for you.') : t('A new story is waiting for you.')}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600 dark:text-gray-300">
-              {contentType === 'audiobook'
-                ? t('Search for a title or author, or browse genres to find your next listen.')
-                : t('Search the configured metadata catalog to discover available titles.')}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              onQueryValueChange('');
-              onQueryTargetChange('general');
-            }}
-            className="mt-4 shrink-0 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 sm:mt-0"
-          >
-            {t('Explore the catalog')}
-          </button>
-        </div>
+
       </div>
 
       <AdvancedFilters
