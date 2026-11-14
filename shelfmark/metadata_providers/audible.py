@@ -660,7 +660,7 @@ class AudibleProvider(MetadataProvider):
         if options.sort == SortOrder.TRENDING:
             # Keep the sort result identical to the Audible "Tendances" homepage
             # carousel: both use the same native bestseller chart and ordering.
-            return self.discover("trending", limit=min(max(options.limit, 1), 40), user_id=options.user_id)
+            return self.discover("trending", limit=20, user_id=options.user_id)
 
         if options.sort in {SortOrder.NEWEST, SortOrder.OLDEST}:
             # Audible exposes -ReleaseDate / ReleaseDate, but no server-side
