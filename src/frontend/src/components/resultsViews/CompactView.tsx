@@ -89,7 +89,7 @@ export const CompactView = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`relative h-full shrink-0 ${contentType === 'audiobook' ? 'w-[140px]' : 'w-[120px]'}`}>
+      <div className={`relative h-full shrink-0 ${contentType === 'audiobook' ? 'w-[160px]' : 'w-[120px]'}`}>
         <div className="absolute inset-0 overflow-hidden rounded-l-[.75rem]">
           {/* Series position badge */}
           {showSeriesPosition && book.series_position != null && (
