@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
-import { listRequests } from '../services/api';
+import { deleteAdminRequest, listRequests } from '../services/api';
 import type { RequestRecord } from '../types';
 
 type RequestStatus = 'pending' | 'approved' | 'completed' | 'processing' | 'problem' | 'rejected';
@@ -46,7 +46,7 @@ const statusStyle: Record<RequestStatus, string> = {
 interface Props {
   isAdmin: boolean;
   onApprove: (request: RequestRecord) => void;
-  onReject: (id: number) => void;
+  onReject: (id: number) => Promise<void>;
   onReopen: (id: number) => void;
   onCancel: (id: number) => void;
 }
@@ -161,10 +161,11 @@ export const RequestsPage = ({ isAdmin, onApprove, onReject, onReopen, onCancel 
             <div className="col-start-2 flex min-w-0 flex-wrap items-center gap-2 sm:col-start-auto sm:flex-col sm:items-stretch sm:justify-center">
               {isAdmin && current === 'pending' && <>
                 <button type="button" onClick={() => onApprove(r)} className="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-violet-500">{t('Examiner / approuver')}</button>
-                <button type="button" onClick={() => onReject(r.id)} className="rounded-lg border border-(--border-muted) bg-(--card-background)/80 px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-red-500/60 hover:text-red-400">{t('Refuser')}</button>
+                <button type="button" onClick={async () => { await onReject(r.id); await refresh(); }} className="rounded-lg border border-(--border-muted) bg-(--card-background)/80 px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-red-500/60 hover:text-red-400">{t('Refuser')}</button>
               </>}
               {isAdmin && current === 'problem' && <button type="button" onClick={() => onApprove(r)} className="rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-violet-500">{t('Relancer le téléchargement')}</button>}
               {isAdmin && current === 'rejected' && <button type="button" onClick={() => onReopen(r.id)} className="rounded-lg border border-(--border-muted) bg-(--card-background)/80 px-4 py-2.5 text-sm font-medium text-(--text-primary) transition-colors hover:border-violet-500/60">{t('Rouvrir la demande')}</button>}
+              {isAdmin && current !== 'pending' && <button type="button" onClick={async () => { if (!window.confirm(t('Supprimer définitivement cette demande ?'))) return; try { await deleteAdminRequest(r.id); await refresh(); } catch (e) { setError(e instanceof Error ? e.message : t('Unable to delete request')); } }} className="rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20">{t('Supprimer la demande')}</button>}
               {!isAdmin && current === 'pending' && <button type="button" onClick={() => onCancel(r.id)} className="rounded-lg border border-(--border-muted) bg-(--card-background)/80 px-4 py-2.5 text-sm font-medium text-(--text-primary) hover:border-red-500/60">{t('Annuler la demande')}</button>}
             </div>
           </article>;
