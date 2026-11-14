@@ -491,22 +491,25 @@ class AudibleProvider(MetadataProvider):
         section: str,
         *,
         limit: int = 20,
+        page: int = 1,
         user_id: int | None = None,
     ) -> SearchResult:
-        """Load Audible's native French popularity and bestseller chart shelves."""
+        """Load one page of Audible's native French popularity/bestseller charts."""
         safe_limit = max(1, min(limit, 40))
+        safe_page = max(1, page)
         chart_paths = {
             "popular": "/charts?scoringSystem=popular&searchLanguage=french",
             "trending": "/charts/best?scoringSystem=bestSeller&searchLanguage=french",
         }
         chart_path = chart_paths.get(section)
         if not chart_path:
-            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+            return SearchResult(books=[], page=safe_page, total_found=0, has_more=False)
 
         chart_url = f"https://www.audible.{self.marketplace}{chart_path}"
         try:
             response = requests.get(
                 chart_url,
+                params={"page": safe_page, "pageSize": safe_limit},
                 headers={
                     "Accept": "text/html",
                     "User-Agent": "Mozilla/5.0 (compatible; ShelfSeerr/1.0; audiobook discovery)",
@@ -519,12 +522,13 @@ class AudibleProvider(MetadataProvider):
             parser.close()
         except (requests.RequestException, ValueError) as exc:
             logger.warning("Audible %s chart request failed (%s): %s", section, self.marketplace, exc)
-            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+            return SearchResult(books=[], page=safe_page, total_found=0, has_more=False)
 
-        asins = parser.asins[: min(safe_limit * 2, 40)]
+        # The same first 20 ASINs are used by the homepage shelf and the Tendances
+        # search result. Subsequent requests ask Audible for the next chart page.
+        asins = parser.asins[:safe_limit]
         if not asins:
-            logger.warning("Audible %s chart returned no product ASINs", section)
-            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+            return SearchResult(books=[], page=safe_page, total_found=0, has_more=False)
 
         payload = self._request("catalog/products", {
             "asins": ",".join(asins),
@@ -537,7 +541,7 @@ class AudibleProvider(MetadataProvider):
         }
         books: list[BookMetadata] = []
         for asin in asins:
-            product = products_by_asin.get(asin)
+            product = products_by_asin.get(asin.upper())
             if not product:
                 continue
             book = _parse_product(product, self.marketplace)
@@ -546,10 +550,15 @@ class AudibleProvider(MetadataProvider):
             if self.french_only and not _is_french_language(book.language):
                 continue
             books.append(book)
-            if len(books) >= safe_limit:
-                break
 
-        return SearchResult(books=books, page=1, total_found=len(books), has_more=False)
+        # Chart endpoints do not expose a dependable total count. A full page
+        # indicates that the infinite-scroll client can request another page.
+        return SearchResult(
+            books=books,
+            page=safe_page,
+            total_found=0,
+            has_more=len(asins) >= safe_limit,
+        )
 
     def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
         """Run one direct Audible catalogue search; no speculative spelling retries."""
@@ -660,7 +669,7 @@ class AudibleProvider(MetadataProvider):
         if options.sort == SortOrder.TRENDING:
             # Keep the sort result identical to the Audible "Tendances" homepage
             # carousel: both use the same native bestseller chart and ordering.
-            return self.discover("trending", limit=20, user_id=options.user_id)
+            return self.discover("trending", limit=20, page=options.page, user_id=options.user_id)
 
         if options.sort in {SortOrder.NEWEST, SortOrder.OLDEST}:
             # Audible exposes -ReleaseDate / ReleaseDate, but no server-side
