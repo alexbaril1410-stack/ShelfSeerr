@@ -724,7 +724,7 @@ function App() {
   const navigateToContent = useCallback((type: ContentType) => {
     handleResetSearch(config);
     setActiveQueryTarget('general');
-    setActiveResultsSort('');
+    setActiveResultsSort('popularity');
     setContentType(type);
     navigate(type === 'audiobook' ? '/audiobooks' : '/books');
     const selectedProvider = type === 'audiobook'
@@ -2461,10 +2461,13 @@ function App() {
       handleManualSearch();
       return;
     }
-    const request = buildCurrentSearchRequest();
+    // A normal search from the header always starts with the most popular
+    // results, independently of the sort used by the previous search. Series
+    // browsing keeps its provider-defined ordering.
+    const isSeriesBrowse = effectiveSearchMode === 'universal' && activeQueryUsesSeriesBrowse;
+    const request = buildCurrentSearchRequest(isSeriesBrowse ? undefined : 'popularity');
     const shouldPersistAppliedSort = !(
-      effectiveSearchMode === 'universal' &&
-      activeQueryUsesSeriesBrowse &&
+      isSeriesBrowse &&
       request.appliedSort === seriesBrowseCapability?.sort
     );
 
@@ -2477,7 +2480,7 @@ function App() {
       fieldValues: request.fieldValues,
       searchModeOverride: effectiveSearchMode,
       providerOverride: request.providerOverride,
-      sort: advancedFilters.sort,
+      sort: request.appliedSort,
     });
   }, [
     activeQueryOption,
