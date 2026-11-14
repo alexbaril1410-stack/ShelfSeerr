@@ -648,7 +648,7 @@ class AudibleProvider(MetadataProvider):
         return SearchResult(books=books, page=page, total_found=total, has_more=offset + len(page_children) < total)
 
     def search_paginated(self, options: MetadataSearchOptions) -> SearchResult:
-        """Search Audible and keep release-date sorting meaningful for real releases."""
+        """Search Audible with stable release-date ordering across API pages."""
         series_value = str(options.fields.get("series", "")).strip()
         if series_value:
             series_asin = series_value.removeprefix("id:").removeprefix("asin:").strip().upper()
@@ -656,15 +656,18 @@ class AudibleProvider(MetadataProvider):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
 
-        if options.sort == SortOrder.NEWEST:
-            # Audible's -ReleaseDate puts future preorders first. Scan successive
-            # API pages and retain only titles already released in this marketplace.
-            collected: list[tuple[date, BookMetadata]] = []
+        if options.sort in {SortOrder.NEWEST, SortOrder.OLDEST}:
+            # Audible exposes -ReleaseDate / ReleaseDate, but no server-side
+            # released-only filter. Fetch successive pages, then apply the date
+            # cutoff and ordering locally so preorders never appear as releases.
+            page_size = min(max(options.limit, 1), _MAX_RESULTS)
+            collected: dict[str, tuple[date, BookMetadata]] = {}
             raw_total = 0
             raw_page = 1
-            page_size = min(max(options.limit, 1), _MAX_RESULTS)
             scan_limit = 20
-            while raw_page <= scan_limit and len(collected) < options.page * page_size + 1:
+            required_count = options.page * page_size + 1
+
+            while raw_page <= scan_limit and len(collected) < required_count:
                 page_options = MetadataSearchOptions(
                     query=options.query,
                     limit=page_size,
@@ -682,29 +685,36 @@ class AudibleProvider(MetadataProvider):
                     value = metadata.get("total_results") or metadata.get("totalResults")
                     with suppress(TypeError, ValueError):
                         raw_total = int(value)
+
                 for product in products:
                     release_date = _release_date(product)
                     book = _parse_product(product, self.marketplace)
-                    if (
-                        release_date
-                        and release_date <= date.today()
-                        and book
-                        and (not self.french_only or _is_french_language(book.language))
-                    ):
-                        collected.append((release_date, book))
+                    if not release_date or not book:
+                        continue
+                    if options.sort == SortOrder.NEWEST and release_date > date.today():
+                        continue
+                    if self.french_only and not _is_french_language(book.language):
+                        continue
+                    collected[book.provider_id] = (release_date, book)
+
                 if not products or len(products) < page_size or (
                     raw_total and raw_page * page_size >= raw_total
                 ):
                     break
                 raw_page += 1
 
+            ordered = sorted(
+                collected.values(),
+                key=lambda item: item[0],
+                reverse=options.sort == SortOrder.NEWEST,
+            )
             start = (options.page - 1) * page_size
-            page_items = collected[start:start + page_size]
-            has_more = len(collected) > start + page_size or raw_page > scan_limit
+            page_items = ordered[start:start + page_size]
+            has_more = len(ordered) > start + page_size or raw_page > scan_limit
             return SearchResult(
-                books=[book for _, book in sorted(page_items, key=lambda item: item[0], reverse=True)],
+                books=[book for _, book in page_items],
                 page=options.page,
-                total_found=len(collected),
+                total_found=len(ordered),
                 has_more=has_more,
             )
 
@@ -716,14 +726,6 @@ class AudibleProvider(MetadataProvider):
             if (book := _parse_product(product, self.marketplace))
             and (not self.french_only or _is_french_language(book.language))
         ]
-        if options.sort == SortOrder.OLDEST:
-            books.sort(
-                key=lambda book: next(
-                    (_release_date(product) for product in products
-                     if str(product.get("asin") or "").upper() == book.provider_id.upper()),
-                    date.max,
-                )
-            )
 
         total_found = 0
         if isinstance(payload, dict):
