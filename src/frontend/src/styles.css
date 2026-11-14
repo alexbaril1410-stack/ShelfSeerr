@@ -1287,3 +1287,37 @@ input, select, textarea { color-scheme:dark; }
     width: 100%;
   }
 }
+
+/* Sidebar brand: the logo lives above navigation, not in the top search bar. */
+@media (min-width: 1024px) {
+  .shelfseerr-primary-nav {
+    width: 324px !important;
+    padding: 18px 17px 24px !important;
+    gap: 5px !important;
+  }
+  .shelfseerr-primary-nav .shelfseerr-sidebar-brand {
+    display: flex;
+    width: 100%;
+    min-height: 78px;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 16px;
+    padding: 2px 4px 12px;
+  }
+  .shelfseerr-sidebar-brand img {
+    display: block;
+    width: 100%;
+    max-width: 286px;
+    height: 68px;
+    object-fit: contain;
+    object-position: center;
+  }
+  .shelfseerr-content-shell { margin-left: 324px !important; }
+  .settings-page-embedded { left: 324px !important; }
+}
+/* Navigation icons are already rendered as SVGs in Header.tsx.
+   Remove the former CSS-generated symbols to prevent duplicate icons. */
+.shelfseerr-primary-nav button::before {
+  content: none !important;
+  display: none !important;
+}
