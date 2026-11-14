@@ -99,7 +99,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
     {
       calibreWebUrl,
       audiobookLibraryUrl,
-      debug,
       logoUrl,
       showSearch = false,
       searchInput = '',
@@ -109,7 +108,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
       onAdvancedToggle,
       isAdvancedActive = false,
       isLoading = false,
-      onDownloadsClick,
       onSettingsClick,
       isAdmin = false,
       canAccessSettings,
@@ -148,13 +146,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
   ) => {
     const { t } = useLanguage();
 
-    // Retained temporarily for compatibility with existing Header props/helpers.
-    void debug;
-    void onDownloadsClick;
-    void activityBadge;
-    void dropdownPanelWidthClass;
-    void handleDebugDownload;
-    void renderSettingsButton;
     const activityBadge = getActivityBadgeState(statusCounts, isAdmin);
     const settingsEnabled = canAccessSettings ?? isAdmin;
     const searchBarRef = useRef<SearchBarHandle>(null);
@@ -388,6 +379,11 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
         </button>
       );
     };
+    // Keep legacy helpers/props intentionally available while the Activity shortcut is hidden.
+    void activityBadge;
+    void dropdownPanelWidthClass;
+    void handleDebugDownload;
+    void renderSettingsButton;
 
     // Icon buttons - reused for both states
     const iconButtonsNode = (
