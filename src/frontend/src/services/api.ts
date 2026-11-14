@@ -342,7 +342,7 @@ interface BookTargetStateResult {
 
 // Search metadata providers and normalize to Book format
 export const discoverMetadata = async (
-  section: 'trending' | 'new_releases',
+  section: 'trending' | 'popular' | 'new_releases',
   contentType: string,
   limit: number = 18,
 ): Promise<Book[]> => {
