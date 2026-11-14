@@ -1,4 +1,5 @@
 import type { DeliveryPreferencesResponse } from '../../../services/api';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import type { ActionResult, SettingsTab } from '../../../types/settings';
 import { SettingsSubpage } from '../shared';
 import type { PerUserSettings } from './types';
@@ -33,6 +34,7 @@ export const UserOverridesView = ({
   globalUsersSettingsValues,
   onTestNotificationRoutes,
 }: UserOverridesViewProps) => {
+  const { t } = useLanguage();
   const content = (
     <div className="space-y-5">
       <div>
@@ -51,7 +53,7 @@ export const UserOverridesView = ({
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
           </svg>
-          Back to User
+          {t('Back to User')}
         </button>
       </div>
 
