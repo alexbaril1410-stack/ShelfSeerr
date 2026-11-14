@@ -2700,7 +2700,7 @@ function App() {
             <RequestsPage
               isAdmin={requestRoleIsAdmin}
               onApprove={(record) => { void handleRequestApprove(record.id, record); }}
-              onReject={(id) => { void handleRequestReject(id); }}
+              onReject={async (id) => { await handleRequestReject(id); }}
               onReopen={(id) => { void handleRequestReopen(id); }}
               onCancel={(id) => { void handleRequestCancel(id); }}
             />
