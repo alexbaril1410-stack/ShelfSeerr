@@ -203,7 +203,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         const hasFieldValues = Object.values(effectiveFieldValues).some(
           (v) => v !== '' && v !== false,
         );
-        const sortOrder = params.get('sort') || 'relevance';
+        const sortOrder = params.get('sort') || 'popularity';
 
         if (!searchQuery && !hasFieldValues && providerOverride !== 'hardcover' && providerOverride !== 'audible') {
           setBooks([]);
