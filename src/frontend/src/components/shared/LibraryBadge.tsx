@@ -1,31 +1,43 @@
 import { useLanguage } from '../../contexts/LanguageContext';
-import type { LibraryOwnership } from '../../types';
+import type { ContentType, LibraryOwnership } from '../../types';
 
-/** True when the library check reports this book held in any format. */
-export function isInLibrary(library?: LibraryOwnership | null): boolean {
+/** True when the selected content type is held in the library. */
+export function isInLibrary(
+  library?: LibraryOwnership | null,
+  contentType: ContentType = 'ebook',
+): boolean {
   if (!library) return false;
-  return Object.values(library).some((holding) => holding === 'owned' || holding === 'collection');
+  const holding = library[contentType];
+  return holding === 'owned' || holding === 'collection';
 }
 
-/** True when every format that holds it holds it inside a larger volume. */
-export function isCollectionOnly(library?: LibraryOwnership | null): boolean {
-  if (!isInLibrary(library)) return false;
-  return !Object.values(library ?? {}).includes('owned');
+/** True when the selected content type is held only inside a larger volume. */
+export function isCollectionOnly(
+  library?: LibraryOwnership | null,
+  contentType: ContentType = 'ebook',
+): boolean {
+  return library?.[contentType] === 'collection';
 }
 
 interface LibraryBadgeProps {
   library?: LibraryOwnership | null;
+  contentType?: ContentType;
   /** Solid pill for use over cover art; otherwise a tinted inline pill. */
   overlay?: boolean;
   className?: string;
 }
 
-/** "Already in your library" badge. Renders nothing when the book is not held. */
-export function LibraryBadge({ library, overlay = false, className = '' }: LibraryBadgeProps) {
+/** "Already in your library" badge. Renders nothing when this format is not held. */
+export function LibraryBadge({
+  library,
+  contentType = 'ebook',
+  overlay = false,
+  className = '',
+}: LibraryBadgeProps) {
   const { t } = useLanguage();
-  if (!isInLibrary(library)) return null;
+  if (!isInLibrary(library, contentType)) return null;
 
-  const collectionOnly = isCollectionOnly(library);
+  const collectionOnly = isCollectionOnly(library, contentType);
   const label = collectionOnly ? 'In your library, inside a collection' : 'Already in your library';
   const text = collectionOnly ? 'In a collection' : 'In library';
 
