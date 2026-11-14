@@ -114,13 +114,25 @@ export const CompactView = ({
               <img
                 src={book.preview}
                 alt={book.title || t('Book cover')}
-                className="h-full w-full"
+                className="absolute inset-0 block h-full w-full"
                 loading="lazy"
                 style={{
                   opacity: imageLoaded ? 1 : 0,
                   transition: 'opacity 0.3s ease-in-out',
-                  objectFit: book.cover_aspect === 'square' ? 'contain' : 'cover',
-                  objectPosition: book.cover_aspect === 'square' ? 'center' : 'top',
+                  // Audiobook artwork must fill the complete square cover slot.
+                  // Use block + absolute positioning to eliminate inline-image baseline gaps.
+                  objectFit:
+                    contentType === 'audiobook'
+                      ? 'cover'
+                      : book.cover_aspect === 'square'
+                        ? 'contain'
+                        : 'cover',
+                  objectPosition:
+                    contentType === 'audiobook'
+                      ? 'center'
+                      : book.cover_aspect === 'square'
+                        ? 'center'
+                        : 'top',
                   background: 'var(--bg-soft)',
                 }}
                 onLoad={() => setImageLoaded(true)}
