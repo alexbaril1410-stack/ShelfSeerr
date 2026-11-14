@@ -13,6 +13,7 @@ export type AppLanguage = 'fr' | 'en';
 const LANGUAGE_STORAGE_KEY = 'shelfseerr-language';
 
 const FRENCH_TRANSLATIONS: Record<string, string> = {
+  'Profile': 'Profil',
   'Use Reset to inherit global values.': 'Utilisez « Réinitialiser » pour reprendre les paramètres globaux.',
   'Reset to inherit global defaults from Search Mode.': 'Réinitialisez pour reprendre les paramètres globaux du mode de recherche.',
   'Choose where completed book files are sent.': 'Choisissez où envoyer les fichiers de livres terminés.',
