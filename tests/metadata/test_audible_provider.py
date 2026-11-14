@@ -53,9 +53,9 @@ def test_audible_search_uses_french_catalogue_and_maps_results(monkeypatch):
     }
 
     def fake_get(url, **kwargs):
-        assert url == "https://api.audible.fr/1.0/catalog/search"
+        assert url == "https://api.audible.fr/1.0/catalog/products"
         assert kwargs["params"]["keywords"] == "Le Hobbit"
-        assert kwargs["params"]["content_type"] == "Audiobook"
+        assert kwargs["params"]["response_groups"] == "contributors,product_desc,product_attrs,product_extended_attrs,media,rating,series,category_ladders,product_details"
         return response
 
     monkeypatch.setattr("shelfmark.metadata_providers.audible.requests.get", fake_get)
