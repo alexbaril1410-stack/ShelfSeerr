@@ -701,6 +701,11 @@ export const fetchRequestPolicy = async (): Promise<RequestPolicyResponse> => {
   return fetchJSON<RequestPolicyResponse>(API.requestPolicy);
 };
 
+export const listRequests = async (isAdmin: boolean): Promise<RequestRecord[]> => {
+  const endpoint = isAdmin ? API.adminRequests : API.requests;
+  return fetchJSON<RequestRecord[]>(`${endpoint}?limit=500&offset=0`);
+};
+
 export const createRequests = async (
   payloads: CreateRequestPayload[],
 ): Promise<RequestSubmissionResult[]> => {
