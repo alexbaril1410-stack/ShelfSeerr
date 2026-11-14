@@ -1558,3 +1558,38 @@ input, select, textarea { color-scheme:dark; }
     transform: none !important;
   }
 }
+
+
+/* Desktop: center the profile avatar against the search field itself.
+   Keep the profile column at the avatar's own height; do not stretch it. */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    align-items: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    align-self: center !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    margin-block: 0 !important;
+    padding-block: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child > .flex {
+    align-items: center !important;
+    justify-content: center !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+  .shelfseerr-header-inner button[aria-label="User menu"] {
+    align-self: center !important;
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    align-items: center !important;
+  }
+}
