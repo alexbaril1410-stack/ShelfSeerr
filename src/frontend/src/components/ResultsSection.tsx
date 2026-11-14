@@ -291,6 +291,7 @@ export const ResultsSection = ({
               <CompactView
                 key={book.id}
                 book={book}
+                contentType={contentType}
                 onDetails={onDetails}
                 onDownload={onDownload}
                 onGetReleases={onGetReleases}
