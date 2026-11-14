@@ -15,6 +15,7 @@ import { SearchBar } from './SearchBar';
 interface SearchSectionProps {
   onSearch: () => void;
   discoveryShelves: { trending: Book[]; popular: Book[] };
+  showDiscoveryShelves: boolean;
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
   isLoading: boolean;
@@ -71,6 +72,7 @@ export const SearchSection = ({
   onSearch,
   isLoading,
   discoveryShelves,
+  showDiscoveryShelves,
   isDiscoveryLoading,
   onDiscoveryBookSelect,
   isInitialState,
@@ -197,9 +199,9 @@ export const SearchSection = ({
           </div>
         </div>
 
-        {([
-          { key: 'trending', title: t('Trending') },
-          { key: 'popular', title: t('Popular') },
+        {showDiscoveryShelves && ([
+          { key: 'trending', title: 'Tendances' },
+          { key: 'popular', title: 'Populaire' },
         ] as const).map((shelf) => {
           const shelfBooks = discoveryShelves[shelf.key];
           if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
@@ -261,6 +263,7 @@ export const SearchSection = ({
             </section>
           );
         })}
+        )}
 
         <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-r from-indigo-50 via-white to-cyan-50 p-5 dark:border-white/10 dark:from-indigo-950/50 dark:via-slate-900 dark:to-cyan-950/40 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7">
           <div>

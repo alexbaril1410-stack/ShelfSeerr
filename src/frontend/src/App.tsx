@@ -943,7 +943,7 @@ function App() {
   const effectiveMetadataProvider =
     effectiveSearchMode === 'universal' ? defaultMetadataProviderForContentType || null : null;
   useEffect(() => {
-    if (!isAuthenticated || !isInitialState || effectiveCombinedMode) {
+    if (!isAuthenticated || (location.pathname !== '/discover' && location.pathname !== '/') || !isInitialState || effectiveCombinedMode) {
       setDiscoveryShelves({ trending: [], popular: [] });
       setIsDiscoveryLoading(false);
       return;
@@ -981,6 +981,7 @@ function App() {
     effectiveCombinedMode,
     effectiveContentType,
     defaultMetadataProviderForContentType,
+    location.pathname,
   ]);
 
   const metadataConfigSessionKey =
@@ -2684,6 +2685,7 @@ function App() {
             onSearch={handleSearchDispatch}
             isLoading={isSearching}
             isInitialState={isInitialState}
+            showDiscoveryShelves={location.pathname === '/discover' || location.pathname === '/'}
             discoveryShelves={discoveryShelves}
             isDiscoveryLoading={isDiscoveryLoading}
             onDiscoveryBookSelect={handleDiscoveryBookSelect}

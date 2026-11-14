@@ -1946,7 +1946,7 @@ class HardcoverProvider(MetadataProvider):
             book_data = row.get("book", {})
             if not isinstance(book_data, dict) or not book_data:
                 continue
-            if exclude_compilations and book_data.get("compilation"):
+            if exclude_compilations and (book_data.get("compilation") or _looks_like_compilation_title(str(book_data.get("title") or ""))):
                 continue
             release_date = _parse_release_date(book_data.get("release_date"))
             if exclude_unreleased and (release_date is None or release_date.date() > today):
@@ -2568,18 +2568,20 @@ class HardcoverProvider(MetadataProvider):
 
         options = MetadataSearchOptions(
             query="*",
-            limit=safe_limit,
+            limit=min(safe_limit * 2, 40),
             page=1,
             sort=sort_order,
             user_id=user_id,
         )
-        return self.search_paginated(options)
+        result = self.search_paginated(options)
+        books = result.books[:safe_limit]
+        return SearchResult(books=books, page=1, total_found=len(books), has_more=False)
 
     def _discover_trending(self, limit: int) -> SearchResult:
         """Fetch Hardcover's native trending list, then hydrate its book IDs."""
         trending = self._execute_query(
             HARDCOVER_TRENDING_BOOKS_QUERY,
-            {"duration": "week", "limit": limit, "offset": 0},
+            {"duration": "week", "limit": min(limit * 2, 40), "offset": 0},
         )
         trending_data = (trending or {}).get("books_trending") or {}
         book_ids = trending_data.get("ids") or []
@@ -2631,11 +2633,13 @@ class HardcoverProvider(MetadataProvider):
             parsed = self._parse_book(book_data)
             if parsed:
                 books.append(parsed)
+                if len(books) >= limit:
+                    break
 
         return SearchResult(
             books=books,
             page=1,
-            total_found=len(book_ids),
+            total_found=len(books),
             has_more=False,
         )
 

@@ -344,7 +344,7 @@ interface BookTargetStateResult {
 export const discoverMetadata = async (
   section: 'trending' | 'popular',
   contentType: string,
-  limit: number = 18,
+  limit: number = 20,
 ): Promise<Book[]> => {
   const params = new URLSearchParams({
     section,

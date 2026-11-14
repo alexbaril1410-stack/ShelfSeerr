@@ -490,7 +490,7 @@ class AudibleProvider(MetadataProvider):
             logger.warning("Audible %s chart request failed (%s): %s", section, self.marketplace, exc)
             return SearchResult(books=[], page=1, total_found=0, has_more=False)
 
-        asins = parser.asins[:safe_limit]
+        asins = parser.asins[: min(safe_limit * 2, 40)]
         if not asins:
             logger.warning("Audible %s chart returned no product ASINs", section)
             return SearchResult(books=[], page=1, total_found=0, has_more=False)
@@ -515,8 +515,10 @@ class AudibleProvider(MetadataProvider):
             if self.french_only and not _is_french_language(book.language):
                 continue
             books.append(book)
+            if len(books) >= safe_limit:
+                break
 
-        return SearchResult(books=books, page=1, total_found=len(asins), has_more=False)
+        return SearchResult(books=books, page=1, total_found=len(books), has_more=False)
 
     def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
         """Run one direct Audible catalogue search; no speculative spelling retries."""

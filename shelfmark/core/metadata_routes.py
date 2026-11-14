@@ -261,9 +261,9 @@ def register_metadata_routes(
                 return jsonify({"error": "Unsupported content type"}), 400
 
             try:
-                limit = max(1, min(int(request.args.get("limit", 18)), 40))
+                limit = max(1, min(int(request.args.get("limit", 20)), 40))
             except ValueError:
-                limit = 18
+                limit = 20
 
             db_user_id = get_session_db_user_id(session)
             provider = get_configured_provider(content_type=content_type, user_id=db_user_id)
