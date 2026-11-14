@@ -1436,3 +1436,28 @@ input, select, textarea { color-scheme:dark; }
     z-index: 2;
   }
 }
+
+
+/* Vertically center the account avatar on the exact same axis as the search field. */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    min-height: 68px !important;
+    align-items: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child {
+    top: 50% !important;
+    right: 24px !important;
+    transform: translateY(-50%) !important;
+    align-items: center !important;
+    height: 68px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:first-child > .flex {
+    align-items: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    align-items: center !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child .search-wrapper {
+    align-self: center !important;
+  }
+}
