@@ -583,7 +583,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   ))}
                 <SearchBar
                   ref={searchBarRef}
-                  className="w-full flex-1 lg:order-2"
+                  className="w-full flex-1 lg:order-1"
                   value={searchInput}
                   valueLabel={searchInputLabel}
                   onChange={handleSearchChange}
@@ -604,7 +604,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   optionsLayout="popover"
                 />
                 {/* Mobile profile control: placed directly beside the search field. */}
-                <div className="order-2 flex shrink-0 items-center lg:order-1">
+                <div className="order-2 flex shrink-0 items-center lg:order-2">
                   {iconButtonsNode}
                 </div>
               </div>
