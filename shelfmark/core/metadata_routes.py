@@ -274,7 +274,37 @@ def register_metadata_routes(
             if not provider or not provider.is_available():
                 return jsonify({"books": [], "provider": None, "section": section}), 200
 
-            if (
+            if section == "trending" and provider.name in {"audible", "hardcover"}:
+                # Provider-side filtering/hydration can remove entries from a chart
+                # page. Continue through the same native trending ordering until the
+                # carousel is full, rather than displaying a short first page.
+                collected = []
+                seen_ids = set()
+                page = 1
+                has_more = True
+                while len(collected) < limit and has_more and page <= 5:
+                    page_result = provider.search_paginated(
+                        MetadataSearchOptions(
+                            query="*",
+                            limit=limit,
+                            page=page,
+                            sort=SortOrder.TRENDING,
+                            user_id=db_user_id,
+                        )
+                    )
+                    for book in page_result.books:
+                        identity = (book.provider, book.provider_id)
+                        if identity in seen_ids:
+                            continue
+                        seen_ids.add(identity)
+                        collected.append(book)
+                        if len(collected) >= limit:
+                            break
+                    has_more = page_result.has_more
+                    page += 1
+                result = page_result
+                result.books = collected
+            elif (
                 content_type == "audiobook"
                 and section == "popular"
                 and provider.name == "audible"
