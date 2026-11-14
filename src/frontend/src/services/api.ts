@@ -368,7 +368,7 @@ export const searchMetadata = async (
 ): Promise<MetadataSearchResult> => {
   const hasFields = Object.values(fields).some((v) => v !== '' && v !== false);
 
-  if (!query && !hasFields && provider !== 'hardcover') {
+  if (!query && !hasFields && provider !== 'hardcover' && provider !== 'audible') {
     return { books: [], page: 1, totalFound: 0, hasMore: false };
   }
 
