@@ -699,24 +699,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
 
               {/* Search bar - appear second on mobile (below logo+icons), first on desktop (left side) */}
               <div className="flex w-full flex-1 items-center gap-4 lg:mx-auto lg:max-w-[min(720px,70vw)] lg:flex-none">
-                {/* Logo - visible on desktop only, aligned with search */}
-                {logoUrl &&
-                  (onLogoClick ? (
-                    <button
-                      type="button"
-                      onClick={onLogoClick}
-                      className="hidden shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:block"
-                      aria-label={t('Reset search')}
-                    >
-                      <img src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')} alt="ShelfSeerr" className="h-12 w-auto max-w-[240px]" />
-                    </button>
-                  ) : (
-                    <img
-                      src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')}
-                      alt="ShelfSeerr"
-                      className="hidden h-12 w-auto max-w-[240px] shrink-0 lg:block"
-                    />
-                  ))}
                 <SearchBar
                   ref={searchBarRef}
                   className="w-full flex-1"
@@ -749,6 +731,9 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           )}
 
           <nav aria-label={t('Main navigation')} className="shelfseerr-primary-nav mt-3 hidden items-center gap-2 overflow-x-auto border-t pt-3 lg:flex" style={{ borderColor: 'var(--border-muted)' }}>
+            <div className="shelfseerr-sidebar-brand">
+              <img src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')} alt="ShelfSeerr" />
+            </div>
             <button type="button" onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }} aria-label={t('Discover')} aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined} className={`shelfseerr-nav-link ${currentPath === '/' || currentPath === '/discover' ? 'is-active' : ''}`}><svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="m19 14 .9 2.1L22 17l-2.1.9L19 20l-.9-2.1L16 17l2.1-.9L19 14Z"/><path d="m5 15 .7 1.3L7 17l-1.3.7L5 19l-.7-1.3L3 17l1.3-.7L5 15Z"/></svg><span>{t('Discover')}</span></button>
             {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} aria-label={t('Books')} aria-current={currentPath === '/books' ? 'page' : undefined} className={`shelfseerr-nav-link ${currentPath === '/books' ? 'is-active' : ''}`}><svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 5.5A2.5 2.5 0 0 1 6 3h12.5v17H6a2.5 2.5 0 0 0-2.5 2V5.5Z"/><path d="M3.5 5.5V22M7.5 7h7M7.5 11h7"/></svg><span>{t('Books')}</span></button>}
             {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} aria-label={t('Audiobooks')} aria-current={currentPath === '/audiobooks' ? 'page' : undefined} className={`shelfseerr-nav-link ${currentPath === '/audiobooks' ? 'is-active' : ''}`}><svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 13v-1a9 9 0 0 1 18 0v1"/><rect x="2.5" y="12" width="4" height="7" rx="2"/><rect x="17.5" y="12" width="4" height="7" rx="2"/><path d="M21.5 17v1a3 3 0 0 1-3 3H16"/></svg><span>{t('Audiobooks')}</span></button>}
