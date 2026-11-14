@@ -469,3 +469,34 @@ def test_audible_catalogue_pagination_stops_at_last_page(monkeypatch):
     assert len(result.books) == 1
     assert result.total_found == 41
     assert result.has_more is False
+
+
+
+def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    assert provider.supported_sorts == (
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.RELEVANCE,
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.TRENDING,
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.POPULARITY,
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.RATING,
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.NEWEST,
+        __import__("shelfmark.metadata_providers", fromlist=["SortOrder"]).SortOrder.SERIES_ORDER,
+    )
+
+    calls = []
+
+    def fake_request(path, params):
+        calls.append(dict(params))
+        return {"products": [{"asin": "B0SORT00001", "title": "Livre audio"}]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    from shelfmark.metadata_providers import SortOrder
+
+    for sort, expected in (
+        (SortOrder.TRENDING, "BestSellers"),
+        (SortOrder.POPULARITY, "BestSellers"),
+        (SortOrder.RATING, "AvgRating"),
+        (SortOrder.NEWEST, "-ReleaseDate"),
+    ):
+        provider.search(MetadataSearchOptions(query="fantasy", sort=sort))
+        assert calls[-1]["products_sort_by"] == expected
