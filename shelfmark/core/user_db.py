@@ -761,8 +761,18 @@ class UserDB:
         finally:
             conn.close()
 
-    def list_requests(
-        self,
+    def delete_request(self, request_id: int) -> bool:
+        """Permanently delete a request row by ID."""
+        with self._lock:
+            conn = self._connect()
+            try:
+                cursor = conn.execute("DELETE FROM download_requests WHERE id = ?", (request_id,))
+                conn.commit()
+                return cursor.rowcount > 0
+            finally:
+                conn.close()
+
+    def list_requests(        self,
         *,
         user_id: int | None = None,
         status: str | None = None,
