@@ -1321,3 +1321,30 @@ input, select, textarea { color-scheme:dark; }
   content: none !important;
   display: none !important;
 }
+
+/* Final desktop header alignment: brand and search share the same horizontal row. */
+@media (min-width: 1024px) {
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    width: min(920px, 82vw) !important;
+    max-width: 920px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child img[alt="ShelfSeerr"] {
+    width: 220px;
+    max-width: 220px;
+    height: 58px;
+    object-fit: contain;
+  }
+  .shelfseerr-primary-nav .shelfseerr-sidebar-brand { display: none !important; }
+}
+/* Keep the SVG icons in navigation; disable all legacy CSS-generated duplicate icons. */
+@media (min-width: 1024px) {
+  nav.shelfseerr-primary-nav button::before {
+    content: "" !important;
+    display: none !important;
+  }
+}
