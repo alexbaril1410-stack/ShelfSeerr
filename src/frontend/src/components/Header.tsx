@@ -561,12 +561,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           {/* When search is active: stack on mobile, side-by-side on desktop */}
           {showSearch && (
             <div className="animate-pop-up flex flex-col gap-3 lg:relative lg:flex-row lg:items-center lg:justify-center">
-              {/* Logo + Icon buttons - appear first on mobile (above search), last on desktop (right side) */}
-              <div className="flex w-full items-center justify-between lg:absolute lg:right-0 lg:top-1/2 lg:flex lg:w-auto lg:-translate-y-1/2 lg:justify-end">
-
-                {iconButtonsNode}
-              </div>
-
               {/* Search bar - appear second on mobile (below logo+icons), first on desktop (left side) */}
               <div className="flex w-full flex-1 items-center gap-4 lg:mx-auto lg:max-w-[min(720px,70vw)] lg:flex-none">
                 {/* ShelfSeerr brand aligned with the global search bar */}
@@ -589,7 +583,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   ))}
                 <SearchBar
                   ref={searchBarRef}
-                  className="w-full flex-1"
+                  className="w-full flex-1 lg:order-2"
                   value={searchInput}
                   valueLabel={searchInputLabel}
                   onChange={handleSearchChange}
@@ -610,7 +604,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   optionsLayout="popover"
                 />
                 {/* Mobile profile control: placed directly beside the search field. */}
-                <div className="flex shrink-0 items-center lg:hidden">
+                <div className="order-2 flex shrink-0 items-center lg:order-1">
                   {iconButtonsNode}
                 </div>
               </div>
