@@ -937,6 +937,21 @@ def register_request_routes(
             updated = redact_request_row(updated)
         return jsonify(updated)
 
+    @app.route("/api/admin/requests/<int:request_id>", methods=["DELETE"])
+    def api_admin_delete_request(request_id: int) -> ResponseReturnValue:
+        """Permanently delete a request. Admin only."""
+        auth_gate = _require_request_endpoints_available(resolve_auth_mode)
+        if auth_gate is not None:
+            return auth_gate
+        _admin_user_id, admin_gate = _require_admin_user_id()
+        if admin_gate is not None:
+            return admin_gate
+        if not user_db.delete_request(request_id):
+            return _error_response("Request not found", 404, code="request_not_found")
+        logger.info("Request #%s permanently deleted by admin", request_id)
+        emit_ws_event(ws_manager, event_name="request_deleted", payload={"request_id": request_id}, room="admins")
+        return jsonify({"deleted": True, "request_id": request_id})
+
     @app.route("/api/admin/requests", methods=["GET"])
     def api_admin_list_requests() -> ResponseReturnValue:
         """List requests for an admin, filtered by ?status and paged by ?limit and ?offset."""
