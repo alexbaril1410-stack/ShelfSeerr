@@ -685,13 +685,13 @@ class AudibleProvider(MetadataProvider):
 
             total_found = 0
             total_match = re.search(
-                r"\\b\\d+\\s*-\\s*\\d+\\s+sur\\s+([\\d\\s\\u00a0]+)\\s+résultats",
+                r"\b\d+\s*-\s*\d+\s+sur\s+([\d\s\u00a0]+)\s+résultats",
                 response.text,
                 re.IGNORECASE,
             )
             if total_match:
                 with suppress(ValueError):
-                    total_found = int(re.sub(r"\\D", "", total_match.group(1)))
+                    total_found = int(re.sub(r"\D", "", total_match.group(1)))
 
             asins = parser.asins[:page_size]
             if not asins:
