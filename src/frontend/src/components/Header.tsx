@@ -445,30 +445,15 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           <button
             type="button"
             onClick={toggleDropdown}
-            className={`hover-action relative rounded-full p-2 transition-colors ${
-              isDropdownOpen ? 'bg-(--hover-action)' : ''
-            }`}
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-(--border-muted) bg-[#cbb69a] text-lg font-semibold text-white shadow-sm transition hover:brightness-110"
             aria-label={t('User menu')}
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"
           >
-            <svg
-              className="h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 6.75a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.118a7.5 7.5 0 0115 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.5-1.632z"
-              />
-            </svg>
+            {(displayName || username || '?').trim().slice(0, 1).toUpperCase()}
             {actingAsUser && (
               <span
-                className="absolute top-1 right-1 h-2 w-2 rounded-full border border-(--bg) bg-sky-500"
+                className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full border-2 border-(--bg) bg-sky-500"
                 title={t('Downloading as {user}').replace(
                   '{user}',
                   formatActingAsUserName(actingAsUser),
@@ -477,189 +462,100 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             )}
           </button>
 
-          {/* Dropdown Menu */}
+          {/* Seerr-style account menu */}
           {(isDropdownOpen || isClosing) && (
             <div
-              className={`absolute right-0 mt-2 ${dropdownPanelWidthClass} z-50 rounded-lg border shadow-lg ${
-                dropdownAnimationClass
-              }`}
+              className={`absolute right-0 mt-2 w-[min(360px,calc(100vw-24px))] z-50 overflow-hidden rounded-xl border shadow-2xl ${dropdownAnimationClass}`}
               style={{
-                background: 'var(--bg)',
-                borderColor: 'var(--border-muted)',
+                background: '#1d2938',
+                borderColor: '#344153',
+                color: '#e7ebf2',
               }}
             >
-              <div className="py-1">
-                {onDownloadsClick && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeDropdown();
-                      onDownloadsClick();
-                    }}
-                    className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left transition-colors"
-                  >
-                    <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                    </svg>
-                    <span>{t('Activity')}</span>
-                    {activityBadge && <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold text-white ${activityBadge.colorClass}`}>{activityBadge.total}</span>}
-                  </button>
-                )}
-                {renderSettingsButton('menu')}
-                <a
-                  href="https://github.com/calibrain/shelfmark/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left text-slate-700 transition-colors dark:text-slate-200"
-                  title={t('Submit a bug report')}
+              {authRequired && isAuthenticated && username && (
+                <div className="flex items-center gap-3 border-b px-4 py-4" style={{ borderColor: '#344153' }}>
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#cbb69a] text-xl font-semibold text-white">
+                    {(displayName || username).trim().slice(0, 1).toUpperCase()}
+                  </span>
+                  <div className="min-w-0">
+                    <div className="truncate text-lg font-semibold">{displayName || username}</div>
+                    <div className="truncate text-sm opacity-65">@{username}</div>
+                  </div>
+                </div>
+              )}
+              <div className="py-2">
+                <button
+                  type="button"
+                  onClick={() => { closeDropdown(); onSettingsClick?.(); }}
+                  className="flex w-full items-center gap-3 px-5 py-2.5 text-left text-sm font-medium transition hover:bg-white/5"
                 >
-                  <svg
-                    className="h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 3v1.5M3 21v-6m0 0 2.77-.693a9 9 0 0 1 6.208.682l.108.054a9 9 0 0 0 6.086.71l3.114-.732a48.524 48.524 0 0 1-.005-10.499l-3.11.732a9 9 0 0 1-6.085-.711l-.108-.054a9 9 0 0 0-6.208-.682L3 4.5M3 15V4.5"
-                    />
-                  </svg>
-                  <span>{t('Report a Bug')}</span>
-                </a>
-
-                {/* Debug Buttons */}
-                {debug && (
-                  <>
-                    <button
-                      type="button"
-                      className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left text-orange-600 transition-colors dark:text-orange-400"
-                      onClick={() => void handleDebugDownload()}
-                    >
-                      <svg
-                        className="h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M12 12.75c1.148 0 2.278.08 3.383.237 1.037.146 1.866.966 1.866 2.013 0 3.728-2.35 6.75-5.25 6.75S6.75 18.728 6.75 15c0-1.046.83-1.867 1.866-2.013A24.204 24.204 0 0112 12.75zm0 0c2.883 0 5.647.508 8.207 1.44a23.91 23.91 0 01-1.152 6.06M12 12.75c-2.883 0-5.647.508-8.208 1.44.125 2.104.52 4.136 1.153 6.06M12 12.75a2.25 2.25 0 002.248-2.354M12 12.75a2.25 2.25 0 01-2.248-2.354M12 8.25c.995 0 1.971-.08 2.922-.236.403-.066.74-.358.795-.762a3.778 3.778 0 00-.399-2.25M12 8.25c-.995 0-1.97-.08-2.922-.236-.402-.066-.74-.358-.795-.762a3.734 3.734 0 01.4-2.253M12 8.25a2.25 2.25 0 00-2.248 2.146M12 8.25a2.25 2.25 0 012.248 2.146M8.683 5a6.032 6.032 0 01-1.155-1.002c.07-.63.27-1.222.574-1.747m.581 2.749A3.75 3.75 0 0115.318 5m0 0c.427-.283.815-.62 1.155-.999a4.471 4.471 0 00-.575-1.752M4.921 6a24.048 24.048 0 00-.392 3.314c1.668.546 3.416.914 5.223 1.082M19.08 6c.205 1.08.337 2.187.392 3.314a23.882 23.882 0 01-5.223 1.082"
-                        />
-                      </svg>
-                      <span>{t('Debug')}</span>
-                    </button>
-                    <form action={withBasePath('/api/restart')} method="get" className="w-full">
-                      <button
-                        className="hover-surface flex w-full items-center gap-3 px-4 py-2 text-left text-orange-600 transition-colors dark:text-orange-400"
-                        type="submit"
-                      >
-                        <svg
-                          className="h-5 w-5"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
-                          />
-                        </svg>
-                        <span>{t('Restart')}</span>
-                      </button>
-                    </form>
-                  </>
-                )}
-
-                {/* User Footer */}
-                {authRequired && isAuthenticated && username && (
-                  <div className="border-t" style={{ borderColor: 'var(--border-muted)' }}>
-                    <div className="flex items-center gap-2.5 px-4 py-3">
-                      <span
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-semibold uppercase"
-                        style={{ backgroundColor: 'var(--hover-surface)', color: 'var(--text)' }}
-                      >
-                        {(displayName || username).slice(0, 2)}
-                      </span>
-                      <div className="min-w-0 flex-1 truncate text-sm font-medium">
-                        {displayName || username}
-                      </div>
-                      {onLogout && (
-                        <button
-                          type="button"
-                          onClick={handleLogout}
-                          className="hover-action shrink-0 rounded-full p-2 text-red-600 transition-colors dark:text-red-400"
-                          title={t('Sign Out')}
-                          aria-label={t('Sign Out')}
-                        >
-                          <svg
-                            className="h-5 w-5"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {isAdmin && onActingAsUserChange && (
-                  <div
-                    className="space-y-2 border-t px-4 py-3"
-                    style={{ borderColor: 'var(--border-muted)' }}
-                  >
-                    <div className="text-xs font-medium tracking-wide uppercase opacity-70">
-                      {t('Download as')}
-                    </div>
-                    <div className={isAdminUsersLoading ? 'pointer-events-none opacity-60' : ''}>
-                      <DropdownList
-                        options={actingAsOptions}
-                        value={selectedActingAsValue}
-                        onChange={handleActingAsChange}
-                        placeholder={t('Myself')}
-                        widthClassName="w-full"
-                        buttonClassName="rounded-lg text-sm"
-                      />
-                    </div>
-                    {isAdminUsersLoading && (
-                      <div className="text-xs opacity-70">{t('Loading users...')}</div>
-                    )}
-                    {adminUsersError && (
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="text-xs text-red-600 dark:text-red-400">
-                          {adminUsersError}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => void onLoadAdminUsers?.()}
-                          className="text-xs font-medium text-sky-600 hover:text-sky-700 dark:text-sky-400 dark:hover:text-sky-300"
-                        >
-                          {t('Retry')}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  <svg className="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+                  <span>{t('Profile')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { closeDropdown(); onNavigatePage?.('/requests'); }}
+                  className="flex w-full items-center gap-3 px-5 py-2.5 text-left text-sm font-medium transition hover:bg-white/5"
+                >
+                  <svg className="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  <span>{t('Requests')}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { closeDropdown(); onSettingsClick?.(); }}
+                  className="flex w-full items-center gap-3 px-5 py-2.5 text-left text-sm font-medium transition hover:bg-white/5"
+                >
+                  <svg className="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.7 2.94-.08-.03a1.7 1.7 0 0 0-1.83.28l-.07.06h-3.4l-.05-.08a1.7 1.7 0 0 0-1.56-.85 1.7 1.7 0 0 0-.4.05l-.09.02-1.7-2.94.06-.06A1.7 1.7 0 0 0 9.3 14.5v-.1l-1.7-2.94.08-.03a1.7 1.7 0 0 0 .9-1.5 1.7 1.7 0 0 0-.05-.4l-.02-.09 2.94-1.7.06.06a1.7 1.7 0 0 0 1.88.34l.06-.03h3.4l.05.08a1.7 1.7 0 0 0 1.56.85 1.7 1.7 0 0 0 .4-.05l.09-.02 1.7 2.94-.06.06A1.7 1.7 0 0 0 20.3 13v.1z"/></svg>
+                  <span>{t('Settings')}</span>
+                </button>
               </div>
+              {isAdmin && onActingAsUserChange && (
+                <div className="space-y-2 border-t px-5 py-3" style={{ borderColor: '#344153' }}>
+                  <div className="text-xs font-semibold uppercase tracking-wide opacity-70">{t('Download as')}</div>
+                  <div className={isAdminUsersLoading ? 'pointer-events-none opacity-60' : ''}>
+                    <DropdownList
+                      options={actingAsOptions}
+                      value={selectedActingAsValue}
+                      onChange={handleActingAsChange}
+                      placeholder={t('Myself')}
+                      widthClassName="w-full"
+                      buttonClassName="rounded-lg text-sm"
+                    />
+                  </div>
+                  {isAdminUsersLoading && <div className="text-xs opacity-70">{t('Loading users...')}</div>}
+                  {adminUsersError && (
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="text-xs text-red-400">{adminUsersError}</div>
+                      <button type="button" onClick={() => void onLoadAdminUsers?.()} className="text-xs font-medium text-sky-300">{t('Retry')}</button>
+                    </div>
+                  )}
+                </div>
+              )}
+              {onDownloadsClick && (
+                <button
+                  type="button"
+                  onClick={() => { closeDropdown(); onDownloadsClick(); }}
+                  className="flex w-full items-center gap-3 border-t px-5 py-2.5 text-left text-sm font-medium transition hover:bg-white/5"
+                  style={{ borderColor: '#344153' }}
+                >
+                  <svg className="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/></svg>
+                  <span>{t('Activity')}</span>
+                  {activityBadge && <span className="ml-auto rounded-full bg-violet-600 px-2 py-0.5 text-xs font-semibold text-white">{activityBadge.total}</span>}
+                </button>
+              )}
+              {onLogout && (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="flex w-full items-center gap-3 border-t px-5 py-3 text-left text-sm font-medium transition hover:bg-white/5"
+                  style={{ borderColor: '#344153' }}
+                >
+                  <svg className="h-5 w-5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3"/><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                  <span>{t('Sign Out')}</span>
+                </button>
+              )}
             </div>
-          )}
+          )}}
         </div>
       </div>
     );
