@@ -721,6 +721,10 @@ export const cancelRequest = async (id: number): Promise<RequestRecord> => {
   });
 };
 
+export const deleteAdminRequest = async (id: number): Promise<void> => {
+  await fetchJSON(`${API.adminRequests}/${encodeURIComponent(String(id))}`, { method: 'DELETE' });
+};
+
 export const fulfilAdminRequest = async (
   id: number,
   body: FulfilAdminRequestBody = {},
