@@ -2820,6 +2820,29 @@ class HardcoverProvider(MetadataProvider):
         exclude_unreleased = coerce_bool(
             app_config.get("HARDCOVER_EXCLUDE_UNRELEASED", False), default=False
         )
+
+        # "Newest" must reflect the French edition users will actually read, not
+        # the original work's release date. Hardcover data can contain malformed
+        # or unrelated work dates (including dates years before the French edition).
+        # Sort the fetched page locally using the selected French edition date.
+        if options.sort in {SortOrder.NEWEST, SortOrder.OLDEST}:
+            missing_date = datetime.min if options.sort == SortOrder.NEWEST else datetime.max
+
+            def catalogue_release_date(item: dict[str, Any]) -> datetime:
+                release_date = None
+                if french_only:
+                    edition = _select_french_edition(item.get("editions"))
+                    if edition:
+                        release_date = _parse_release_date(edition.get("release_date"))
+                if release_date is None:
+                    release_date = _parse_release_date(item.get("release_date"))
+                return release_date or missing_date
+
+            raw_books.sort(
+                key=catalogue_release_date,
+                reverse=options.sort == SortOrder.NEWEST,
+            )
+
         books = []
         for item in raw_books:
             book_id = coerce_int(item.get("id"), 0)
