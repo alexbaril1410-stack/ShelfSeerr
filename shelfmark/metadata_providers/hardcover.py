@@ -692,10 +692,13 @@ def _extract_graphql_error_message(payload: Any) -> str:
 # Note: release_year is more consistently populated than release_date_i
 SORT_MAPPING: dict[SortOrder, str] = {
     SortOrder.RELEVANCE: "_text_match:desc,users_count:desc",
-    SortOrder.POPULARITY: "users_count:desc",
-    SortOrder.RATING: "rating:desc",
-    SortOrder.NEWEST: "release_year:desc",
-    SortOrder.OLDEST: "release_year:asc",
+    # These names mirror Hardcover catalogue sort keys.
+    # Trending is scoped to the current month by Hardcover.
+    SortOrder.TRENDING: "trending_count:desc",
+    SortOrder.POPULARITY: "books_users_count:desc",
+    SortOrder.RATING: "books_rating:desc",
+    SortOrder.NEWEST: "books_release_date:desc",
+    SortOrder.OLDEST: "books_release_date:asc",
 }
 
 # `fields` becomes Typesense's `query_by`, but Hardcover keeps `num_typos` and
