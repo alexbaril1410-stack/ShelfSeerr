@@ -357,7 +357,57 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           aria-label={t('Settings')}
           title={isNav ? t('Settings') : undefined}
         >
-          <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"/></svg>
+          <svg
+            className="h-5 w-5"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          {!isNav && <span>{t('Settings')}</span>}
+        </button>
+      );
+    };
+
+    // Icon buttons - reused for both states
+    const iconButtonsNode = (
+      <div className="flex items-center gap-2">
+        {/* Book Library Button */}
+        {calibreWebUrl && (
+          <a
+            href={calibreWebUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover-action flex items-center gap-2 rounded-full px-3 py-2 text-gray-900 transition-all duration-200 dark:text-gray-100"
+            aria-label={t('Open book library')}
+            title={t(showIconsOnly ? 'Book Library' : 'Go To Library')}
+          >
+            <svg
+              className="h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+              />
+            </svg>
             {!showIconsOnly && <span className="text-sm font-medium">{t('Go To Library')}</span>}
           </a>
         )}
@@ -714,56 +764,56 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           </nav>
 
           <nav aria-label={t('Main navigation')} className="fixed inset-x-0 bottom-0 z-50 flex items-center justify-around border-t px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-8px_24px_rgba(0,0,0,0.18)] lg:hidden" style={{ background: 'var(--bg)', borderColor: 'var(--border-muted)' }}>
-            <button type="button" onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }} aria-label={t('Discover')} aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined} className={`flex min-w-0 flex-1 items-center justify-center rounded-xl py-1.5 ${currentPath === '/' || currentPath === '/discover' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
-              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg>
+            <button type="button" onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }} aria-label={t('Discover')} aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/' || currentPath === '/discover' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m7 7 8-3 3 3-8 3-3-3Z"/><path d="m9 10 6 7M16 7l3 3M14.5 16.5l-2 4M9 10l-5 9M4 19h5M12.5 20.5h5M18 10l2 2"/></svg>
             </button>
-            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} aria-label={t('Books')} aria-current={currentPath === '/books' ? 'page' : undefined} className={`flex min-w-0 flex-1 items-center justify-center rounded-xl py-1.5 ${currentPath === '/books' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} aria-label={t('Books')} aria-current={currentPath === '/books' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/books' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
               <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 5.5A2.5 2.5 0 0 1 6 3h12.5v17H6a2.5 2.5 0 0 0-2.5 2V5.5Z"/><path d="M3.5 5.5V22M7.5 7h7M7.5 11h7"/></svg>
             </button>}
-            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} aria-label={t('Audiobooks')} aria-current={currentPath === '/audiobooks' ? 'page' : undefined} className={`flex min-w-0 flex-1 items-center justify-center rounded-xl py-1.5 ${currentPath === '/audiobooks' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} aria-label={t('Audiobooks')} aria-current={currentPath === '/audiobooks' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/audiobooks' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
               <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 6A2.5 2.5 0 0 1 6 3.5h12v16H6A2.5 2.5 0 0 0 3.5 22V6Z"/><path d="M3.5 6V22M7.5 7.5h6M7.5 11h6"/><path d="M6 5.5V5a7 7 0 0 1 14 0v3"/><rect x="5" y="7" width="3" height="5" rx="1.3"/><rect x="18" y="7" width="3" height="5" rx="1.3"/></svg>
             </button>}
-            <button type="button" onClick={() => onNavigatePage?.('/requests')} aria-label={t('Requests')} aria-current={currentPath === '/requests' ? 'page' : undefined} className={`flex min-w-0 flex-1 items-center justify-center rounded-xl py-1.5 ${currentPath === '/requests' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
-              <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+            <button type="button" onClick={() => onNavigatePage?.('/requests')} aria-label={t('Requests')} aria-current={currentPath === '/requests' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/requests' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
             </button>
             <div className="relative flex min-w-0 flex-1 justify-center">
-              {isMoreMenuOpen && <div className="fixed inset-x-0 bottom-[calc(3.25rem+env(safe-area-inset-bottom))] z-[70] w-full overflow-hidden border-t px-4 py-3 shadow-2xl" style={{ background: 'var(--bg)', borderColor: 'var(--border-muted)' }}>
-                <div className="flex flex-col gap-1">
-                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onHomeClick?.(); onNavigatePage?.('/discover'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"/></svg>
+              {isMoreMenuOpen && <div className="fixed inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-[70] w-full overflow-hidden border-t p-3 shadow-2xl" style={{ background: 'var(--bg)', borderColor: 'var(--border-muted)' }}>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onHomeClick?.(); onNavigatePage?.('/discover'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m14.5 5.5 4 4"/><path d="m12.5 7.5 4-4 4 4-4 4"/><path d="m14 10-5 5"/><path d="m8 14 3 3"/><path d="m7 15-3 6 6-3"/><path d="m16 11 3 3"/></svg>
                     <span>{t('Discover')}</span>
                   </button>
-                  {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => { setIsMoreMenuOpen(false); (onNavigateContentType ?? onContentTypeChange)?.('ebook'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 5.5A2.5 2.5 0 0 1 6 3h12.5v17H6a2.5 2.5 0 0 0-2.5 2V5.5Z"/><path d="M3.5 5.5V22M7.5 7h7M7.5 11h7"/></svg>
+                  {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => { setIsMoreMenuOpen(false); (onNavigateContentType ?? onContentTypeChange)?.('ebook'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18V5a2 2 0 0 1 2-2h2a5 5 0 0 1 5 5 5 5 0 0 1 5-5h2a2 2 0 0 1 2 2v13h-4a5 5 0 0 0-5 3 5 5 0 0 0-5-3H3Z"/></svg>
                     <span>{t('Books')}</span>
                   </button>}
-                  {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => { setIsMoreMenuOpen(false); (onNavigateContentType ?? onContentTypeChange)?.('audiobook'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.5 6A2.5 2.5 0 0 1 6 3.5h12v16H6A2.5 2.5 0 0 0 3.5 22V6Z"/><path d="M3.5 6V22M7.5 7.5h6M7.5 11h6"/><path d="M6 5.5V5a7 7 0 0 1 14 0v3"/><rect x="5" y="7" width="3" height="5" rx="1.3"/><rect x="18" y="7" width="3" height="5" rx="1.3"/></svg>
+                  {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => { setIsMoreMenuOpen(false); (onNavigateContentType ?? onContentTypeChange)?.('audiobook'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8v13"/><path d="M3 18V5a2 2 0 0 1 2-2h2a5 5 0 0 1 5 5 5 5 0 0 1 5-5h2a2 2 0 0 1 2 2v13h-4a5 5 0 0 0-5 3 5 5 0 0 0-5-3H3Z"/><path d="M5 8V6a7 7 0 0 1 14 0v2"/><rect x="3" y="8" width="4" height="6" rx="2"/><rect x="17" y="8" width="4" height="6" rx="2"/></svg>
                     <span>{t('Audiobooks')}</span>
                   </button>}
-                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/requests'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/requests'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
                     <span>{t('Requests')}</span>
                   </button>
-                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/blocks'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/blocks'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"/><path d="M9.9 5.2A10.8 10.8 0 0 1 12 5c5 0 8.5 4.5 9.5 7-.4 1.1-1.2 2.3-2.3 3.4M6.2 6.2C3.8 7.6 2.7 10 2.5 12c1 2.5 4.5 7 9.5 7 1.1 0 2.1-.2 3-.6"/></svg>
                     <span>{t('Blocklist')}</span>
                   </button>
-                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/issues'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/></svg>
+                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/issues'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M10.3 3.8 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.8a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 16.5h.01"/></svg>
                     <span>{t('Issues')}</span>
                   </button>
-                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/users'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/></svg>
+                  <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/users'); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M16 21v-1.5a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4V21"/><circle cx="9" cy="7" r="4"/><path d="M20 21v-1.5a4 4 0 0 0-3-3.9M16 3.2a4 4 0 0 1 0 7.6"/></svg>
                     <span>{t('Users')}</span>
                   </button>
-                  {onSettingsClick && <button type="button" onClick={() => { setIsMoreMenuOpen(false); onSettingsClick(); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium">
-                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 0 0 15 0m-15 0a7.5 7.5 0 1 1 15 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077 1.41-.513m14.095-5.13 1.41-.513M5.106 17.785l1.15-.964m11.49-9.642 1.149-.964M7.501 19.795l.75-1.3m7.5-12.99.75-1.3m-6.063 16.658.26-1.477m2.605-14.772.26-1.477m0 17.726-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205 12 12m6.894 5.785-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"/></svg>
+                  {onSettingsClick && <button type="button" onClick={() => { setIsMoreMenuOpen(false); onSettingsClick(); }} className="hover-surface flex min-h-12 w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-medium">
+                    <svg viewBox="0 0 24 24" className="h-6 w-6 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9L16 21h-2.8l-.3-1.8a8 8 0 0 1-1.7-.7l-1.6.8-1.5-2.4 1.4-1.2a7 7 0 0 1 0-1.8l-1.4-1.2 1.5-2.4 1.6.8a8 8 0 0 1 1.7-.7l.3-1.8H16l.3 1.8a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.4Z"/></svg>
                     <span>{t('Settings')}</span>
                   </button>}
                 </div>
               </div>}
-              <button type="button" onClick={() => setIsMoreMenuOpen((open) => !open)} aria-label={t('More')} aria-expanded={isMoreMenuOpen} className={`flex min-w-0 flex-1 items-center justify-center rounded-xl py-1.5 ${isMoreMenuOpen ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <button type="button" onClick={() => setIsMoreMenuOpen((open) => !open)} aria-label={t('More')} aria-expanded={isMoreMenuOpen} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${isMoreMenuOpen ? 'text-violet-400' : 'text-(--text-muted)'}`}>
                 <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
               </button>
             </div>
