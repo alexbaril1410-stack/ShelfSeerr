@@ -1176,7 +1176,6 @@ class HardcoverProvider(MetadataProvider):
         SortOrder.RATING,
         SortOrder.NEWEST,
         SortOrder.OLDEST,
-        SortOrder.SERIES_ORDER,
     )
     capabilities: ClassVar[tuple[MetadataCapability, ...]] = (
         MetadataCapability(
