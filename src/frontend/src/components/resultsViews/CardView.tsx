@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSearchMode } from '../../contexts/SearchModeContext';
-import type { Book, ButtonStateInfo } from '../../types';
+import type { Book, ButtonStateInfo, ContentType } from '../../types';
 import { getDownloadsCount } from '../../types';
 import { bookSupportsTargets } from '../../utils/bookTargetLoader';
 import { BookActionButton } from '../BookActionButton';
@@ -14,6 +14,7 @@ const SkeletonLoader = () => (
 );
 
 interface CardViewProps {
+  contentType: ContentType;
   book: Book;
   onDetails: (id: string) => Promise<void>;
   onDownload: (book: Book) => Promise<void>;
@@ -26,6 +27,7 @@ interface CardViewProps {
 
 export const CardView = ({
   book,
+  contentType,
   onDetails,
   onDownload,
   onGetReleases,
@@ -101,7 +103,7 @@ export const CardView = ({
               #{book.series_position}
             </div>
           )}
-          <LibraryBadge library={book.library} overlay className="absolute top-2 right-2 z-10" />
+          <LibraryBadge library={book.library} contentType={contentType} overlay className="absolute top-2 right-2 z-10" />
           {book.preview && !imageError ? (
             <>
               {!imageLoaded && (
