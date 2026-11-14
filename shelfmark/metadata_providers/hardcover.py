@@ -1174,7 +1174,7 @@ class HardcoverProvider(MetadataProvider):
     display_name = "Hardcover"
     requires_auth = True
     supported_sorts: ClassVar[tuple[SortOrder, ...]] = (
-        SortOrder.RELEVANCE,
+        SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
