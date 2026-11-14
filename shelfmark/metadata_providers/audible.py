@@ -287,6 +287,19 @@ def _duration(product: dict[str, Any]) -> str | None:
     return None
 
 
+def _release_date(product: dict[str, Any]) -> date | None:
+    """Return Audible's exact release date when it is available."""
+    raw = product.get("release_date") or product.get("publication_date")
+    if not raw:
+        return None
+    with suppress(TypeError, ValueError, OverflowError):
+        if isinstance(raw, (int, float)):
+            return date.fromtimestamp(raw)
+        value = str(raw).strip()
+        return date.fromisoformat(value[:10])
+    return None
+
+
 def _year(product: dict[str, Any]) -> int | None:
     raw = product.get("release_date") or product.get("publication_date")
     if not raw:
@@ -635,13 +648,66 @@ class AudibleProvider(MetadataProvider):
         return SearchResult(books=books, page=page, total_found=total, has_more=offset + len(page_children) < total)
 
     def search_paginated(self, options: MetadataSearchOptions) -> SearchResult:
-        """Support the full series view workflow, with accurate page metadata."""
+        """Search Audible and keep release-date sorting meaningful for real releases."""
         series_value = str(options.fields.get("series", "")).strip()
         if series_value:
             series_asin = series_value.removeprefix("id:").removeprefix("asin:").strip().upper()
             if not re.fullmatch(r"[A-Z0-9]{10}", series_asin):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
+
+        if options.sort == SortOrder.NEWEST:
+            # Audible's -ReleaseDate puts future preorders first. Scan successive
+            # API pages and retain only titles already released in this marketplace.
+            collected: list[tuple[date, BookMetadata]] = []
+            raw_total = 0
+            raw_page = 1
+            page_size = min(max(options.limit, 1), _MAX_RESULTS)
+            scan_limit = 20
+            while raw_page <= scan_limit and len(collected) < options.page * page_size + 1:
+                page_options = MetadataSearchOptions(
+                    query=options.query,
+                    limit=page_size,
+                    page=raw_page,
+                    sort=options.sort,
+                    fields=options.fields,
+                    user_id=options.user_id,
+                    search_type=options.search_type,
+                )
+                payload = self._search_payload(page_options)
+                products = _product_items(payload)
+                if isinstance(payload, dict):
+                    response = payload.get("response")
+                    metadata = response if isinstance(response, dict) else payload
+                    value = metadata.get("total_results") or metadata.get("totalResults")
+                    with suppress(TypeError, ValueError):
+                        raw_total = int(value)
+                for product in products:
+                    release_date = _release_date(product)
+                    book = _parse_product(product, self.marketplace)
+                    if (
+                        release_date
+                        and release_date <= date.today()
+                        and book
+                        and (not self.french_only or _is_french_language(book.language))
+                    ):
+                        collected.append((release_date, book))
+                if not products or len(products) < page_size or (
+                    raw_total and raw_page * page_size >= raw_total
+                ):
+                    break
+                raw_page += 1
+
+            start = (options.page - 1) * page_size
+            page_items = collected[start:start + page_size]
+            has_more = len(collected) > start + page_size or raw_page > scan_limit
+            return SearchResult(
+                books=[book for _, book in sorted(page_items, key=lambda item: item[0], reverse=True)],
+                page=options.page,
+                total_found=len(collected),
+                has_more=has_more,
+            )
+
         payload = self._search_payload(options)
         products = _product_items(payload)
         books = [
@@ -650,6 +716,14 @@ class AudibleProvider(MetadataProvider):
             if (book := _parse_product(product, self.marketplace))
             and (not self.french_only or _is_french_language(book.language))
         ]
+        if options.sort == SortOrder.OLDEST:
+            books.sort(
+                key=lambda book: next(
+                    (_release_date(product) for product in products
+                     if str(product.get("asin") or "").upper() == book.provider_id.upper()),
+                    date.max,
+                )
+            )
 
         total_found = 0
         if isinstance(payload, dict):
