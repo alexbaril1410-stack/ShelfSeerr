@@ -251,7 +251,11 @@ def register_metadata_routes(
         try:
             from dataclasses import asdict
 
-            from shelfmark.metadata_providers import get_configured_provider
+            from shelfmark.metadata_providers import (
+                MetadataSearchOptions,
+                SortOrder,
+                get_configured_provider,
+            )
 
             section = request.args.get("section", "").strip()
             content_type = request.args.get("content_type", "ebook").strip()
@@ -270,7 +274,20 @@ def register_metadata_routes(
             if not provider or not provider.is_available():
                 return jsonify({"books": [], "provider": None, "section": section}), 200
 
-            result = provider.discover(section, limit=limit, user_id=db_user_id)
+            if content_type == "audiobook" and section == "popular" and provider.name == "audible":
+                # Keep the discovery carousel UI and response flow unchanged, while
+                # sourcing its books from the exact catalogue popularity sort.
+                result = provider.search_paginated(
+                    MetadataSearchOptions(
+                        query="*",
+                        limit=limit,
+                        page=1,
+                        sort=SortOrder.POPULARITY,
+                        user_id=db_user_id,
+                    )
+                )
+            else:
+                result = provider.discover(section, limit=limit, user_id=db_user_id)
             books_data = [asdict(book) for book in result.books]
 
             from shelfmark.core.utils import transform_cover_url
