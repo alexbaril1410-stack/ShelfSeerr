@@ -120,6 +120,48 @@ query GetListBooksById($id: Int!, $limit: Int!, $offset: Int!) {
 }
 """
 
+HARDCOVER_CATALOGUE_BOOKS_QUERY = """
+query GetCatalogueBooks($limit: Int!, $offset: Int!) {
+    books(
+        where: {
+            canonical_id: {_is_null: true},
+            state: {_in: ["normalized", "normalizing"]}
+        },
+        order_by: [{release_date: desc_nulls_last}, {id: desc}],
+        limit: $limit,
+        offset: $offset
+    ) {
+        id
+        title
+        subtitle
+        slug
+        release_date
+        headline
+        description
+        pages
+        rating
+        ratings_count
+        users_count
+        cached_image
+        cached_contributors
+        cached_tags
+        contributions(where: {contribution: {_eq: "Author"}}) {
+            author { name }
+        }
+        featured_book_series {
+            position
+            series { id name primary_books_count }
+        }
+    }
+    books_aggregate(where: {
+        canonical_id: {_is_null: true},
+        state: {_in: ["normalized", "normalizing"]}
+    }) {
+        aggregate { count }
+    }
+}
+"""
+
 HARDCOVER_TRENDING_BOOKS_QUERY = """
 query GetTrendingBooks($duration: TrendingDuration!, $limit: Int!, $offset: Int!) {
     books_trending(duration: $duration, limit: $limit, offset: $offset) {
@@ -2548,42 +2590,35 @@ class HardcoverProvider(MetadataProvider):
         limit: int = 20,
         user_id: int | None = None,
     ) -> SearchResult:
-        """Browse Hardcover public catalogue for homepage discovery shelves.
-
-        Typesense accepts a wildcard query to browse all matching documents. The
-        existing search pipeline still applies Hardcover parsing, sorting and cache.
-        """
+        """Browse Hardcover catalogue shelves using native catalogue ordering."""
         if not self.api_key:
             return SearchResult(books=[], page=1, total_found=0, has_more=False)
 
         safe_limit = max(1, min(limit, 40))
-        if section == "trending":
-            return self._discover_trending(safe_limit)
-        
         sort_by_section = {
+            "trending": SortOrder.TRENDING,
             "popular": SortOrder.POPULARITY,
             "new_releases": SortOrder.NEWEST,
+            "oldest": SortOrder.OLDEST,
+            "rating": SortOrder.RATING,
         }
         sort_order = sort_by_section.get(section)
         if sort_order is None:
             return SearchResult(books=[], page=1, total_found=0, has_more=False)
-
         options = MetadataSearchOptions(
             query="*",
-            limit=min(safe_limit * 2, 40),
+            limit=safe_limit,
             page=1,
             sort=sort_order,
             user_id=user_id,
         )
-        result = self.search_paginated(options)
-        books = result.books[:safe_limit]
-        return SearchResult(books=books, page=1, total_found=len(books), has_more=False)
+        return self.search_paginated(options)
 
     def _discover_trending(self, limit: int) -> SearchResult:
         """Fetch Hardcover's native trending list, then hydrate its book IDs."""
         trending = self._execute_query(
             HARDCOVER_TRENDING_BOOKS_QUERY,
-            {"duration": "week", "limit": min(limit * 2, 40), "offset": 0},
+            {"duration": "month", "limit": min(limit * 2, 40), "offset": 0},
         )
         trending_data = (trending or {}).get("books_trending") or {}
         book_ids = trending_data.get("ids") or []
@@ -2648,6 +2683,99 @@ class HardcoverProvider(MetadataProvider):
             has_more=False,
         )
 
+    def _search_catalogue(self, options: MetadataSearchOptions) -> SearchResult:
+        """Fetch a sorted public catalogue page using Hardcover's GraphQL API."""
+        page = max(1, options.page)
+        limit = max(1, min(options.limit, HARDCOVER_PAGE_SIZE))
+        offset = (page - 1) * limit
+
+        if options.sort in {SortOrder.TRENDING, SortOrder.POPULARITY}:
+            trending = self._execute_query(
+                HARDCOVER_TRENDING_BOOKS_QUERY,
+                {"duration": "month", "limit": limit, "offset": offset},
+            )
+            trending_data = (trending or {}).get("books_trending") or {}
+            ids = [
+                coerce_int(book_id, 0)
+                for book_id in (trending_data.get("ids") or [])
+            ]
+            ids = [book_id for book_id in ids if book_id > 0]
+            if not ids:
+                return SearchResult(books=[], page=page, total_found=0, has_more=False)
+            hydrated = self._execute_query(HARDCOVER_BOOKS_BY_IDS_QUERY, {"bookIds": ids})
+            raw_books = (hydrated or {}).get("books") or []
+            by_id = {
+                coerce_int(book.get("id"), 0): book
+                for book in raw_books
+                if isinstance(book, dict)
+            }
+            raw_books = [by_id[book_id] for book_id in ids if book_id in by_id]
+            if options.sort == SortOrder.POPULARITY:
+                raw_books.sort(
+                    key=lambda book: coerce_int(book.get("users_count"), 0),
+                    reverse=True,
+                )
+            total = offset + len(ids)
+            has_more = len(ids) >= limit
+        else:
+            order_by = {
+                SortOrder.RATING: "{rating: desc_nulls_last}, {id: desc}",
+                SortOrder.NEWEST: "{release_date: desc_nulls_last}, {id: desc}",
+                SortOrder.OLDEST: "{release_date: asc_nulls_last}, {id: asc}",
+            }[options.sort]
+            query = HARDCOVER_CATALOGUE_BOOKS_QUERY.replace(
+                "{release_date: desc_nulls_last}, {id: desc}", order_by
+            )
+            result = self._execute_query(query, {"limit": limit, "offset": offset})
+            root = result or {}
+            raw_books = root.get("books") or []
+            aggregate = root.get("books_aggregate") or {}
+            total = coerce_int(
+                ((aggregate.get("aggregate") or {}).get("count")), 0
+            )
+            has_more = offset + len(raw_books) < total
+
+        french_only = coerce_bool(app_config.get("HARDCOVER_FRENCH_ONLY", True), default=True)
+        book_ids = tuple(coerce_int(book.get("id"), 0) for book in raw_books)
+        french_editions = self._fetch_french_editions(book_ids) if french_only else {}
+        if french_only and french_editions is None:
+            logger.warning("Hardcover French-edition lookup failed for catalogue")
+            french_only = False
+
+        exclude_compilations = coerce_bool(
+            app_config.get("HARDCOVER_EXCLUDE_COMPILATIONS", False), default=False
+        )
+        exclude_unreleased = coerce_bool(
+            app_config.get("HARDCOVER_EXCLUDE_UNRELEASED", False), default=False
+        )
+        books = []
+        for item in raw_books:
+            book_id = coerce_int(item.get("id"), 0)
+            if exclude_compilations and (
+                item.get("compilation")
+                or _looks_like_compilation_title(str(item.get("title") or ""))
+            ):
+                continue
+            if exclude_unreleased:
+                release_date = _parse_release_date(item.get("release_date"))
+                if release_date and release_date.date() > datetime.now(UTC).date():
+                    continue
+            if french_only:
+                edition = french_editions.get(book_id)
+                if not edition:
+                    continue
+                self._apply_french_edition(item, edition)
+            parsed = self._parse_book(item)
+            if parsed:
+                books.append(parsed)
+
+        return SearchResult(
+            books=books,
+            page=page,
+            total_found=total,
+            has_more=has_more,
+        )
+
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         """Search for books using Hardcover's search API."""
         return self.search_paginated(options).books
@@ -2657,6 +2785,22 @@ class HardcoverProvider(MetadataProvider):
         if not self.api_key:
             logger.warning("Hardcover API key not configured")
             return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+
+        # Catalogue sort options use Hardcover's native book/trending queries.
+        # Keep ordinary title/author searches on Typesense.
+        if (
+            options.query.strip() == "*"
+            and not options.fields
+            and options.search_type == SearchType.GENERAL
+            and options.sort in {
+                SortOrder.TRENDING,
+                SortOrder.POPULARITY,
+                SortOrder.RATING,
+                SortOrder.NEWEST,
+                SortOrder.OLDEST,
+            }
+        ):
+            return self._search_catalogue(options)
 
         # Allow pasting a Hardcover list URL directly in the search input
         list_url_parts = self._detect_list_url(options.query)
