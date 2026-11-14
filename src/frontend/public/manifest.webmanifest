@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "ShelfSeerr",
+  "short_name": "ShelfSeerr",
+  "description": "Discover books and audiobooks and manage requests",
+  "start_url": "/discover",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone"],
+  "orientation": "any",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "icons": [
+    {
+      "src": "/shelfseerr-app-icon-512-transparent.png.PNG",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
