@@ -119,8 +119,9 @@ export const CompactView = ({
                 style={{
                   opacity: imageLoaded ? 1 : 0,
                   transition: 'opacity 0.3s ease-in-out',
-                  objectFit: 'cover',
-                  objectPosition: 'top',
+                  objectFit: book.cover_aspect === 'square' ? 'contain' : 'cover',
+                  objectPosition: book.cover_aspect === 'square' ? 'center' : 'top',
+                  background: 'var(--bg-soft)',
                 }}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageError(true)}
@@ -187,9 +188,9 @@ export const CompactView = ({
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col p-3 py-2">
-        <div className="min-w-0 space-y-0.5">
+        <div className="min-h-0 min-w-0 space-y-0.5 overflow-hidden">
           <h3
-            className="line-clamp-3 min-w-0 text-base leading-tight font-semibold"
+            className="line-clamp-2 min-w-0 text-base leading-tight font-semibold"
             title={book.title || t('Untitled')}
           >
             {book.title || t('Untitled')}
@@ -209,12 +210,12 @@ export const CompactView = ({
                 fields={book.display_fields.filter(
                   (f) => f.icon !== 'editions' && f.icon !== 'microphone',
                 )}
-                className="text-xs opacity-70"
+                className="max-h-5 min-w-0 flex-nowrap overflow-hidden text-xs opacity-70 [&>span]:min-w-0 [&>span]:max-w-full [&>span>span]:truncate"
               />
               {microphoneField && (
-                <div className="flex items-center gap-0.5 text-xs opacity-70">
+                <div className="flex min-w-0 items-center gap-0.5 overflow-hidden text-xs opacity-70">
                   <DisplayFieldIcon icon="microphone" />
-                  <span>{microphoneField.value}</span>
+                  <span className="truncate">{microphoneField.value}</span>
                 </div>
               )}
             </>
@@ -242,7 +243,7 @@ export const CompactView = ({
           )}
 
           {showDetailsButton ? (
-            <div className="flex gap-1.5">
+            <div className="flex shrink-0 gap-1.5">
               <button
                 type="button"
                 className="flex shrink-0 items-center justify-center gap-1 rounded-sm border px-2 py-1.5 text-xs"
