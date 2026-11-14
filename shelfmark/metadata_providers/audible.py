@@ -378,7 +378,14 @@ class AudibleProvider(MetadataProvider):
     name = "audible"
     display_name = "Audible"
     requires_auth = False
-    supported_sorts = (SortOrder.RELEVANCE, SortOrder.POPULARITY, SortOrder.NEWEST, SortOrder.SERIES_ORDER)
+    supported_sorts = (
+        SortOrder.RELEVANCE,
+        SortOrder.TRENDING,
+        SortOrder.POPULARITY,
+        SortOrder.RATING,
+        SortOrder.NEWEST,
+        SortOrder.SERIES_ORDER,
+    )
     capabilities = (
         MetadataCapability(key="view_series", field_key="series", sort=SortOrder.SERIES_ORDER),
     )
@@ -447,8 +454,10 @@ class AudibleProvider(MetadataProvider):
             "page": max(options.page - 1, 0),
             "response_groups": _RESPONSE_GROUPS,
         }
-        if options.sort == SortOrder.POPULARITY:
+        if options.sort in {SortOrder.TRENDING, SortOrder.POPULARITY}:
             params["products_sort_by"] = "BestSellers"
+        elif options.sort == SortOrder.RATING:
+            params["products_sort_by"] = "AvgRating"
         elif options.sort == SortOrder.NEWEST:
             params["products_sort_by"] = "-ReleaseDate"
         if options.search_type == SearchType.AUTHOR:
