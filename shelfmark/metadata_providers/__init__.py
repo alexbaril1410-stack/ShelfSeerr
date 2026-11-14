@@ -23,7 +23,8 @@ class SortOrder(StrEnum):
     """Sort order for search results."""
 
     RELEVANCE = "relevance"  # Best match first (default)
-    POPULARITY = "popularity"  # Most popular first
+    TRENDING = "trending"  # Trending this month
+    POPULARITY = "popularity"  # Most popular this month
     RATING = "rating"  # Highest rated first
     NEWEST = "newest"  # Most recently published first
     OLDEST = "oldest"  # Oldest published first
@@ -33,10 +34,11 @@ class SortOrder(StrEnum):
 # Display labels for sort options
 SORT_LABELS: dict[SortOrder, str] = {
     SortOrder.RELEVANCE: "Most relevant",
-    SortOrder.POPULARITY: "Most popular",
-    SortOrder.RATING: "Highest rated",
-    SortOrder.NEWEST: "Newest",
-    SortOrder.OLDEST: "Oldest",
+    SortOrder.TRENDING: "Tendances",
+    SortOrder.POPULARITY: "Les plus populaires",
+    SortOrder.RATING: "Les mieux notés",
+    SortOrder.NEWEST: "Les plus récents",
+    SortOrder.OLDEST: "Les plus anciens",
     SortOrder.SERIES_ORDER: "Series order",
 }
 
