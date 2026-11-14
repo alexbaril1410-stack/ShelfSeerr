@@ -555,7 +555,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                 </button>
               )}
             </div>
-          )}}
+          )}
         </div>
       </div>
     );
