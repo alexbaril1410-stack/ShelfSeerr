@@ -147,6 +147,14 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
     ref,
   ) => {
     const { t } = useLanguage();
+
+    // Retained temporarily for compatibility with existing Header props/helpers.
+    void debug;
+    void onDownloadsClick;
+    void activityBadge;
+    void dropdownPanelWidthClass;
+    void handleDebugDownload;
+    void renderSettingsButton;
     const activityBadge = getActivityBadgeState(statusCounts, isAdmin);
     const settingsEnabled = canAccessSettings ?? isAdmin;
     const searchBarRef = useRef<SearchBarHandle>(null);
