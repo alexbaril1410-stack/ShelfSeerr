@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useSearchMode } from '../../contexts/SearchModeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
-import type { Book, ButtonStateInfo, DisplayField } from '../../types';
+import type { Book, ButtonStateInfo, ContentType, DisplayField } from '../../types';
 import { getDownloadsCount } from '../../types';
 import { bookSupportsTargets } from '../../utils/bookTargetLoader';
 import { getFormatColor, getLanguageColor } from '../../utils/colorMaps';
@@ -11,6 +11,7 @@ import { BookTargetDropdown } from '../BookTargetDropdown';
 import { DisplayFieldIcon, DisplayFieldBadge, LibraryBadge } from '../shared';
 
 interface ListViewProps {
+  contentType: ContentType;
   books: Book[];
   onDetails: (id: string) => Promise<void>;
   onDownload: (book: Book) => Promise<void>;
@@ -83,6 +84,7 @@ const ListViewThumbnail = ({
 };
 
 export const ListView = ({
+  contentType,
   books,
   onDetails,
   onDownload,
@@ -206,7 +208,7 @@ export const ListView = ({
                     {book.author || t('Unknown author')}
                     {book.year && <span className="sm:hidden"> • {book.year}</span>}
                   </p>
-                  <LibraryBadge library={book.library} className="mt-0.5" />
+                  <LibraryBadge library={book.library} contentType={contentType} className="mt-0.5" />
                 </div>
 
                 {/* Mobile universal mode info */}
