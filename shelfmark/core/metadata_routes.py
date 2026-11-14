@@ -404,9 +404,13 @@ def register_metadata_routes(
                         else:
                             fields[search_field.key] = value
 
-            # Require either a query or at least one field value
+            # Hardcover supports public catalogue browsing through its Typesense wildcard.
+            # Keep empty searches rejected for every other provider.
             if not query and not fields:
-                return jsonify({"error": "Either 'query' or search field values are required"}), 400
+                if provider.name == "hardcover":
+                    query = "*"
+                else:
+                    return jsonify({"error": "Either 'query' or search field values are required"}), 400
 
             options = MetadataSearchOptions(
                 query=query,
