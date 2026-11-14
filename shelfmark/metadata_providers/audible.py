@@ -392,6 +392,7 @@ class AudibleProvider(MetadataProvider):
     display_name = "Audible"
     requires_auth = False
     supported_sorts = (
+        SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
@@ -655,6 +656,74 @@ class AudibleProvider(MetadataProvider):
             if not re.fullmatch(r"[A-Z0-9]{10}", series_asin):
                 return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
             return self._fetch_series_books(series_asin, options.page, options.limit)
+
+        if options.sort == SortOrder.TRENDING:
+            # Audible's storefront popularity-rank ordering is distinct from the
+            # JSON API's BestSellers velocity sort. Use the storefront search so
+            # the ranking also works with title/author searches.
+            page_size = min(max(options.limit, 1), _MAX_RESULTS)
+            query = options.query.strip() or "*"
+            params = {
+                "keywords": query,
+                "sort": "popularity-rank",
+                "pageSize": page_size,
+            }
+            if options.page > 1:
+                params["page"] = options.page
+            url = f"https://www.audible.{self.marketplace}/search"
+            try:
+                response = requests.get(
+                    url,
+                    params=params,
+                    headers={
+                        "Accept": "text/html",
+                        "User-Agent": "Mozilla/5.0 (compatible; ShelfSeerr/1.0; audiobook search)",
+                    },
+                    timeout=_TIMEOUT_SECONDS,
+                )
+                response.raise_for_status()
+                parser = _ChartASINParser()
+                parser.feed(response.text)
+                parser.close()
+            except (requests.RequestException, ValueError) as exc:
+                logger.warning("Audible trending search failed (%s): %s", self.marketplace, exc)
+                return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+
+            asins = parser.asins[:page_size]
+            if not asins:
+                return SearchResult(books=[], page=options.page, total_found=0, has_more=False)
+            payload = self._request("catalog/products", {
+                "asins": ",".join(asins),
+                "num_results": len(asins),
+                "response_groups": _RESPONSE_GROUPS,
+            })
+            products_by_asin = {
+                str(product.get("asin") or "").upper(): product
+                for product in _product_items(payload)
+            }
+            books: list[BookMetadata] = []
+            for asin in asins:
+                product = products_by_asin.get(asin.upper())
+                if not product:
+                    continue
+                book = _parse_product(product, self.marketplace)
+                if book and (not self.french_only or _is_french_language(book.language)):
+                    books.append(book)
+            total_match = re.search(
+                r"\\b\\d+\\s*-\\s*\\d+\\s+sur\\s+([\\d\\s\\u00a0]+)\\s+résultats",
+                response.text,
+                re.IGNORECASE,
+            )
+            total_found = 0
+            if total_match:
+                with suppress(ValueError):
+                    total_found = int(re.sub(r"\\D", "", total_match.group(1)))
+            return SearchResult(
+                books=books,
+                page=options.page,
+                total_found=total_found or len(books),
+                has_more=(options.page * page_size < total_found) if total_found else len(asins) >= page_size,
+            )
 
         if options.sort == SortOrder.NEWEST and options.query.strip() == "*" and not options.fields:
             # Use Audible's curated storefront for the unfiltered catalogue.
