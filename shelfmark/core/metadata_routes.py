@@ -294,6 +294,78 @@ def register_metadata_routes(
             logger.error_trace(f"Metadata discovery error: {e}")
             return jsonify({"error": "Metadata discovery failed"}), 500
 
+    @app.route("/api/metadata/debug/hardcover-newest", methods=["GET"])
+    @login_required
+    def api_metadata_debug_hardcover_newest() -> Response | tuple[Response, int]:
+        """Temporary authenticated diagnostic for Hardcover newest catalogue results."""
+        try:
+            from shelfmark.metadata_providers import get_provider, get_provider_kwargs
+            from shelfmark.metadata_providers.hardcover import (
+                HARDCOVER_CATALOGUE_BOOKS_QUERY,
+                _select_french_edition,
+            )
+
+            kwargs = get_provider_kwargs("hardcover")
+            provider = get_provider("hardcover", **kwargs)
+            if not provider.is_available():
+                return jsonify({"error": "Hardcover provider is not available"}), 503
+
+            limit = 25
+            raw_result = provider._execute_query(
+                HARDCOVER_CATALOGUE_BOOKS_QUERY,
+                {"limit": limit, "offset": 0},
+            ) or {}
+            raw_books = raw_result.get("books") or []
+            aggregate = raw_result.get("books_aggregate") or {}
+            raw_summary = []
+            for book in raw_books:
+                edition = _select_french_edition(book.get("editions"))
+                raw_summary.append({
+                    "id": book.get("id"),
+                    "title": book.get("title"),
+                    "work_release_date": book.get("release_date"),
+                    "selected_french_edition": ({
+                        "id": edition.get("id"),
+                        "title": edition.get("title"),
+                        "release_date": edition.get("release_date"),
+                        "language": edition.get("language"),
+                    } if edition else None),
+                })
+
+            from shelfmark.metadata_providers import MetadataSearchOptions, SortOrder
+            processed = provider.search_paginated(MetadataSearchOptions(
+                query="*",
+                limit=limit,
+                page=1,
+                sort=SortOrder.NEWEST,
+            ))
+            processed_summary = [{
+                "id": book.provider_id,
+                "title": book.title,
+                "publish_year": book.publish_year,
+                "isbn_10": book.isbn_10,
+                "isbn_13": book.isbn_13,
+            } for book in processed.books]
+
+            response = jsonify({
+                "diagnostic": "hardcover-newest",
+                "cache": "The diagnostic raw request bypasses ShelfSeerr's metadata result cache.",
+                "raw_hardcover": {
+                    "count_returned": len(raw_books),
+                    "total_found": ((aggregate.get("aggregate") or {}).get("count")),
+                    "books": raw_summary,
+                },
+                "shelfseerr_processed": {
+                    "count_returned": len(processed.books),
+                    "books": processed_summary,
+                },
+            })
+            response.headers["Cache-Control"] = "no-store, max-age=0"
+            return response
+        except _IMPORT_OPERATIONAL_ERRORS as e:
+            logger.error_trace(f"Hardcover newest diagnostic failed: {e}")
+            return jsonify({"error": "Hardcover diagnostic failed", "detail": str(e)}), 500
+
     @app.route("/api/metadata/search", methods=["GET"])
     @login_required
     def api_metadata_search() -> Response | tuple[Response, int]:
