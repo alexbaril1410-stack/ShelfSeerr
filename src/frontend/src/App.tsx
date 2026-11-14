@@ -634,8 +634,9 @@ function App() {
   const [metadataProviders, setMetadataProviders] = useState<MetadataProviderSummary[]>([]);
   const [discoveryShelves, setDiscoveryShelves] = useState<{
     trending: Book[];
+    popular: Book[];
     new_releases: Book[];
-  }>({ trending: [], new_releases: [] });
+  }>({ trending: [], popular: [], new_releases: [] });
   const [isDiscoveryLoading, setIsDiscoveryLoading] = useState(false);
   const [configuredMetadataProvider, setConfiguredMetadataProvider] = useState<string | null>(null);
   const [configuredAudiobookMetadataProvider, setConfiguredAudiobookMetadataProvider] = useState<
@@ -953,11 +954,12 @@ function App() {
     setIsDiscoveryLoading(true);
     Promise.all([
       discoverMetadata('trending', effectiveContentType),
+      discoverMetadata('popular', effectiveContentType),
       discoverMetadata('new_releases', effectiveContentType),
     ])
-      .then(([trending, newReleases]) => {
+      .then(([trending, popular, newReleases]) => {
         if (isCurrent) {
-          setDiscoveryShelves({ trending, new_releases: newReleases });
+          setDiscoveryShelves({ trending, popular, new_releases: newReleases });
         }
       })
       .catch((error: unknown) => {
