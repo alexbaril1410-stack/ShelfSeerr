@@ -77,7 +77,7 @@ export const CompactView = ({
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- mouse handlers drive a decorative hover shadow only; no interactive behavior requiring keyboard support
     <article
-      className={`book-card animate-pop-up relative flex! w-full flex-row! transition-shadow duration-300 ${contentType === 'audiobook' ? 'h-[180px]!' : 'h-[180px]!'}`}
+      className={`book-card animate-pop-up relative flex! w-full flex-row! transition-shadow duration-300 ${contentType === 'audiobook' ? 'h-[160px]!' : 'h-[180px]!'}`}
       style={{
         background: 'var(--bg-soft)',
         borderRadius: '.75rem',
@@ -89,7 +89,7 @@ export const CompactView = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className={`relative h-full shrink-0 ${contentType === 'audiobook' ? 'w-[180px]' : 'w-[120px]'}`}>
+      <div className={`relative h-full min-h-full self-stretch shrink-0 ${contentType === 'audiobook' ? 'w-[160px]' : 'w-[120px]'}`}>
         <div className="absolute inset-0 overflow-hidden rounded-l-[.75rem]">
           {/* Series position badge */}
           {showSeriesPosition && book.series_position != null && (
