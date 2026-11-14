@@ -280,12 +280,17 @@ def register_metadata_routes(
                 result = provider.search_paginated(
                     MetadataSearchOptions(
                         query="*",
-                        limit=limit,
+                        # Catalogue searches request up to 40 items per page.
+                        # Fetch that same larger batch, then keep the carousel's
+                        # requested 20 cards so Audible's short responses don't
+                        # leave the shelf with 17-19 items.
+                        limit=max(limit, 40),
                         page=1,
                         sort=SortOrder.POPULARITY,
                         user_id=db_user_id,
                     )
                 )
+                result.books = result.books[:limit]
             else:
                 result = provider.discover(section, limit=limit, user_id=db_user_id)
             books_data = [asdict(book) for book in result.books]
