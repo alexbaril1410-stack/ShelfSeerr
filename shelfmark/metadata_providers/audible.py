@@ -379,7 +379,6 @@ class AudibleProvider(MetadataProvider):
     display_name = "Audible"
     requires_auth = False
     supported_sorts = (
-        SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
@@ -451,10 +450,8 @@ class AudibleProvider(MetadataProvider):
             "page": max(options.page - 1, 0),
             "response_groups": _RESPONSE_GROUPS,
         }
-        if options.sort == SortOrder.TRENDING:
+        if options.sort == SortOrder.POPULARITY:
             params["products_sort_by"] = "BestSellers"
-        elif options.sort == SortOrder.POPULARITY:
-            params["products_sort_by"] = "Popularity"
         elif options.sort == SortOrder.RATING:
             params["products_sort_by"] = "AvgRating"
         elif options.sort == SortOrder.NEWEST:
