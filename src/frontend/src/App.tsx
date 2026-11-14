@@ -727,7 +727,20 @@ function App() {
     setActiveResultsSort('');
     setContentType(type);
     navigate(type === 'audiobook' ? '/audiobooks' : '/books');
-  }, [config, handleResetSearch, navigate, setActiveQueryTarget, setActiveResultsSort, setContentType]);
+    const selectedProvider = type === 'audiobook'
+      ? configuredAudiobookMetadataProvider
+      : configuredMetadataProvider;
+    if (selectedProvider === 'hardcover' && effectiveSearchMode === 'universal') {
+      void handleSearch({
+        query: '',
+        config,
+        fieldValues: {},
+        contentTypeOverride: type,
+        searchMode: 'universal',
+        providerOverride: 'hardcover',
+      });
+    }
+  }, [config, configuredAudiobookMetadataProvider, configuredMetadataProvider, effectiveSearchMode, handleResetSearch, handleSearch, navigate, setActiveQueryTarget, setActiveResultsSort, setContentType]);
 
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   useShowOnboardingDebug({
