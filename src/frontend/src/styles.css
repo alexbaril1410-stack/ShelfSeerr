@@ -1348,3 +1348,51 @@ input, select, textarea { color-scheme:dark; }
     display: none !important;
   }
 }
+
+
+/* Correct Seerr desktop proportions and header brand placement. */
+@media (min-width: 1024px) {
+  .shelfseerr-primary-nav {
+    width: 260px !important;
+    padding: 18px 14px 24px !important;
+  }
+  .shelfseerr-content-shell {
+    margin-left: 260px !important;
+  }
+  .settings-page-embedded {
+    left: 260px !important;
+  }
+
+  /* Seerr places its wordmark at the far upper-left of the top bar. */
+  .shelfseerr-header-inner > .animate-pop-up {
+    justify-content: flex-start !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child > .flex {
+    display: flex !important;
+    width: 100% !important;
+    max-width: none !important;
+    justify-content: flex-start !important;
+    gap: 22px !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child img[alt="ShelfSeerr"] {
+    width: 190px !important;
+    max-width: 190px !important;
+    height: 54px !important;
+    flex: 0 0 190px !important;
+    object-fit: contain;
+    object-position: left center;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child .search-wrapper {
+    width: min(720px, calc(100vw - 520px)) !important;
+    max-width: 720px !important;
+    flex: 0 1 720px !important;
+  }
+  .shelfseerr-primary-nav .shelfseerr-sidebar-brand {
+    display: none !important;
+  }
+}
