@@ -198,8 +198,8 @@ export const SearchSection = ({
         </div>
 
         {([
-          { key: 'trending', title: contentType === 'audiobook' ? t('Audiobooks trending now') : t('Books trending now'), eyebrow: t('Trends') },
-          { key: 'popular', title: contentType === 'audiobook' ? t('Most popular audiobooks') : t('Most popular books'), eyebrow: t('Book Popularity') },
+          { key: 'trending', title: t('Trending') },
+          { key: 'popular', title: t('Popular') },
         ] as const).map((shelf) => {
           const shelfBooks = discoveryShelves[shelf.key];
           if (!isDiscoveryLoading && shelfBooks.length === 0) return null;
@@ -208,8 +208,7 @@ export const SearchSection = ({
             <section key={shelf.key} className="min-w-0">
               <div className="mb-3 flex items-end justify-between gap-3">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-indigo-500 dark:text-indigo-300">{t(shelf.eyebrow)}</p>
-                  <h2 className="mt-1 text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
+                  <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
                 </div>
                 {shelfBooks.length > 0 && (
                   <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} {t('titles')}</span>
