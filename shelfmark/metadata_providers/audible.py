@@ -129,7 +129,7 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
                 continue
             role = str(entry.get("role") or entry.get("role_name") or "").casefold()
             name = _text(entry)
-            if not name:
+            if not name or "translat" in role:
                 continue
             if "author" in role and name not in authors:
                 authors.append(name)
