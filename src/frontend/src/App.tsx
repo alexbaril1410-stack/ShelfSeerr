@@ -730,14 +730,14 @@ function App() {
     const selectedProvider = type === 'audiobook'
       ? configuredAudiobookMetadataProvider
       : configuredMetadataProvider;
-    if (selectedProvider === 'hardcover') {
+    if (selectedProvider === 'hardcover' || (type === 'audiobook' && selectedProvider === 'audible')) {
       void handleSearch({
-        query: '',
+        query: selectedProvider === 'audible' ? '*' : '',
         config,
         fieldValues: {},
         contentTypeOverride: type,
         searchMode: 'universal',
-        providerOverride: 'hardcover',
+        providerOverride: selectedProvider,
       });
     }
   }, [config, configuredAudiobookMetadataProvider, configuredMetadataProvider, handleResetSearch, handleSearch, navigate, setActiveQueryTarget, setActiveResultsSort, setContentType]);
