@@ -205,7 +205,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         );
         const sortOrder = params.get('sort') || 'relevance';
 
-        if (!searchQuery && !hasFieldValues) {
+        if (!searchQuery && !hasFieldValues && providerOverride !== 'hardcover') {
           setBooks([]);
           setLastSearchQuery('');
           setHasMore(false);
