@@ -94,7 +94,8 @@ export const RequestsPage = ({ isAdmin, onApprove, onReject, onReopen, onCancel 
               {r.note && <p className="mt-2 text-xs italic opacity-60">{r.note}</p>}
               <div className="mt-3 flex flex-wrap gap-2">
                 {isAdmin && current === 'pending' && <><button type="button" onClick={() => onApprove(r)} className="rounded-lg bg-violet-600 px-3 py-1.5 text-xs font-medium text-white">{t('Review / approve')}</button><button type="button" onClick={() => onReject(r.id)} className="rounded-lg border border-(--border-muted) px-3 py-1.5 text-xs">{t('Reject')}</button></>}
-                {isAdmin && (current === 'problem' || current === 'rejected') && <button type="button" onClick={() => onReopen(r.id)} className="rounded-lg border border-(--border-muted) px-3 py-1.5 text-xs">{t('Retry / reopen')}</button>}
+                {isAdmin && current === 'problem' && <button type="button" onClick={() => onApprove(r)} className="rounded-lg border border-(--border-muted) px-3 py-1.5 text-xs">{t('Retry download')}</button>}
+                {isAdmin && current === 'rejected' && <button type="button" onClick={() => onReopen(r.id)} className="rounded-lg border border-(--border-muted) px-3 py-1.5 text-xs">{t('Reopen request')}</button>}
                 {!isAdmin && current === 'pending' && <button type="button" onClick={() => onCancel(r.id)} className="rounded-lg border border-(--border-muted) px-3 py-1.5 text-xs">{t('Cancel request')}</button>}
               </div>
             </div>
