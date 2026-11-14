@@ -563,24 +563,6 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
             <div className="animate-pop-up flex flex-col gap-3 lg:relative lg:flex-row lg:items-center lg:justify-center">
               {/* Logo + Icon buttons - appear first on mobile (above search), last on desktop (right side) */}
               <div className="flex w-full items-center justify-between lg:absolute lg:right-0 lg:top-1/2 lg:flex lg:w-auto lg:-translate-y-1/2 lg:justify-end">
-                {/* Logo - visible on mobile only, aligned left */}
-                {logoUrl &&
-                  (onLogoClick ? (
-                    <button
-                      type="button"
-                      onClick={onLogoClick}
-                      className="shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:hidden"
-                      aria-label={t('Reset search')}
-                    >
-                      <img src={logoUrl} alt="" className="h-10 w-10" />
-                    </button>
-                  ) : (
-                    <img
-                      src={logoUrl}
-                      alt="ShelfSeerr logo"
-                      className="h-10 w-10 shrink-0 lg:hidden"
-                    />
-                  ))}
 
                 {iconButtonsNode}
               </div>
@@ -627,6 +609,10 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   activeQueryField={activeQueryField}
                   optionsLayout="popover"
                 />
+                {/* Mobile profile control: placed directly beside the search field. */}
+                <div className="flex shrink-0 items-center lg:hidden">
+                  {iconButtonsNode}
+                </div>
               </div>
             </div>
           )}
