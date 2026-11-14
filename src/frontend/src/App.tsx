@@ -945,7 +945,7 @@ function App() {
     effectiveSearchMode === 'universal' ? defaultMetadataProviderForContentType || null : null;
   useEffect(() => {
     if (!isAuthenticated || !isInitialState || effectiveCombinedMode) {
-      setDiscoveryShelves({ trending: [], new_releases: [] });
+      setDiscoveryShelves({ trending: [], popular: [], new_releases: [] });
       setIsDiscoveryLoading(false);
       return;
     }
@@ -965,7 +965,7 @@ function App() {
       .catch((error: unknown) => {
         console.warn('Unable to load homepage discovery shelves:', error);
         if (isCurrent) {
-          setDiscoveryShelves({ trending: [], new_releases: [] });
+          setDiscoveryShelves({ trending: [], popular: [], new_releases: [] });
         }
       })
       .finally(() => {
