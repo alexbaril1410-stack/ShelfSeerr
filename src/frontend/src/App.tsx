@@ -2737,6 +2737,7 @@ function App() {
           />
 
           <ResultsSection
+            contentType={effectiveContentType}
             books={books}
             visible={hasResults}
             onDetails={handleShowDetails}
