@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchMode } from '../contexts/SearchModeContext';
@@ -79,6 +79,22 @@ export const ResultsSection = ({
     }
   });
   const isDesktop = useMediaQuery('(min-width: 640px)');
+  const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (searchMode !== 'universal' || !hasMore || !onLoadMore || isLoadingMore) return;
+    const sentinel = loadMoreSentinelRef.current;
+    if (!sentinel || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) onLoadMore();
+      },
+      { rootMargin: '700px 0px' },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [searchMode, hasMore, onLoadMore, isLoadingMore]);
 
   const updateViewMode = (nextViewMode: 'card' | 'compact' | 'list') => {
     setViewMode(nextViewMode);
@@ -289,49 +305,14 @@ export const ResultsSection = ({
         <div className="mt-4 text-sm opacity-80">{t('No results found.')}</div>
       )}
 
-      {/* Load More button (universal mode pagination) */}
+      {/* Infinite scroll sentinel: pages are fetched silently as the user approaches the end. */}
       {searchMode === 'universal' && hasMore && onLoadMore && (
-        <div className="mt-12 flex flex-col items-center gap-2">
-          <button
-            type="button"
-            onClick={onLoadMore}
-            disabled={isLoadingMore}
-            className={`rounded-full px-3 py-2 text-sm font-medium transition-all duration-200 ${
-              isLoadingMore
-                ? 'cursor-wait bg-gray-300 text-gray-500 dark:bg-gray-600 dark:text-gray-400'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700'
-            }`}
-          >
-            {isLoadingMore ? (
-              <span className="flex items-center gap-2">
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
-                {t('Loading...')}
-              </span>
-            ) : (
-              t('Load More')
-            )}
-          </button>
-          {totalFound !== undefined && totalFound > 0 && (
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {t('Showing {count} of {total} results')
-                .replace('{count}', String(books.length))
-                .replace('{total}', String(totalFound))}
-            </span>
+        <div ref={loadMoreSentinelRef} className="flex min-h-12 items-center justify-center py-4" aria-live="polite">
+          {isLoadingMore && (
+            <svg className="h-5 w-5 animate-spin text-gray-500" viewBox="0 0 24 24" role="status" aria-label={t('Loading...')}>
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
           )}
         </div>
       )}
