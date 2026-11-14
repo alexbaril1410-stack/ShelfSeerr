@@ -1642,3 +1642,16 @@ input, select, textarea { color-scheme:dark; }
     margin: 0 !important;
   }
 }
+
+
+@media (max-width: 1023px) {
+  .shelfseerr-header-inner > .animate-pop-up {
+    grid-template-rows: auto !important;
+    row-gap: 0 !important;
+  }
+  .shelfseerr-header-inner > .animate-pop-up > div:last-child .search-wrapper {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+  }
+}
