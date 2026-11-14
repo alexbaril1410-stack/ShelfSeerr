@@ -475,7 +475,6 @@ def test_audible_catalogue_pagination_stops_at_last_page(monkeypatch):
 def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     assert provider.supported_sorts == (
-        SortOrder.TRENDING,
         SortOrder.POPULARITY,
         SortOrder.RATING,
         SortOrder.NEWEST,
@@ -490,8 +489,7 @@ def test_audible_exposes_catalogue_sort_options_and_maps_them(monkeypatch):
 
     monkeypatch.setattr(provider, "_request", fake_request)
     for sort, expected in (
-        (SortOrder.TRENDING, "BestSellers"),
-        (SortOrder.POPULARITY, "Popularity"),
+        (SortOrder.POPULARITY, "BestSellers"),
         (SortOrder.RATING, "AvgRating"),
         (SortOrder.NEWEST, "-ReleaseDate"),
         (SortOrder.OLDEST, "ReleaseDate"),
