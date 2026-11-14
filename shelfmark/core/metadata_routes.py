@@ -274,16 +274,30 @@ def register_metadata_routes(
             if not provider or not provider.is_available():
                 return jsonify({"books": [], "provider": None, "section": section}), 200
 
-            if content_type == "audiobook" and section == "popular" and provider.name == "audible":
+            if (
+                content_type == "audiobook"
+                and section == "popular"
+                and provider.name == "audible"
+            ):
                 # Keep the discovery carousel UI and response flow unchanged, while
                 # sourcing its books from the exact catalogue popularity sort.
                 result = provider.search_paginated(
                     MetadataSearchOptions(
                         query="*",
-                        # Catalogue searches request up to 40 items per page.
-                        # Fetch that same larger batch, then keep the carousel's
-                        # requested 20 cards so Audible's short responses don't
-                        # leave the shelf with 17-19 items.
+                        limit=max(limit, 40),
+                        page=1,
+                        sort=SortOrder.POPULARITY,
+                        user_id=db_user_id,
+                    )
+                )
+                result.books = result.books[:limit]
+            elif content_type == "ebook" and section == "popular":
+                # Fetch a larger provider batch and keep the first requested cards,
+                # matching the catalogue's popularity ordering without changing
+                # the catalogue or the carousel response contract.
+                result = provider.search_paginated(
+                    MetadataSearchOptions(
+                        query="*",
                         limit=max(limit, 40),
                         page=1,
                         sort=SortOrder.POPULARITY,
