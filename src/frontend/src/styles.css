@@ -961,15 +961,9 @@ input, select, textarea { color-scheme:dark; }
   *,*::before,*::after { scroll-behavior:auto !important; animation-duration:.01ms !important; }
 }
 
-/* Seerr-style mobile navigation: keep search at the top and navigation reachable at the bottom. */
+/* Seerr-style mobile navigation: the icon-only bar is rendered separately in Header. */
 @media (max-width:1023px) {
-  .shelfseerr-primary-nav {
-    position:fixed; z-index:60; right:0; bottom:0; left:0; justify-content:space-around;
-    padding:8px 8px calc(8px + env(safe-area-inset-bottom)) !important;
-    border-top:1px solid #202638 !important; background:rgba(12,16,28,.96);
-    backdrop-filter:blur(18px);
-  }
-  .shelfseerr-primary-nav button { flex:0 0 auto; min-height:44px; font-size:12px; }
+  nav.shelfseerr-primary-nav { display:none !important; }
   .shelfseerr-content-shell > main { padding-bottom:calc(92px + env(safe-area-inset-bottom)) !important; }
 }
 
