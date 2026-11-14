@@ -385,3 +385,22 @@ def test_audible_discovery_maps_popular_and_trending_to_native_charts(monkeypatc
     assert [book.provider_id for book in popular.books] == ["B0BOOK0001", "B0BOOK0002"]
     assert [book.provider_id for book in trending.books] == ["B0BOOK0001", "B0BOOK0002"]
     assert catalogue_calls[0][1]["asins"] == "B0BOOK0001,B0BOOK0002"
+
+
+def test_parse_audible_product_excludes_translators_from_authors():
+    book = _parse_product(
+        {
+            "asin": "B0TRANSLATE1",
+            "title": "Livre traduit",
+            "contributors": [
+                {"name": "Auteur original", "role": "Author"},
+                {"name": "Traducteur", "role": "Translator"},
+                {"name": "Narrateur", "role": "Narrator"},
+            ],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Auteur original"]
+    assert book.narrators == ["Narrateur"]
