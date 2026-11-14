@@ -4,7 +4,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchMode } from '../contexts/SearchModeContext';
 import { SORT_OPTIONS } from '../data/filterOptions';
 import { useMediaQuery } from '../hooks/useMediaQuery';
-import type { Book, ButtonStateInfo, SortOption } from '../types';
+import type { Book, ButtonStateInfo, ContentType, SortOption } from '../types';
 import { Dropdown } from './Dropdown';
 import { CardView } from './resultsViews/CardView';
 import { CompactView } from './resultsViews/CompactView';
@@ -18,6 +18,7 @@ const GRID_CLASSES = {
 } as const;
 
 interface ResultsSectionProps {
+  contentType: ContentType;
   books: Book[];
   visible: boolean;
   onDetails: (id: string) => Promise<void>;
@@ -41,6 +42,7 @@ interface ResultsSectionProps {
 }
 
 export const ResultsSection = ({
+  contentType,
   books,
   visible,
   onDetails,
@@ -249,6 +251,7 @@ export const ResultsSection = ({
       {viewMode === 'list' ? (
         <ListView
           books={books}
+          contentType={contentType}
           onDetails={onDetails}
           onDownload={onDownload}
           onGetReleases={onGetReleases}
@@ -275,6 +278,7 @@ export const ResultsSection = ({
               <CardView
                 key={book.id}
                 book={book}
+                contentType={contentType}
                 onDetails={onDetails}
                 onDownload={onDownload}
                 onGetReleases={onGetReleases}
