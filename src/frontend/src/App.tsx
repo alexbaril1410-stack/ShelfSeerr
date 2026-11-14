@@ -47,6 +47,7 @@ const RequestConfirmationModal = lazy(() => import('./components/RequestConfirma
 const ResultsSection = lazy(() => import('./components/ResultsSection').then((module) => ({ default: module.ResultsSection })));
 const SearchSection = lazy(() => import('./components/SearchSection').then((module) => ({ default: module.SearchSection })));
 import { LoginPage } from './pages/LoginPage';
+import { RequestsPage } from './pages/RequestsPage';
 import {
   getSourceRecordInfo,
   getMetadataBookInfo,
@@ -2602,10 +2603,6 @@ function App() {
             navigateToContent(type);
           }}
           onNavigatePage={(path) => {
-            if (path === '/requests') {
-              setDownloadsSidebarOpen(true);
-              return;
-            }
             if (path === '/blocks' || path === '/issues') {
               setDownloadsSidebarOpen(true);
               return;
@@ -2667,7 +2664,7 @@ function App() {
         }
       >
         <AdvancedFilters
-          visible={effectiveShowAdvanced && !isInitialState}
+          visible={effectiveShowAdvanced && !isInitialState && location.pathname !== '/requests'}
           bookLanguages={bookLanguages}
           defaultLanguage={defaultLanguageCodes}
           filters={advancedFilters}
@@ -2699,6 +2696,15 @@ function App() {
               : undefined
           }
         >
+          {location.pathname === '/requests' ? (
+            <RequestsPage
+              isAdmin={requestRoleIsAdmin}
+              onApprove={(record) => { void handleRequestApprove(record.id, record); }}
+              onReject={(id) => { void handleRequestReject(id); }}
+              onReopen={(id) => { void handleRequestReopen(id); }}
+              onCancel={(id) => { void handleRequestCancel(id); }}
+            />
+          ) : (
           <Suspense fallback={null}>
           <SearchSection
             onSearch={handleSearchDispatch}
