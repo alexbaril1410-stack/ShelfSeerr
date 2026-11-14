@@ -120,6 +120,49 @@ query GetListBooksById($id: Int!, $limit: Int!, $offset: Int!) {
 }
 """
 
+HARDCOVER_TRENDING_BOOKS_QUERY = """
+query GetTrendingBooks($duration: TrendingDuration!, $limit: Int!, $offset: Int!) {
+    books_trending(duration: $duration, limit: $limit, offset: $offset) {
+        error
+        ids
+    }
+}
+"""
+
+HARDCOVER_BOOKS_BY_IDS_QUERY = """
+query GetBooksByIds($bookIds: [Int!]!) {
+    books(where: {id: {_in: $bookIds}}, limit: 100) {
+        id
+        title
+        subtitle
+        slug
+        release_date
+        headline
+        description
+        pages
+        rating
+        ratings_count
+        users_count
+        cached_image
+        cached_contributors
+        cached_tags
+        contributions(where: {contribution: {_eq: "Author"}}) {
+            author {
+                name
+            }
+        }
+        featured_book_series {
+            position
+            series {
+                id
+                name
+                primary_books_count
+            }
+        }
+    }
+}
+"""
+
 FRENCH_EDITION_BOOK_IDS_QUERY = """
 query GetFrenchEditionBookIds($bookIds: [Int!]!) {
     editions(
@@ -2508,22 +2551,93 @@ class HardcoverProvider(MetadataProvider):
         Typesense accepts a wildcard query to browse all matching documents. The
         existing search pipeline still applies Hardcover parsing, sorting and cache.
         """
+        if not self.api_key:
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        safe_limit = max(1, min(limit, 40))
+        if section == "trending":
+            return self._discover_trending(safe_limit)
+        
         sort_by_section = {
-            "trending": SortOrder.POPULARITY,
+            "popular": SortOrder.POPULARITY,
             "new_releases": SortOrder.NEWEST,
         }
         sort_order = sort_by_section.get(section)
-        if sort_order is None or not self.api_key:
+        if sort_order is None:
             return SearchResult(books=[], page=1, total_found=0, has_more=False)
 
         options = MetadataSearchOptions(
             query="*",
-            limit=max(1, min(limit, 40)),
+            limit=safe_limit,
             page=1,
             sort=sort_order,
             user_id=user_id,
         )
         return self.search_paginated(options)
+
+    def _discover_trending(self, limit: int) -> SearchResult:
+        """Fetch Hardcover's native trending list, then hydrate its book IDs."""
+        trending = self._execute_query(
+            HARDCOVER_TRENDING_BOOKS_QUERY,
+            {"duration": "week", "limit": limit, "offset": 0},
+        )
+        trending_data = (trending or {}).get("books_trending") or {}
+        book_ids = trending_data.get("ids") or []
+        book_ids = [coerce_int(book_id, 0) for book_id in book_ids]
+        book_ids = [book_id for book_id in book_ids if book_id > 0]
+        if not book_ids:
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        hydrated = self._execute_query(
+            HARDCOVER_BOOKS_BY_IDS_QUERY,
+            {"bookIds": book_ids},
+        )
+        raw_books = (hydrated or {}).get("books") or []
+        books_by_id = {
+            coerce_int(book.get("id"), 0): book
+            for book in raw_books
+            if isinstance(book, dict) and coerce_int(book.get("id"), 0) > 0
+        }
+
+        french_only = coerce_bool(app_config.get("HARDCOVER_FRENCH_ONLY", True), default=True)
+        french_editions = self._fetch_french_editions(tuple(book_ids)) if french_only else {}
+        if french_only and french_editions is None:
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        exclude_compilations = coerce_bool(
+            app_config.get("HARDCOVER_EXCLUDE_COMPILATIONS", False),
+            default=False,
+        )
+        exclude_unreleased = coerce_bool(
+            app_config.get("HARDCOVER_EXCLUDE_UNRELEASED", False),
+            default=False,
+        )
+        books: list[BookMetadata] = []
+        for book_id in book_ids:
+            book_data = books_by_id.get(book_id)
+            if not book_data:
+                continue
+            if exclude_compilations and book_data.get("compilation"):
+                continue
+            if exclude_unreleased:
+                release_date = _parse_release_date(book_data.get("release_date"))
+                if release_date and release_date.date() > datetime.now(UTC).date():
+                    continue
+            if french_only:
+                edition = french_editions.get(book_id)
+                if not edition:
+                    continue
+                self._apply_french_edition(book_data, edition)
+            parsed = self._parse_book(book_data)
+            if parsed:
+                books.append(parsed)
+
+        return SearchResult(
+            books=books,
+            page=1,
+            total_found=len(book_ids),
+            has_more=False,
+        )
 
     def search(self, options: MetadataSearchOptions) -> list[BookMetadata]:
         """Search for books using Hardcover's search API."""
