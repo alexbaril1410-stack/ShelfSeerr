@@ -673,7 +673,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
           {showSearch && (
             <div className="animate-pop-up flex flex-col gap-3 lg:relative lg:flex-row lg:items-center lg:justify-center">
               {/* Logo + Icon buttons - appear first on mobile (above search), last on desktop (right side) */}
-              <div className="flex w-full items-center justify-between lg:absolute lg:right-0 lg:top-1/2 lg:w-auto lg:-translate-y-1/2 lg:justify-end">
+              <div className="hidden w-full items-center justify-between lg:absolute lg:right-0 lg:top-1/2 lg:flex lg:w-auto lg:-translate-y-1/2 lg:justify-end">
                 {/* Logo - visible on mobile only, aligned left */}
                 {logoUrl &&
                   (onLogoClick ? (
