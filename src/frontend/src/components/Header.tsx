@@ -156,6 +156,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
         searchBarRef.current?.submit();
       },
     }));
+    const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [shouldAnimateIn, setShouldAnimateIn] = useState(false);
@@ -749,43 +750,44 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
 
           <nav
             aria-label={t('Main navigation')}
-            className="shelfseerr-primary-nav mt-3 flex items-center gap-2 overflow-x-auto border-t pt-3"
+            className="shelfseerr-primary-nav mt-3 hidden items-center gap-2 overflow-x-auto border-t pt-3 lg:flex"
             style={{ borderColor: 'var(--border-muted)' }}
           >
-            <button
-              type="button"
-              onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }}
-              className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors"
-              aria-label={t('Discover')}
-              aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined}
-            >
-              {t('Discover')}
-            </button>
-            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && (
-              <button
-                type="button"
-                onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')}
-                className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`}
-                aria-pressed={contentType === 'ebook'}
-              >
-                {t('Books')}
-              </button>
-            )}
-            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && (
-              <button
-                type="button"
-                onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')}
-                className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`}
-                aria-pressed={contentType === 'audiobook'}
-              >
-                {t('Audiobooks')}
-              </button>
-            )}
+            <button type="button" onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors" aria-label={t('Discover')} aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined}>{t('Discover')}</button>
+            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'ebook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'ebook'}>{t('Books')}</button>}
+            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} className={`hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors ${contentType === 'audiobook' ? 'bg-(--hover-action)' : ''}`} aria-pressed={contentType === 'audiobook'}>{t('Audiobooks')}</button>}
             <button type="button" onClick={() => onNavigatePage?.('/requests')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Requests')}</button>
             <button type="button" onClick={() => onNavigatePage?.('/blocks')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Blocklist')}</button>
             <button type="button" onClick={() => onNavigatePage?.('/issues')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Issues')}</button>
             <button type="button" onClick={() => onNavigatePage?.('/users')} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Users')}</button>
             <button type="button" onClick={onSettingsClick} className="hover-surface rounded-lg px-3 py-2 text-sm font-medium transition-colors">{t('Settings')}</button>
+          </nav>
+
+          <nav aria-label={t('Main navigation')} className="fixed inset-x-0 bottom-0 z-50 flex items-center justify-around border-t px-2 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-8px_24px_rgba(0,0,0,0.18)] lg:hidden" style={{ background: 'var(--bg)', borderColor: 'var(--border-muted)' }}>
+            <button type="button" onClick={() => { onHomeClick?.(); onNavigatePage?.('/discover'); }} aria-label={t('Discover')} aria-current={currentPath === '/' || currentPath === '/discover' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/' || currentPath === '/discover' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 21 14.5 9.5M8 21l3-3M14 3l1.5 4.5L20 9l-4.5 1.5L14 15l-1.5-4.5L8 9l4.5-1.5L14 3Z"/><circle cx="19" cy="19" r="2"/></svg>
+            </button>
+            {(!allowedContentTypes || allowedContentTypes.includes('ebook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('ebook')} aria-label={t('Books')} aria-pressed={contentType === 'ebook'} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${contentType === 'ebook' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22V5.5Z"/><path d="M4 5.5V22M8 7h8M8 11h8"/></svg>
+            </button>}
+            {(!allowedContentTypes || allowedContentTypes.includes('audiobook')) && <button type="button" onClick={() => (onNavigateContentType ?? onContentTypeChange)?.('audiobook')} aria-label={t('Audiobooks')} aria-pressed={contentType === 'audiobook'} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${contentType === 'audiobook' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="12" width="4" height="7" rx="2"/><rect x="17" y="12" width="4" height="7" rx="2"/><path d="M17 19a5 5 0 0 1-5 3h-1"/></svg>
+            </button>}
+            <button type="button" onClick={() => onNavigatePage?.('/requests')} aria-label={t('Requests')} aria-current={currentPath === '/requests' ? 'page' : undefined} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${currentPath === '/requests' ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+              <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </button>
+            <div className="relative flex min-w-0 flex-1 justify-center">
+              {isMoreMenuOpen && <div className="absolute right-0 bottom-full mb-3 w-52 overflow-hidden rounded-2xl border p-1 shadow-2xl" style={{ background: 'var(--bg)', borderColor: 'var(--border-muted)' }}>
+                <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/blocks'); }} className="hover-surface flex w-full items-center rounded-xl px-4 py-3 text-left text-sm">{t('Blocklist')}</button>
+                <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/issues'); }} className="hover-surface flex w-full items-center rounded-xl px-4 py-3 text-left text-sm">{t('Issues')}</button>
+                <button type="button" onClick={() => { setIsMoreMenuOpen(false); onNavigatePage?.('/users'); }} className="hover-surface flex w-full items-center rounded-xl px-4 py-3 text-left text-sm">{t('Users')}</button>
+                {onSettingsClick && <button type="button" onClick={() => { setIsMoreMenuOpen(false); onSettingsClick(); }} className="hover-surface flex w-full items-center rounded-xl px-4 py-3 text-left text-sm">{t('Settings')}</button>}
+                {onDownloadsClick && <button type="button" onClick={() => { setIsMoreMenuOpen(false); onDownloadsClick(); }} className="hover-surface flex w-full items-center rounded-xl px-4 py-3 text-left text-sm">{t('Activity')}</button>}
+              </div>}
+              <button type="button" onClick={() => setIsMoreMenuOpen((open) => !open)} aria-label={t('More')} aria-expanded={isMoreMenuOpen} className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 ${isMoreMenuOpen ? 'text-violet-400' : 'text-(--text-muted)'}`}>
+                <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+              </button>
+            </div>
           </nav>
         </div>
       </header>
