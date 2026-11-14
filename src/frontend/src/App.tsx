@@ -2796,6 +2796,7 @@ function App() {
             resultsSourceUrl={resultsSourceUrl}
           />
           </Suspense>
+          )}
 
           <Suspense fallback={null}>
           {selectedBook && (
