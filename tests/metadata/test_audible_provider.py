@@ -343,3 +343,45 @@ def test_audible_series_suggestions_are_deduplicated(monkeypatch):
     ]
 
 
+
+
+
+def test_audible_discovery_maps_popular_and_trending_to_native_charts(monkeypatch):
+    provider = AudibleProvider(marketplace="fr", french_only=True)
+    chart_calls = []
+    catalogue_calls = []
+
+    class FakeResponse:
+        text = (
+            '<div data-asin="B0BOOK0001"></div>'
+            '<a href="/pd/B0BOOK0002"></a>'
+            '<div data-asin="B0BOOK0001"></div>'
+        )
+
+        def raise_for_status(self):
+            return None
+
+    def fake_get(url, **kwargs):
+        chart_calls.append(url)
+        return FakeResponse()
+
+    def fake_request(path, params):
+        catalogue_calls.append((path, dict(params)))
+        return {"products": [
+            {"asin": "B0BOOK0002", "title": "Deuxième livre", "language": "French"},
+            {"asin": "B0BOOK0001", "title": "Premier livre", "language": "French"},
+        ]}
+
+    monkeypatch.setattr("shelfmark.metadata_providers.audible.requests.get", fake_get)
+    monkeypatch.setattr(provider, "_request", fake_request)
+
+    popular = provider.discover("popular", limit=20)
+    trending = provider.discover("trending", limit=20)
+
+    assert chart_calls == [
+        "https://www.audible.fr/charts?scoringSystem=popular&searchLanguage=french",
+        "https://www.audible.fr/charts/best?scoringSystem=bestSeller&searchLanguage=french",
+    ]
+    assert [book.provider_id for book in popular.books] == ["B0BOOK0001", "B0BOOK0002"]
+    assert [book.provider_id for book in trending.books] == ["B0BOOK0001", "B0BOOK0002"]
+    assert catalogue_calls[0][1]["asins"] == "B0BOOK0001,B0BOOK0002"

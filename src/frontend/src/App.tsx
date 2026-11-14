@@ -635,8 +635,7 @@ function App() {
   const [discoveryShelves, setDiscoveryShelves] = useState<{
     trending: Book[];
     popular: Book[];
-    new_releases: Book[];
-  }>({ trending: [], popular: [], new_releases: [] });
+  }>({ trending: [], popular: [] });
   const [isDiscoveryLoading, setIsDiscoveryLoading] = useState(false);
   const [configuredMetadataProvider, setConfiguredMetadataProvider] = useState<string | null>(null);
   const [configuredAudiobookMetadataProvider, setConfiguredAudiobookMetadataProvider] = useState<
@@ -945,7 +944,7 @@ function App() {
     effectiveSearchMode === 'universal' ? defaultMetadataProviderForContentType || null : null;
   useEffect(() => {
     if (!isAuthenticated || !isInitialState || effectiveCombinedMode) {
-      setDiscoveryShelves({ trending: [], popular: [], new_releases: [] });
+      setDiscoveryShelves({ trending: [], popular: [] });
       setIsDiscoveryLoading(false);
       return;
     }
@@ -955,17 +954,16 @@ function App() {
     Promise.all([
       discoverMetadata('trending', effectiveContentType),
       discoverMetadata('popular', effectiveContentType),
-      discoverMetadata('new_releases', effectiveContentType),
     ])
-      .then(([trending, popular, newReleases]) => {
+      .then(([trending, popular]) => {
         if (isCurrent) {
-          setDiscoveryShelves({ trending, popular, new_releases: newReleases });
+          setDiscoveryShelves({ trending, popular });
         }
       })
       .catch((error: unknown) => {
         console.warn('Unable to load homepage discovery shelves:', error);
         if (isCurrent) {
-          setDiscoveryShelves({ trending: [], popular: [], new_releases: [] });
+          setDiscoveryShelves({ trending: [], popular: [] });
         }
       })
       .finally(() => {

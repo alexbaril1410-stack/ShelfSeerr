@@ -14,7 +14,7 @@ import { SearchBar } from './SearchBar';
 
 interface SearchSectionProps {
   onSearch: () => void;
-  discoveryShelves: { trending: Book[]; popular: Book[]; new_releases: Book[] };
+  discoveryShelves: { trending: Book[]; popular: Book[] };
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
   isLoading: boolean;
@@ -200,7 +200,6 @@ export const SearchSection = ({
         {([
           { key: 'trending', title: contentType === 'audiobook' ? t('Audiobooks trending now') : t('Books trending now'), eyebrow: t('Trends') },
           { key: 'popular', title: contentType === 'audiobook' ? t('Most popular audiobooks') : t('Most popular books'), eyebrow: t('Book Popularity') },
-          { key: 'new_releases', title: contentType === 'audiobook' ? t('Latest audiobook releases') : t('New releases'), eyebrow: t('Coming soon and recently published') },
         ] as const).map((shelf) => {
           const shelfBooks = discoveryShelves[shelf.key];
           if (!isDiscoveryLoading && shelfBooks.length === 0) return null;

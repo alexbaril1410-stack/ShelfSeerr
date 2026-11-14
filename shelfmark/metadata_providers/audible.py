@@ -209,6 +209,38 @@ def _series_fields(
 
     return parsed[0]
 
+
+class _ChartASINParser(HTMLParser):
+    """Extract Audible product ASINs from chart markup, preserving chart order."""
+
+    _ASIN_PATTERN = re.compile(r"/pd/([A-Z0-9]{10})(?:[/?#]|$)", re.IGNORECASE)
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.asins: list[str] = []
+        self._seen: set[str] = set()
+
+    def _add(self, value: str | None) -> None:
+        if not value:
+            return
+        candidates = [value.strip()]
+        candidates.extend(match.group(1) for match in self._ASIN_PATTERN.finditer(value))
+        for candidate in candidates:
+            asin = candidate.upper()
+            if re.fullmatch(r"[A-Z0-9]{10}", asin) and asin not in self._seen:
+                self._seen.add(asin)
+                self.asins.append(asin)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        for key in ("data-asin", "data-product-id", "data-item-id"):
+            self._add(values.get(key))
+        self._add(values.get("href"))
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.handle_starttag(tag, attrs)
+
+
 def _product_items(payload: Any) -> list[dict[str, Any]]:
     if not isinstance(payload, dict):
         return []
@@ -422,6 +454,69 @@ class AudibleProvider(MetadataProvider):
 
         payload = self._request("catalog/products", params)
         return payload if payload and _product_items(payload) else None
+
+    def discover(
+        self,
+        section: str,
+        *,
+        limit: int = 20,
+        user_id: int | None = None,
+    ) -> SearchResult:
+        """Load Audible's native French popularity and bestseller chart shelves."""
+        safe_limit = max(1, min(limit, 40))
+        chart_paths = {
+            "popular": "/charts?scoringSystem=popular&searchLanguage=french",
+            "trending": "/charts/best?scoringSystem=bestSeller&searchLanguage=french",
+        }
+        chart_path = chart_paths.get(section)
+        if not chart_path:
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        chart_url = f"https://www.audible.{self.marketplace}{chart_path}"
+        try:
+            response = requests.get(
+                chart_url,
+                headers={
+                    "Accept": "text/html",
+                    "User-Agent": "Mozilla/5.0 (compatible; ShelfSeerr/1.0; audiobook discovery)",
+                },
+                timeout=_TIMEOUT_SECONDS,
+            )
+            response.raise_for_status()
+            parser = _ChartASINParser()
+            parser.feed(response.text)
+            parser.close()
+        except (requests.RequestException, ValueError) as exc:
+            logger.warning("Audible %s chart request failed (%s): %s", section, self.marketplace, exc)
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        asins = parser.asins[:safe_limit]
+        if not asins:
+            logger.warning("Audible %s chart returned no product ASINs", section)
+            return SearchResult(books=[], page=1, total_found=0, has_more=False)
+
+        payload = self._request("catalog/products", {
+            "asins": ",".join(asins),
+            "num_results": len(asins),
+            "response_groups": _RESPONSE_GROUPS,
+        })
+        products_by_asin = {
+            str(product.get("asin") or "").upper(): product
+            for product in _product_items(payload)
+        }
+        books: list[BookMetadata] = []
+        for asin in asins:
+            product = products_by_asin.get(asin)
+            if not product:
+                continue
+            book = _parse_product(product, self.marketplace)
+            if not book:
+                continue
+            if self.french_only and not _is_french_language(book.language):
+                continue
+            books.append(book)
+
+        return SearchResult(books=books, page=1, total_found=len(asins), has_more=False)
 
     def _search_payload(self, options: MetadataSearchOptions) -> dict[str, Any] | None:
         """Run one direct Audible catalogue search; no speculative spelling retries."""
