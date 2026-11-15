@@ -570,7 +570,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                     aria-label={t('Reset search')}
                   >
                     <img
-                      src={logoUrl}
+                      src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')}
                       alt="ShelfSeerr"
                       className="block h-full w-full object-contain object-left"
                     />
