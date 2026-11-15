@@ -558,32 +558,27 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
         style={{ background: 'var(--bg)', paddingTop: 'env(safe-area-inset-top)' }}
       >
         <div className="shelfseerr-header-inner mx-auto max-w-full px-4 py-4 sm:px-6 lg:px-8">
-          {/* When search is active: stack on mobile, side-by-side on desktop */}
+          {/* Search header: desktop = logo, search, avatar; mobile = search, avatar. */}
           {showSearch && (
-            <div className="animate-pop-up flex flex-col gap-3 lg:relative lg:flex-row lg:items-center lg:justify-center">
-              {/* Search bar - appear second on mobile (below logo+icons), first on desktop (left side) */}
-              <div className="flex w-full flex-1 items-center gap-4 lg:mx-auto lg:max-w-[min(720px,70vw)] lg:flex-none">
-                {/* ShelfSeerr brand aligned with the global search bar */}
-                {logoUrl &&
-                  (onLogoClick ? (
-                    <button
-                      type="button"
-                      onClick={onLogoClick}
-                      className="hidden shrink-0 cursor-pointer border-0 bg-transparent p-0 lg:block"
-                      aria-label={t('Reset search')}
-                    >
-                      <img src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')} alt="ShelfSeerr" className="h-12 w-auto max-w-[240px]" />
-                    </button>
-                  ) : (
+            <div className="shelfseerr-topbar-row flex w-full items-center">
+              <div className="shelfseerr-topbar-content flex w-full min-w-0 items-center">
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={onLogoClick}
+                    className="shelfseerr-topbar-logo hidden shrink-0 border-0 bg-transparent p-0 lg:flex"
+                    aria-label={t('Reset search')}
+                  >
                     <img
-                      src={withBasePath('/shelfseerr-desktop-logo-transparent.png.PNG')}
+                      src={logoUrl}
                       alt="ShelfSeerr"
-                      className="hidden h-12 w-auto max-w-[240px] shrink-0 lg:block"
+                      className="block h-full w-full object-contain object-left"
                     />
-                  ))}
+                  </button>
+                )}
                 <SearchBar
                   ref={searchBarRef}
-                  className="w-full flex-1 lg:order-1"
+                  className="shelfseerr-topbar-search w-full min-w-0 flex-1"
                   value={searchInput}
                   valueLabel={searchInputLabel}
                   onChange={handleSearchChange}
@@ -603,8 +598,7 @@ export const Header = forwardRef<HeaderHandle, HeaderProps>(
                   activeQueryField={activeQueryField}
                   optionsLayout="popover"
                 />
-                {/* Mobile profile control: placed directly beside the search field. */}
-                <div className="order-2 flex shrink-0 items-center lg:order-2">
+                <div className="shelfseerr-topbar-account flex shrink-0 items-center">
                   {iconButtonsNode}
                 </div>
               </div>
