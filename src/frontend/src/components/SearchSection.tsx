@@ -13,6 +13,7 @@ import type {
 } from '../types';
 import { listRequests } from '../services/api';
 import { requestToActivityItem } from './activity/activityMappers';
+import { withBasePath } from '../utils/basePath';
 import { AdvancedFilters } from './AdvancedFilters';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from './SearchBar';
@@ -264,7 +265,7 @@ export const SearchSection = ({
                     return (
                       <a
                         key={record.id}
-                        href="/requests"
+                        href={withBasePath('/requests')}
                         className="group relative flex h-36 w-[min(82vw,360px)] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-300/20 bg-slate-900 text-left shadow-sm transition hover:border-indigo-400/60 hover:shadow-lg sm:h-40 sm:w-[386px]"
                         title={title}
                       >
