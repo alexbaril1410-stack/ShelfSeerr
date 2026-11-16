@@ -963,7 +963,7 @@ input, select, textarea { color-scheme:dark; }
   .shelfseerr-content-shell {
     margin-left:0;
   }
-  .shelfseerr-content-shell > main { padding:18px 16px 36px !important; }
+  .shelfseerr-content-shell > main { padding:10px 16px 36px !important; }
 }
 /* Discovery is a catalogue page; the fixed global search replaces the old search hero. */
 #search-section.search-initial-state > .relative.isolate,
