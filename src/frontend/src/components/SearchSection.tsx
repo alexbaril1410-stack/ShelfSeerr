@@ -228,18 +228,18 @@ export const SearchSection = ({
                     const title = item.title;
                     const username = isAdmin ? record.username : undefined;
                     const status = record.delivery_state === 'complete'
-                      ? 'Disponible'
+                      ? 'Request status: Available'
                       : record.delivery_state === 'error'
-                        ? 'Problème'
+                        ? 'Request status: Problem'
                         : record.delivery_state && ['queued', 'resolving', 'locating', 'downloading'].includes(record.delivery_state)
-                          ? 'En cours'
+                          ? 'Request status: In progress'
                           : record.status === 'pending'
-                            ? 'Demandé'
+                            ? 'Request status: Requested'
                             : record.status === 'rejected'
-                              ? 'Refusé'
+                              ? 'Request status: Rejected'
                               : record.status === 'cancelled'
-                                ? 'Annulé'
-                                : 'Approuvé';
+                                ? 'Request status: Cancelled'
+                                : 'Request status: Approved';
                     const initials = (username || 'A').slice(0, 1).toUpperCase();
                     return (
                       <a
@@ -259,7 +259,7 @@ export const SearchSection = ({
                           </span>
                           <span className="mt-auto flex items-center gap-2 pt-2 text-[11px] font-semibold text-slate-300">
                             <span>{t('Status')}</span>
-                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${status === 'Disponible' ? 'bg-emerald-500 text-white' : status === 'Problème' ? 'bg-red-500 text-white' : status === 'Demandé' ? 'bg-indigo-500 text-white' : 'bg-slate-500 text-white'}`}>{t(status)}</span>
+                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${status === 'Request status: Available' ? 'bg-emerald-500 text-white' : status === 'Request status: Problem' ? 'bg-red-500 text-white' : status === 'Request status: Requested' ? 'bg-indigo-500 text-white' : 'bg-slate-500 text-white'}`}>{t(status)}</span>
                           </span>
                         </div>
                         {item.preview && <img src={item.preview} alt="" loading="lazy" className="relative z-10 my-3 mr-3 w-20 shrink-0 rounded-lg object-cover shadow-xl sm:my-3.5 sm:mr-3.5 sm:w-24" />}
