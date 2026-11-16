@@ -14,6 +14,18 @@ const LANGUAGE_STORAGE_KEY = 'shelfseerr-language';
 
 const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Profile': 'Profil',
+  'Recent requests': 'Demandes récentes',
+  'requests': 'demandes',
+  'Previous requests': 'Demandes précédentes',
+  'Next requests': 'Demandes suivantes',
+  'Status': 'Statut',
+  'Available': 'Disponible',
+  'In progress': 'En cours',
+  'Requested': 'Demandé',
+  'Approved': 'Approuvé',
+  'Rejected': 'Refusé',
+  'Cancelled': 'Annulé',
+  'You': 'Vous',
   'Use Reset to inherit global values.': 'Utilisez « Réinitialiser » pour reprendre les paramètres globaux.',
   'Reset to inherit global defaults from Search Mode.': 'Réinitialisez pour reprendre les paramètres globaux du mode de recherche.',
   'Choose where completed book files are sent.': 'Choisissez où envoyer les fichiers de livres terminés.',
