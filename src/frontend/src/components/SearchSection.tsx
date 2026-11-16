@@ -199,7 +199,7 @@ export const SearchSection = ({
         </div>
       )}
 
-      <div className={isInitialState ? 'space-y-4 sm:space-y-5' : 'hidden'}>
+      <div className={isInitialState ? 'space-y-3 sm:space-y-4' : 'hidden'}>
         {showDiscoveryShelves && (requestsLoading || requestCardItems.length > 0) && (
           <section className="min-w-0" aria-label={t('Recent requests')}>
             <div className="mb-3 flex items-center justify-between gap-3">
