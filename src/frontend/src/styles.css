@@ -656,12 +656,10 @@
     align-items: center; /* Keep search box centered horizontally */
   }
 
-  /* Center search section vertically when in initial state (no results, no queue) */
-  /* Responsive to different window sizes */
+  /* Initial discovery content starts directly below the fixed application header. */
   .search-initial-state {
     flex: 1;
     justify-content: flex-start;
-    padding-top: 20vh; /* Position in upper portion of screen */
   }
 
   /* Mobile-friendly book card layout */
@@ -670,7 +668,6 @@
   @media (max-width: 639px) {
     .search-initial-state {
       justify-content: flex-start;
-      padding-top: 18vh; /* push the search UI toward the upper third */
     }
 
     /* When advanced filters are visible, pull the search bar to the very top */
