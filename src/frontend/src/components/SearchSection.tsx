@@ -55,25 +55,6 @@ interface SearchSectionProps {
   isAdmin?: boolean;
 }
 
-const DISCOVERY_TOPICS = {
-  ebook: [
-    { label: 'Fantasy', query: 'fantasy', description: 'Imaginary worlds and epic sagas', icon: '✦' },
-    { label: 'Mystery & thriller', query: 'thriller', description: 'Investigations, suspense, and mysteries', icon: '⌕' },
-    { label: 'Science fiction', query: 'science fiction', description: 'Tomorrow starts here', icon: '◈' },
-    { label: 'Romance', query: 'romance', description: 'Stories to devour', icon: '♡' },
-    { label: 'Personal development', query: 'personal development', description: 'Learn and grow', icon: '↗' },
-    { label: 'History', query: 'history', description: 'Understand the world', icon: '⌂' },
-  ],
-  audiobook: [
-    { label: 'Fiction to listen to', query: 'roman', description: 'Let yourself be carried away by a story', icon: '♫' },
-    { label: 'Mysteries & thrillers', query: 'thriller', description: 'Suspense in your ears', icon: '⌕' },
-    { label: 'Fantasy', query: 'fantasy', description: 'Great adventures to listen to', icon: '✦' },
-    { label: 'Personal development', query: 'personal development', description: 'Ideas to take with you', icon: '↗' },
-    { label: 'Biographies', query: 'biography', description: 'Inspiring journeys', icon: '◉' },
-    { label: 'Science fiction', query: 'science fiction', description: 'Somewhere else, in a different way', icon: '◈' },
-  ],
-} as const;
-
 export const SearchSection = ({
   onSearch,
   isLoading,
@@ -155,22 +136,20 @@ export const SearchSection = ({
     })),
     [isAdmin, recentRequests],
   );
-  const topics = DISCOVERY_TOPICS[contentType];
   const discoverySections = [
     { key: 'ebook-trending', title: 'Tendances – Livres', books: discoveryShelves.ebook.trending },
     { key: 'ebook-popular', title: 'Populaire – Livres', books: discoveryShelves.ebook.popular },
     { key: 'audiobook-trending', title: 'Tendances – Livres audio', books: discoveryShelves.audiobook.trending },
     { key: 'audiobook-popular', title: 'Populaire – Livres audio', books: discoveryShelves.audiobook.popular },
   ] as const;
-  const selectTopic = (query: string) => onQueryValueChange(query);
 
   return (
     <section
       id="search-section"
-      className={`${isInitialState ? 'search-initial-state mb-8' : 'mb-3 sm:mb-4'} ${showAdvanced ? 'search-advanced-visible' : ''}`}
+      className={`${isInitialState ? 'search-initial-state mb-3 sm:mb-4' : 'mb-3 sm:mb-4'} ${showAdvanced ? 'search-advanced-visible' : ''}`}
     >
       {isInitialState && (
-        <div className="relative isolate mb-6 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 px-4 py-7 text-white shadow-2xl sm:mb-12 sm:rounded-3xl sm:px-10 sm:py-14 lg:px-14">
+        <div className="relative isolate mb-3 overflow-hidden rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white shadow-2xl sm:mb-4 sm:rounded-3xl sm:px-8 sm:py-4 lg:px-10">
           <div className="pointer-events-none absolute -right-20 -top-28 -z-10 h-80 w-80 rounded-full bg-indigo-500/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-32 left-1/3 -z-10 h-72 w-72 rounded-full bg-cyan-500/20 blur-3xl" />
           <div className="mx-auto max-w-4xl text-center">
@@ -178,18 +157,18 @@ export const SearchSection = ({
               <img src={logoUrl} alt="ShelfSeerr" className="h-9 w-9 rounded-xl" />
               <span className="text-sm font-semibold tracking-[0.22em] text-slate-300">{searchPageTitle || 'SHELFSEERR'}</span>
             </div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">
               {t('Your next read starts here')}
             </p>
             <h1 className="mx-auto max-w-3xl text-[1.75rem] leading-tight font-bold tracking-tight sm:text-4xl lg:text-5xl">
               {contentType === 'audiobook' ? t('Listen. Discover. Share.') : t('Find your next favorite book.')}
             </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
+            <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-300 sm:text-base">
               {contentType === 'audiobook'
                 ? t('Explore audiobooks, find your next listen, and add it to your library.')
                 : t('Explore the catalog, discover new worlds, and find the books you want to read.')}
             </p>
-            <div className="mx-auto mt-6 max-w-3xl rounded-xl bg-white p-1.5 shadow-xl sm:mt-8 sm:rounded-2xl sm:p-2">
+            <div className="mx-auto mt-3 max-w-3xl rounded-xl bg-white p-1.5 shadow-xl sm:mt-4 sm:rounded-2xl sm:p-2">
               <SearchBar
                 value={queryValue}
                 valueLabel={queryValueLabel}
@@ -220,7 +199,7 @@ export const SearchSection = ({
         </div>
       )}
 
-      <div className={isInitialState ? 'space-y-8 sm:space-y-11' : 'hidden'}>
+      <div className={isInitialState ? 'space-y-4 sm:space-y-5' : 'hidden'}>
         {showDiscoveryShelves && (requestsLoading || requestCardItems.length > 0) && (
           <section className="min-w-0" aria-label={t('Recent requests')}>
             <div className="mb-3 flex items-center justify-between gap-3">
@@ -290,40 +269,6 @@ export const SearchSection = ({
             </div>
           </section>
         )}
-        <div>
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-500 dark:text-indigo-300">{t('Explore')}</p>
-              <h2 className="mt-1 text-xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-2xl">
-                {contentType === 'audiobook' ? t('Listen by mood') : t('Browse by genre')}
-              </h2>
-              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                {t('Choose a theme to search your catalog.')}
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-            {topics.map((topic, index) => (
-              <button
-                key={topic.query}
-                type="button"
-                onClick={() => selectTopic(topic.query)}
-                className="group min-h-32 rounded-2xl border border-gray-200/80 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg dark:border-white/10 dark:bg-slate-900 dark:hover:border-indigo-400/50"
-              >
-                <span className={`mb-4 flex h-9 w-9 items-center justify-center rounded-xl text-lg ${index % 2 === 0 ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-500/15 dark:text-indigo-300' : 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-300'}`}>
-                  {topic.icon}
-                </span>
-                <span className="block text-sm font-semibold text-gray-900 transition-colors group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-300">
-                  {t(topic.label)}
-                </span>
-                <span className="mt-1 block text-xs leading-5 text-gray-500 dark:text-gray-400">
-                  {t(topic.description)}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         {showDiscoveryShelves && discoverySections.map((shelf) => {
           const shelfBooks = shelf.books;
 
