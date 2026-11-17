@@ -2746,7 +2746,7 @@ function App() {
 
       <div
         className={`shelfseerr-content-shell flex flex-col${
-          usePinnedMainScrollContainer ? ' min-h-0 overflow-y-auto overscroll-y-contain' : ' flex-1'
+          usePinnedMainScrollContainer ? ' min-h-0 overflow-y-auto overscroll-y-contain' : ''
         }`}
         style={
           usePinnedMainScrollContainer
