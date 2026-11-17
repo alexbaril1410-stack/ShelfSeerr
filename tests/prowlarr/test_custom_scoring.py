@@ -161,7 +161,7 @@ def test_multi_volume_bundle_remains_visible_but_receives_large_penalty(monkeypa
 
     values = {
         "CUSTOM_SCORES_EBOOKS_ENABLED": True,
-        "CUSTOM_SCORES_EBOOK_RULES": [],
+        "CUSTOM_SCORES_EBOOK_RULES": [{"enabled": True, "name": "Compilation de plusieurs tomes", "field": "multi_volume_bundle", "operator": "equals", "value": "true", "score": -500}],
     }
     monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
 
@@ -172,3 +172,8 @@ def test_multi_volume_bundle_remains_visible_but_receives_large_penalty(monkeypa
 
     assert score_release(release, book, "ebook") == -500
     assert release.extra["custom_score_breakdown"][0]["name"] == "Compilation de plusieurs tomes"
+    values["CUSTOM_SCORES_EBOOK_RULES"][0]["enabled"] = False
+    assert score_release(release, book, "ebook") == 0
+    values["CUSTOM_SCORES_EBOOK_RULES"][0]["enabled"] = True
+    values["CUSTOM_SCORES_EBOOK_RULES"][0]["score"] = -250
+    assert score_release(release, book, "ebook") == -250
