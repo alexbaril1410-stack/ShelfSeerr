@@ -278,14 +278,14 @@ export const SearchSection = ({
                       <a
                         key={record.id}
                         href={withBasePath('/requests')}
-                        className="shelfseerr-recent-request-card group relative flex h-36 w-[min(82vw,360px)] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-300/20 bg-slate-900 text-left shadow-sm transition hover:border-indigo-400/60 hover:shadow-lg sm:h-40 sm:w-[386px]"
+                        className="shelfseerr-recent-request-card group relative flex h-44 w-[min(82vw,360px)] shrink-0 snap-start overflow-hidden rounded-xl border border-slate-300/20 bg-slate-900 text-left shadow-sm transition hover:border-indigo-400/60 hover:shadow-lg sm:h-44 sm:w-[386px]"
                         title={title}
                       >
                         {item.preview && <img src={item.preview} alt="" aria-hidden="true" loading="lazy" className="absolute inset-0 h-full w-full object-cover opacity-20 blur-[1px] transition duration-300 group-hover:scale-105" />}
                         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-900/45" />
                         <div className="relative z-10 flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
                           {year && <span className="text-[11px] font-semibold text-slate-300">{year}</span>}
-                          <span className="mt-0.5 min-w-0 line-clamp-3 whitespace-normal break-words text-sm font-bold leading-5 text-white sm:text-base [overflow-wrap:anywhere]">{title}</span>
+                          <span className="mt-0.5 min-w-0 line-clamp-4 whitespace-normal break-words text-[13px] font-bold leading-[1.15rem] text-white sm:text-base [overflow-wrap:anywhere]">{title}</span>
                           <span className="mt-2 flex min-w-0 items-center gap-2 text-xs text-slate-300">
                             <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-900">{initials}</span>
                             <span className="truncate">{username || t('You')}</span>
