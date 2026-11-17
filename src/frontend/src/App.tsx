@@ -2761,7 +2761,7 @@ function App() {
             : {
                 paddingTop: isDesktopViewport
                   ? 0
-                  : `${Math.max(0, headerHeight - (isStandalonePwa ? 0 : 0))}px`,
+                  : `${Math.max(0, headerHeight - (isStandalonePwa ? 32 : 0))}px`,
               }
         }
       >
