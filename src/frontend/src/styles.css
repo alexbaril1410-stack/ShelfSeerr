@@ -819,7 +819,7 @@
    Les cartes de demandes récentes conservent leur hauteur habituelle. */
 @media (display-mode: standalone) and (max-width: 1023px) {
   .shelfseerr-content-shell {
-    margin-top: -48px;
+    margin-top: -72px;
   }
 }
 
