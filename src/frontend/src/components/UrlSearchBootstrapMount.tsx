@@ -27,6 +27,7 @@ interface UrlSearchBootstrapMountProps {
   advancedFilters: AdvancedFilterState;
   resolvedMetadataDefaultSort: string;
   resolvedMetadataSortOptions: SortOption[];
+  providerOverride?: string;
   setContentType: (value: ContentType) => void;
   setCombinedMode: (value: boolean) => void;
   setSearchInput: (value: string) => void;
@@ -54,6 +55,7 @@ export const UrlSearchBootstrapMount = ({
   advancedFilters,
   resolvedMetadataDefaultSort,
   resolvedMetadataSortOptions,
+  providerOverride,
   setContentType,
   setCombinedMode,
   setSearchInput,
@@ -205,6 +207,7 @@ export const UrlSearchBootstrapMount = ({
       query,
       contentTypeOverride: urlContentTypeOverride,
       searchModeOverride: parsedSearchMode,
+      providerOverride: parsedSearchMode === 'universal' ? providerOverride : undefined,
       fieldValues: urlFieldValues,
       sort: parsedParams?.advancedFilters?.sort,
     });
