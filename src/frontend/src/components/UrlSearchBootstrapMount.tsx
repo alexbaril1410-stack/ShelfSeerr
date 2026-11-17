@@ -40,6 +40,7 @@ interface UrlSearchBootstrapMountProps {
     contentTypeOverride?: ContentType;
     searchModeOverride?: SearchMode;
     fieldValues?: Record<string, string | number | boolean>;
+    providerOverride?: string;
     sort?: string;
   }) => void;
   onComplete: () => void;
