@@ -115,6 +115,23 @@ export const ScoringPage = ({ onShowToast }: ScoringPageProps) => {
         <p className="mt-2">{t('Placeholders such as {{book_title}}, {{book_author}}, {{series_name}} and {{requested_volume}} are filled in automatically using the book being searched.')}</p>
       </div>
 
+      <section className="space-y-3">
+        <div>
+          <h2 className="text-lg font-semibold">{t('Automatic rules')}</h2>
+          <p className="mt-1 text-sm text-(--text-muted)">{t('Rules applied automatically by ShelfSeerr in addition to the configurable scoring profile.')}</p>
+        </div>
+        <article className="rounded-xl border border-(--border-muted) bg-(--bg-soft) p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-semibold">{t('Multi-volume compilation')}</h3>
+              <p className="mt-1 text-sm leading-6 text-(--text-muted)">{t('When a release title contains the requested series name and an explicit range of volumes, it remains available but is ranked lower than individual-volume releases.')}</p>
+              <p className="mt-2 text-xs text-(--text-muted)">{t('Applied to ebooks and audiobooks when series information is available.')}</p>
+            </div>
+            <span className="shrink-0 rounded-lg border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-sm font-bold tabular-nums text-red-400">−500 {t('points')}</span>
+          </div>
+        </article>
+      </section>
+
       <SettingsContent
         tab={tab}
         values={values}
