@@ -718,7 +718,7 @@ export const fetchBlockedBooks = async (): Promise<BlockedBook[]> => {
 export const addBlockedBook = async (book: Book): Promise<BlockedBook> => {
   const result = await fetchJSON<{ item: BlockedBook }>(`${API_BASE}/admin/blocklist`, {
     method: 'POST',
-    body: JSON.stringify({ book_data: { ...book, content_type: book.content_type || 'ebook' } }),
+    body: JSON.stringify({ book_data: { ...book, content_type: book.content_type === 'audiobook' || book.provider === 'audible' ? 'audiobook' : 'ebook' } }),
   });
   return result.item;
 };
