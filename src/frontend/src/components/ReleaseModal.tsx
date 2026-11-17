@@ -1820,7 +1820,7 @@ const ReleaseModalSession = ({
                               void handleRequestBook();
                             }}
                             disabled={isRequestingBook}
-                            className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
+                            className="inline-flex items-center gap-1 rounded-full bg-[#8057ef]/10 px-2 py-1 text-xs font-medium text-[#8057ef] transition-colors hover:bg-[#8057ef]/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-[#8057ef]/15 dark:text-[#a78bfa] dark:hover:bg-[#8057ef]/25"
                           >
                             <svg
                               className="h-3 w-3"
