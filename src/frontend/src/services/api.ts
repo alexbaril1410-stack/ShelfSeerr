@@ -697,6 +697,36 @@ export interface ActivityHistoryItem {
   source_id: string | null;
 }
 
+export interface BlockedBook {
+  id: number;
+  provider: string;
+  provider_id: string;
+  content_type: ContentType;
+  title: string;
+  author?: string | null;
+  preview?: string | null;
+  source_url?: string | null;
+  book_data: Record<string, unknown>;
+  created_at: string;
+}
+
+export const fetchBlockedBooks = async (): Promise<BlockedBook[]> => {
+  const result = await fetchJSON<{ items: BlockedBook[] }>(`${API_BASE}/admin/blocklist`);
+  return result.items;
+};
+
+export const addBlockedBook = async (book: Book): Promise<BlockedBook> => {
+  const result = await fetchJSON<{ item: BlockedBook }>(`${API_BASE}/admin/blocklist`, {
+    method: 'POST',
+    body: JSON.stringify({ book_data: { ...book, content_type: book.content_type || 'ebook' } }),
+  });
+  return result.item;
+};
+
+export const removeBlockedBook = async (id: number): Promise<void> => {
+  await fetchJSON(`${API_BASE}/admin/blocklist/${encodeURIComponent(String(id))}`, { method: 'DELETE' });
+};
+
 export const fetchRequestPolicy = async (): Promise<RequestPolicyResponse> => {
   return fetchJSON<RequestPolicyResponse>(API.requestPolicy);
 };
