@@ -295,8 +295,19 @@ export const SearchSection = ({
           return (
             <section key={shelf.key} className="min-w-0">
               <div className="mb-3 flex items-end justify-between gap-3">
-                <div>
+                <div className="flex min-w-0 items-center gap-2">
                   <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
+                  <a
+                    href={withBasePath(shelf.key.startsWith('audiobook') ? '/audiobooks' : '/books')}
+                    aria-label={`${t('View full selection')} – ${t(shelf.title)}`}
+                    title={t('View full selection')}
+                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-indigo-300"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9" />
+                      <path d="m10 8 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </a>
                 </div>
                 <div className="flex shrink-0 items-center gap-3">
                   {shelfBooks.length > 0 && (
