@@ -815,21 +815,11 @@
   }
 }
 
-/* Dans la PWA, réduire légèrement la hauteur des cartes de demandes récentes
-   sans modifier leur dimension dans Safari ou sur ordinateur. */
-@media (display-mode: standalone) {
-  .shelfseerr-recent-request-card {
-    height: 8rem;
-  }
-
-  .shelfseerr-recent-request-card > img:last-child {
-    width: 4.5rem;
-    margin-top: 0.625rem;
-    margin-bottom: 0.625rem;
-  }
-
-  .shelfseerr-recent-request-card > div.relative {
-    padding: 0.625rem;
+/* En PWA mobile, rapprocher le début du contenu de la barre de recherche fixe.
+   Les cartes de demandes récentes conservent leur hauteur habituelle. */
+@media (display-mode: standalone) and (max-width: 1023px) {
+  .shelfseerr-content-shell {
+    margin-top: -48px;
   }
 }
 
