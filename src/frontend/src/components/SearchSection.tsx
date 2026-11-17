@@ -286,14 +286,16 @@ export const SearchSection = ({
                         <div className="relative z-10 flex min-w-0 flex-1 flex-col p-3.5 sm:p-4">
                           {year && <span className="text-[11px] font-semibold text-slate-300">{year}</span>}
                           <span className="mt-0.5 min-w-0 line-clamp-4 whitespace-normal break-words text-[13px] font-bold leading-[1.15rem] text-white sm:text-base [overflow-wrap:anywhere]">{title}</span>
-                          <span className="mt-2 flex min-w-0 items-center gap-2 text-xs text-slate-300">
-                            <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-900">{initials}</span>
-                            <span className="truncate">{username || t('You')}</span>
-                          </span>
-                          <span className="mt-auto flex items-center gap-2 pt-2 text-[11px] font-semibold text-slate-300">
-                            <span>{t('Status')}</span>
-                            <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${status === 'Request status: Available' ? 'bg-emerald-500 text-white' : status === 'Request status: Problem' ? 'bg-red-500 text-white' : status === 'Request status: Requested' ? 'bg-indigo-500 text-white' : 'bg-slate-500 text-white'}`}>{t(status)}</span>
-                          </span>
+                          <div className="mt-auto flex min-w-0 flex-col gap-2 pt-2">
+                            <span className="flex min-w-0 items-center gap-2 text-xs text-slate-300">
+                              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-100 text-[10px] font-bold text-amber-900">{initials}</span>
+                              <span className="truncate">{username || t('You')}</span>
+                            </span>
+                            <span className="flex items-center gap-2 text-[11px] font-semibold text-slate-300">
+                              <span>{t('Status')}</span>
+                              <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold ${status === 'Request status: Available' ? 'bg-emerald-500 text-white' : status === 'Request status: Problem' ? 'bg-red-500 text-white' : status === 'Request status: Requested' ? 'bg-indigo-500 text-white' : 'bg-slate-500 text-white'}`}>{t(status)}</span>
+                            </span>
+                          </div>
                         </div>
                         {item.preview && <img src={item.preview} alt="" loading="lazy" className="relative z-10 my-3 mr-3 w-20 shrink-0 rounded-lg object-cover shadow-xl sm:my-3.5 sm:mr-3.5 sm:w-24" />}
                       </a>
