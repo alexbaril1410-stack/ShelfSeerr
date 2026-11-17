@@ -757,6 +757,68 @@ function App() {
     enabled: urlSearchEnabled,
     nonce: urlSearchNonce,
   });
+  const contentRouteSearchRef = useRef<string | null>(null);
+
+  // Direct visits to /books and /audiobooks have no hash to bootstrap from.
+  // Start the same provider search that the content selector starts, once per route entry.
+  const routeContentType: ContentType | null =
+    location.pathname === '/audiobooks'
+      ? 'audiobook'
+      : location.pathname === '/books'
+        ? 'ebook'
+        : null;
+
+  useEffect(() => {
+    if (!routeContentType) {
+      contentRouteSearchRef.current = null;
+      return;
+    }
+    if (!isAuthenticated || !config || parsedParams) {
+      return;
+    }
+
+    const selectedProvider = routeContentType === 'audiobook'
+      ? configuredAudiobookMetadataProvider
+      : configuredMetadataProvider;
+    if (
+      selectedProvider !== 'hardcover' &&
+      !(routeContentType === 'audiobook' && selectedProvider === 'audible')
+    ) {
+      return;
+    }
+
+    const routeKey = `${location.pathname}:${selectedProvider}`;
+    if (contentRouteSearchRef.current === routeKey) {
+      return;
+    }
+    contentRouteSearchRef.current = routeKey;
+
+    handleResetSearch(config);
+    setActiveQueryTarget('general');
+    setActiveResultsSort('popularity');
+    setContentType(routeContentType);
+    void handleSearch({
+      query: selectedProvider === 'audible' ? '*' : '',
+      config,
+      fieldValues: {},
+      contentTypeOverride: routeContentType,
+      searchMode: 'universal',
+      providerOverride: selectedProvider,
+    });
+  }, [
+    config,
+    configuredAudiobookMetadataProvider,
+    configuredMetadataProvider,
+    handleResetSearch,
+    handleSearch,
+    isAuthenticated,
+    location.pathname,
+    parsedParams,
+    routeContentType,
+    setActiveQueryTarget,
+    setActiveResultsSort,
+    setContentType,
+  ]);
   const [hasExecutedUrlSearchBootstrap, setHasExecutedUrlSearchBootstrap] = useState(false);
   // Same fact as the state above, readable from loadConfig's async continuation, which
   // closes over the render it started in and would otherwise see a stale `false`.
