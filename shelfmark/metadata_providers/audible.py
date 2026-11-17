@@ -598,7 +598,7 @@ class AudibleProvider(MetadataProvider):
         return options[:15]
 
     def _fetch_series_books(self, series_asin: str, page: int, limit: int) -> SearchResult:
-        """Load child products from Audible series relationships in reading order."""
+        """Load one French-preferred edition per numbered Audible series volume."""
         empty = SearchResult(books=[], page=page, total_found=0, has_more=False)
         payload = self._request("catalog/products", {
             "asins": series_asin,
@@ -613,49 +613,95 @@ class AudibleProvider(MetadataProvider):
         if not isinstance(relationships, list):
             return empty
 
-        children: list[tuple[float, str]] = []
-        seen: set[str] = set()
+        # Audible often lists several editions (different release years / narrators)
+        # as separate child products for the same volume. Keep their shared sequence
+        # number and choose the French edition with the newest release date.
+        editions_by_position: dict[float | str, list[str]] = {}
+        seen_asins: set[str] = set()
+        ordered_positions: list[float | str] = []
         for relation in relationships:
             if not isinstance(relation, dict):
                 continue
             asin = _text(relation.get("asin"))
-            if relation.get("relationship_to_product") != "child" or relation.get("relationship_type") != "series" or not asin or asin in seen:
+            if (
+                relation.get("relationship_to_product") != "child"
+                or relation.get("relationship_type") != "series"
+                or not asin
+                or asin.upper() in seen_asins
+            ):
                 continue
-            seen.add(asin)
+            seen_asins.add(asin.upper())
             try:
-                position = float(str(relation.get("sequence")).replace(",", "."))
+                position: float | str = float(str(relation.get("sequence")).replace(",", "."))
             except (TypeError, ValueError):
-                position = float("inf")
-            children.append((position, asin))
+                # Unknown sequence values must not collapse unrelated editions.
+                position = f"unknown:{asin.upper()}"
+            if position not in editions_by_position:
+                editions_by_position[position] = []
+                ordered_positions.append(position)
+            editions_by_position[position].append(asin)
 
-        children.sort(key=lambda item: (item[0], item[1]))
-        total = len(children)
+        ordered_positions.sort(key=lambda value: (isinstance(value, str), value))
+        if not ordered_positions:
+            return empty
+
+        products: dict[str, dict[str, Any]] = {}
+        all_asins = [asin for position in ordered_positions for asin in editions_by_position[position]]
+        for offset in range(0, len(all_asins), _MAX_RESULTS):
+            batch = all_asins[offset:offset + _MAX_RESULTS]
+            book_payload = self._request("catalog/products", {
+                "asins": ",".join(batch),
+                "num_results": len(batch),
+                "response_groups": _RESPONSE_GROUPS,
+            })
+            products.update({
+                str(item.get("asin") or "").upper(): item
+                for item in _product_items(book_payload)
+            })
+
+        selected: list[tuple[float | str, BookMetadata]] = []
+        for position in ordered_positions:
+            candidates: list[tuple[tuple[int, int, str], BookMetadata]] = []
+            for asin in editions_by_position[position]:
+                product = products.get(asin.upper())
+                if not product:
+                    continue
+                book = _parse_product(product, self.marketplace)
+                if not book:
+                    continue
+                release = _release_date(product)
+                # French editions win; among them, prefer the most recent release.
+                # ASIN is a stable final tie-breaker for deterministic results.
+                rank = (
+                    1 if _is_french_language(book.language) else 0,
+                    release.toordinal() if release else 0,
+                    book.provider_id,
+                )
+                candidates.append((rank, book))
+            if not candidates:
+                continue
+            _rank, chosen = max(candidates, key=lambda item: item[0])
+            if self.french_only and not _is_french_language(chosen.language):
+                continue
+            selected.append((position, chosen))
+
+        total = len(selected)
         offset = max(page - 1, 0) * max(limit, 1)
-        page_children = children[offset:offset + max(limit, 1)]
-        if not page_children:
-            return SearchResult(books=[], page=page, total_found=total, has_more=False)
-
-        book_payload = self._request("catalog/products", {
-            "asins": ",".join(asin for _position, asin in page_children),
-            "num_results": len(page_children),
-            "response_groups": _RESPONSE_GROUPS,
-        })
-        products = {str(item.get("asin") or "").upper(): item for item in _product_items(book_payload)}
-        books: list[BookMetadata] = []
+        page_items = selected[offset:offset + max(limit, 1)]
         series_name = _text(series_product.get("title") or series_product.get("name"))
-        for position, asin in page_children:
-            product = products.get(asin.upper())
-            if not product:
-                continue
-            book = _parse_product(product, self.marketplace)
-            if not book or (self.french_only and not _is_french_language(book.language)):
-                continue
+        books: list[BookMetadata] = []
+        for position, book in page_items:
             book.series_id = series_asin
             book.series_name = series_name or book.series_name
-            book.series_position = position if position != float("inf") else book.series_position
+            book.series_position = position if isinstance(position, float) else book.series_position
             book.series_count = total
             books.append(book)
-        return SearchResult(books=books, page=page, total_found=total, has_more=offset + len(page_children) < total)
+        return SearchResult(
+            books=books,
+            page=page,
+            total_found=total,
+            has_more=offset + len(page_items) < total,
+        )
 
     def search_paginated(self, options: MetadataSearchOptions) -> SearchResult:
         """Search Audible with stable release-date ordering across API pages."""
