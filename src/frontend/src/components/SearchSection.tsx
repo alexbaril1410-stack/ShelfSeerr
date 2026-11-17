@@ -223,9 +223,22 @@ export const SearchSection = ({
         {showDiscoveryShelves && (requestsLoading || requestCardItems.length > 0) && (
           <section className="min-w-0" aria-label={t('Recent requests')}>
             <div className="mb-3 flex items-center justify-between gap-3">
-              <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">
-                {t('Recent requests')}
-              </h2>
+              <div className="flex min-w-0 items-center gap-2">
+                <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">
+                  {t('Recent requests')}
+                </h2>
+                <a
+                  href={withBasePath('/requests')}
+                  aria-label={t('View full selection')}
+                  title={t('View full selection')}
+                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-indigo-300"
+                >
+                  <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="m10 8 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </a>
+              </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="hidden text-xs text-gray-500 dark:text-gray-400 sm:inline">
                   {recentRequests.length} {t('requests')}
@@ -298,7 +311,15 @@ export const SearchSection = ({
                 <div className="flex min-w-0 items-center gap-2">
                   <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
                   <a
-                    href={withBasePath(shelf.key.startsWith('audiobook') ? '/audiobooks' : '/books')}
+                    href={withBasePath(
+                      shelf.key === 'ebook-trending'
+                        ? '/books#sort=trending'
+                        : shelf.key === 'ebook-popular'
+                          ? '/books'
+                          : shelf.key === 'audiobook-trending'
+                            ? '/audiobooks#content_type=audiobook'
+                            : '/audiobooks#content_type=audiobook&sort=popularity',
+                    )}
                     aria-label={`${t('View full selection')} – ${t(shelf.title)}`}
                     title={t('View full selection')}
                     className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-indigo-300"
