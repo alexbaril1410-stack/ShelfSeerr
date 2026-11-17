@@ -7,7 +7,6 @@ import type {
   ReleaseSource,
   ReleasesResponse,
   RequestPolicyResponse,
-  ContentType,
   CreateRequestPayload,
   RequestRecord,
   RequestSubmissionResult,
