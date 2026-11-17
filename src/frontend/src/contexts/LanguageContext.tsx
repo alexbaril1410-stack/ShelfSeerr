@@ -878,7 +878,7 @@ const FRENCH_TRANSLATIONS: Record<string, string> = {
   Home: 'Accueil',
   Discover: 'Découvrir',
   'Administration': 'Administration',
-  'Scoring': 'Classement des résultats',
+  'Scoring': 'Scoring',
   'Fine-tune how release results are ranked for ebooks and audiobooks. The scoring engine and its existing rules remain unchanged; this page gives you clearer control over them.': 'Ajustez le classement des résultats pour les livres numériques et les livres audio. Le moteur de notation et ses règles restent inchangés : cette page vous donne simplement un contrôle plus clair.',
   'Points are cumulative': 'Les points se cumulent',
   'Each matching active rule adds or subtracts its points. The total determines the order of the results.': 'Chaque règle active qui correspond ajoute ou retire ses points. Le total obtenu détermine l’ordre des résultats.',
