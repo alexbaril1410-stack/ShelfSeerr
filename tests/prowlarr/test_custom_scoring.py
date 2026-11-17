@@ -3,6 +3,7 @@ from shelfmark.release_sources.prowlarr.custom_scoring import (
     _release_language_signal,
     release_title_matches_book,
     release_author_matches_book,
+    score_release,
 )\nfrom shelfmark.metadata_providers import BookMetadata
 
 
@@ -152,3 +153,22 @@ def test_release_title_matching_does_not_accept_wrong_series_volume():
         _release("Dungeon Crawler Carl T03 [EPUB]"),
         book,
     )
+
+
+
+def test_multi_volume_bundle_remains_visible_but_receives_large_penalty(monkeypatch):
+    import shelfmark.release_sources.prowlarr.custom_scoring as scoring
+
+    values = {
+        "CUSTOM_SCORES_EBOOKS_ENABLED": True,
+        "CUSTOM_SCORES_EBOOK_RULES": [],
+    }
+    monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
+
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    book.series_name = "Dungeon Crawler Carl"
+    book.series_position = 2
+    release = _release("Matt.Dinniman.Dungeon.Crawler.Carl.T01-T04.FRENCH.EPUB-NoTAG")
+
+    assert score_release(release, book, "ebook") == -500
+    assert release.extra["custom_score_breakdown"][0]["name"] == "Compilation de plusieurs tomes"
