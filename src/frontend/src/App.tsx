@@ -2791,7 +2791,7 @@ function App() {
         )}
 
         <main
-          className="relative mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:py-6 lg:px-8"
+          className={`relative mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:py-6 lg:px-8 ${(location.pathname === '/discover' || location.pathname === '/') ? 'flex-none' : ''}`}
           style={
             usePinnedMainScrollContainer
               ? { display: 'block', flex: '0 0 auto', minHeight: 0 }
