@@ -1146,6 +1146,12 @@ class ProwlarrSource(ReleaseSource):
 
         variants = [v for v in plan.title_variants if v.title]
 
+        # A manual query supplements the metadata-derived variants. Keeping both
+        # in one search means every result goes through the same relevance checks,
+        # custom scoring, deduplication and final ordering.
+        if plan.manual_query and all(v.title.casefold() != plan.manual_query.casefold() for v in variants):
+            variants.append(ReleaseSearchVariant(title=plan.manual_query, author="", languages=None))
+
         if not variants and plan.isbn_candidates:
             variants = [
                 ReleaseSearchVariant(title=isbn, author="", languages=None)
@@ -1171,22 +1177,15 @@ class ProwlarrSource(ReleaseSource):
         # Audiobooks use 3030 (Audio/Audiobook), ebooks use 7000 (Books)
         search_categories = [3030] if content_type == "audiobook" else [7000]
 
-        # Manual query override should behave like normal Prowlarr searches:
-        # - default: search within the content-type categories
-        # - expand: rerun without categories
-        if plan.manual_query:
-            categories = None if expand_search else search_categories
-            self.last_search_type = "manual_expanded" if expand_search else "manual_query"
-        else:
-            categories = None if expand_search else search_categories
-            self.last_search_type = "expanded" if expand_search else "categories"
+        # Manual queries are additional variants, not replacements. Keep the same
+        # category filters and relevance pipeline for every query.
+        categories = None if expand_search else search_categories
+        self.last_search_type = "expanded" if expand_search else "categories"
 
-        if plan.manual_query:
-            query_type = "manual"
-        elif not plan.title_variants and plan.isbn_candidates:
+        if not plan.title_variants and plan.isbn_candidates:
             query_type = "isbn"
         else:
-            query_type = "title"
+            query_type = "title+manual" if plan.manual_query else "title"
 
         indexer_desc = f"indexers={indexer_ids}" if indexer_ids else "all enabled indexers"
         if len(variants) == 1:
@@ -1396,7 +1395,7 @@ class ProwlarrSource(ReleaseSource):
             mam_indexer: dict | None = None
             # A manual query is the user's own words; ranking it against the
             # metadata author would second-guess what they typed.
-            wanted_author = "" if plan.manual_query else plan.author
+            wanted_author = plan.author
             hide_unsupported_formats = config.get("PROWLARR_HIDE_UNSUPPORTED_FORMATS", True)
             hidden_unsupported = 0
 
@@ -1423,7 +1422,7 @@ class ProwlarrSource(ReleaseSource):
                 # Prowlarr can return fuzzy matches that are not the requested
                 # book (e.g. "d'une" for "Dune", or "(1984)" as a publication year).
                 # Manual searches are intentionally left untouched.
-                if not plan.manual_query and not release_title_matches_book(release, book):
+                if not release_title_matches_book(release, book):
                     logger.debug(
                         "Prowlarr: hiding unrelated title for '%s': '%s'",
                         book.search_title or book.title,
@@ -1483,7 +1482,7 @@ class ProwlarrSource(ReleaseSource):
             # Prefer results that identify the requested author for every title,
             # not only one-word titles. If no indexer provides the author, fall back
             # to the already title-filtered results rather than returning nothing.
-            if not plan.manual_query and results:
+            if results:
                 author_matched = [
                     release for release in results
                     if release_author_matches_book(release, book)
