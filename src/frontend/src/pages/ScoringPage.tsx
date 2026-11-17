@@ -84,7 +84,7 @@ export const ScoringPage = ({ onShowToast }: ScoringPageProps) => {
         <div className="pointer-events-none absolute -right-12 -top-16 h-56 w-56 rounded-full bg-violet-500/10 blur-3xl" />
         <div className="relative flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-violet-500/15 text-violet-400">
-            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 3-4 3 2 5-7"/><path d="M15 6h3v3"/></svg>
+            <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><circle cx="9" cy="6" r="2" fill="#080b14"/><circle cx="15" cy="12" r="2" fill="#080b14"/><circle cx="7" cy="18" r="2" fill="#080b14"/></svg>
           </div>
           <div className="min-w-0">
             <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-violet-400">{t('Administration')}</p>
