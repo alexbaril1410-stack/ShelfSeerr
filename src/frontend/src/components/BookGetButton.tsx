@@ -72,7 +72,7 @@ export const BookGetButton = ({
   // Determine button styling based on state
   const getButtonClasses = () => {
     if (isCompleted) {
-      return isIconVariant ? 'bg-green-600 text-white' : 'bg-green-600 hover:bg-green-700';
+      return isIconVariant ? 'bg-[#8057ef] text-white' : 'bg-[#8057ef] text-white hover:bg-[#6941d5]';
     }
     if (hasError) {
       return isIconVariant ? 'bg-red-600 text-white opacity-75' : 'bg-red-600 hover:bg-red-700';
@@ -93,7 +93,7 @@ export const BookGetButton = ({
     // Default state - icon variant has no background
     return isIconVariant
       ? 'text-gray-600 dark:text-gray-200 hover-action'
-      : 'bg-emerald-600 hover:bg-emerald-700';
+      : 'bg-[#8057ef] text-white hover:bg-[#6941d5]';
   };
 
   const handleClick = () => {
@@ -188,7 +188,7 @@ export const BookGetButton = ({
     return (
       <button
         type="button"
-        className={`flex items-center justify-center rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:outline-hidden ${sizeClass} ${getButtonClasses()} ${className}`.trim()}
+        className={`flex items-center justify-center rounded-full transition-all duration-200 focus-visible:ring-2 focus-visible:ring-[#a78bfa] focus-visible:ring-offset-2 focus-visible:outline-hidden ${sizeClass} ${getButtonClasses()} ${className}`.trim()}
         onClick={handleClick}
         disabled={isDisabled}
         style={style}
