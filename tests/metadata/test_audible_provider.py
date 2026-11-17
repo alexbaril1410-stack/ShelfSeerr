@@ -331,6 +331,40 @@ def test_audible_series_browse_loads_child_books_in_sequence_order(monkeypatch):
     assert calls[1][1]["asins"] == "B0BOOK0001"
 
 
+def test_audible_series_browse_keeps_one_latest_french_edition_per_volume(monkeypatch):
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        if params.get("asins") == "B0SERIES999":
+            return {"products": [{
+                "asin": "B0SERIES999",
+                "title": "Les Sept Sœurs",
+                "relationships": [
+                    {"asin": "B0OLD00001", "relationship_to_product": "child", "relationship_type": "series", "sequence": "1"},
+                    {"asin": "B0NEW00001", "relationship_to_product": "child", "relationship_type": "series", "sequence": "1"},
+                    {"asin": "B0BOOK00002", "relationship_to_product": "child", "relationship_type": "series", "sequence": "2"},
+                ],
+            }]}
+        return {"products": [
+            {"asin": "B0OLD00001", "title": "Maia", "language": "French", "release_date": "2016-01-01"},
+            {"asin": "B0NEW00001", "title": "Maia", "language": "French", "release_date": "2022-01-01"},
+            {"asin": "B0BOOK00002", "title": "La sœur de la tempête", "language": "French", "release_date": "2017-01-01"},
+        ]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    result = provider.search_paginated(MetadataSearchOptions(
+        query="", limit=10, page=1, fields={"series": "asin:B0SERIES999"},
+    ))
+
+    assert [book.provider_id for book in result.books] == ["B0NEW00001", "B0BOOK00002"]
+    assert [book.series_position for book in result.books] == [1.0, 2.0]
+    assert [book.series_count for book in result.books] == [2, 2]
+    assert result.total_found == 2
+    assert result.has_more is False
+
+
 def test_audible_series_suggestions_are_deduplicated(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     monkeypatch.setattr(provider, "_request", lambda _path, _params: {"products": [
