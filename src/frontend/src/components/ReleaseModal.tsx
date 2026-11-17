@@ -2424,6 +2424,19 @@ const ReleaseModalSession = ({
             {/* Release list content */}
             <div className="min-h-[200px]">
               {(() => {
+                const warnings = releasesBySource[activeTab]?.search_info?.[activeTab]?.warnings ?? [];
+                if (warnings.length === 0) return null;
+                return (
+                  <div className="mx-4 mt-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800 dark:text-amber-200" role="status">
+                    <p className="font-medium">{t('Some indexers could not be reached')}</p>
+                    <ul className="mt-1 list-disc pl-5">
+                      {warnings.map((warning) => <li key={warning}>{warning}</li>)}
+                    </ul>
+                    <p className="mt-1 text-xs opacity-80">{t('The results from the available indexers are shown below.')}</p>
+                  </div>
+                );
+              })()}
+              {(() => {
                 if (formatReview) {
                   return (
                     <FormatReviewPanel
