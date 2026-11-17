@@ -13,6 +13,8 @@ export type AppLanguage = 'fr' | 'en';
 const LANGUAGE_STORAGE_KEY = 'shelfseerr-language';
 
 const FRENCH_TRANSLATIONS: Record<string, string> = {
+  'Some indexers could not be reached': 'Certains indexeurs sont temporairement indisponibles',
+  'The results from the available indexers are shown below.': 'Les résultats des indexeurs disponibles sont affichés ci-dessous.',
   'Profile': 'Profil',
   'View full selection': 'Voir toute la sélection',
   'Previous': 'Précédent',
