@@ -1125,6 +1125,14 @@ function App() {
     void loadConfig('settings-saved');
   }, [loadConfig]);
 
+  const getBookContentType = (book: Book): ContentType => {
+    // Discovery cards can come from a different catalogue than the global search
+    // selector. Their provider is authoritative when the API omits content_type.
+    if (book.provider === 'audible') return 'audiobook';
+    if (book.provider === 'hardcover') return 'ebook';
+    return toContentType(book.content_type || effectiveContentType);
+  };
+
   // Show book details
   const handleShowDetails = async (id: string): Promise<void> => {
     const book = books.find((entry) => entry.id === id);
@@ -1135,6 +1143,7 @@ function App() {
         const fullBook = await getMetadataBookInfo(metadataBook.provider, metadataBook.provider_id);
         setSelectedBook({
           ...metadataBook,
+          content_type: getBookContentType(metadataBook),
           description: fullBook.description || metadataBook.description,
           series_id: fullBook.series_id || metadataBook.series_id,
           series_name: fullBook.series_name,
@@ -1662,7 +1671,7 @@ function App() {
   const handleGetReleases = async (book: Book) => {
     // Actions launched from a metadata card must follow that card's media type,
     // not the global search selector (which can be on the other catalogue).
-    const bookContentType = toContentType(book.content_type || effectiveContentType);
+    const bookContentType = getBookContentType(book);
     let mode = getDefaultMode(bookContentType);
     const normalizedContentType = bookContentType;
     policyTrace('universal.get:start', {
@@ -2430,8 +2439,7 @@ function App() {
         return;
       }
 
-      const bookContentType: ContentType =
-        book.content_type === 'audiobook' ? 'audiobook' : 'ebook';
+      const bookContentType = getBookContentType(book);
 
       try {
         const metadataConfig = await getMetadataSearchConfig(bookContentType, book.provider);
@@ -2571,7 +2579,7 @@ function App() {
   const activeReleaseContentType =
     fulfillingRequest?.contentType ??
     effectiveCombinedState?.phase ??
-    (releaseBook ? toContentType(releaseBook.content_type || effectiveContentType) : effectiveContentType);
+    (releaseBook ? getBookContentType(releaseBook) : effectiveContentType);
   const combinedSelectionPhases = effectiveCombinedState
     ? getCombinedSelectionPhases(effectiveCombinedState)
     : [];
