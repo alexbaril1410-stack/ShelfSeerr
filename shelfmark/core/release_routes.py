@@ -729,6 +729,9 @@ def register_release_routes(
                     info["search_type"] = source_instance.last_search_type
                 if hasattr(source_instance, "total_results"):
                     info["total_results"] = source_instance.total_results
+                warnings = getattr(source_instance, "last_search_warnings", None)
+                if warnings:
+                    info["warnings"] = list(warnings)
                 if info:
                     search_info[source_name] = info
 
