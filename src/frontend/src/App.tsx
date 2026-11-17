@@ -760,12 +760,12 @@ function App() {
     return () => { active = false; };
   }, [isAuthenticated, requestRoleIsAdmin]);
 
-  const getBlockKey = useCallback((book: Book) => `${book.provider || ''}:${book.provider_id || ''}:${book.content_type === 'audiobook' ? 'audiobook' : 'ebook'}`, []);
+  const getBlockKey = useCallback((book: Book) => `${book.provider || ''}:${book.provider_id || ''}:${book.content_type === 'audiobook' || book.provider === 'audible' ? 'audiobook' : 'ebook'}`, []);
   const handleToggleBookBlock = useCallback(async (book: Book, blocked: boolean) => {
     try {
       if (blocked) {
         const items = await fetchBlockedBooks();
-        const match = items.find((item) => item.provider === book.provider && item.provider_id === book.provider_id && item.content_type === (book.content_type === 'audiobook' ? 'audiobook' : 'ebook'));
+        const match = items.find((item) => item.provider === book.provider && item.provider_id === book.provider_id && item.content_type === (book.content_type === 'audiobook' || book.provider === 'audible' ? 'audiobook' : 'ebook'));
         if (match) await removeBlockedBook(match.id);
         setBlockedBookKeys((current) => { const next = new Set(current); next.delete(getBlockKey(book)); return next; });
         showToast(t('Book unblocked'), 'success');
