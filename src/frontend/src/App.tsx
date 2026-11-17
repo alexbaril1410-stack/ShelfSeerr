@@ -2698,7 +2698,7 @@ function App() {
             navigateToContent(type);
           }}
           onNavigatePage={(path) => {
-            if (path === '/blocks' || path === '/issues') {
+            if (path === '/issues') {
               setDownloadsSidebarOpen(true);
               return;
             }
