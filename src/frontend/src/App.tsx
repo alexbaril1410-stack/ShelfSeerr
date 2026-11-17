@@ -2792,7 +2792,9 @@ function App() {
               : undefined
           }
         >
-          {location.pathname === '/blocks' && requestRoleIsAdmin ? (
+          {location.pathname === '/scoring' && requestRoleIsAdmin ? (
+            <ScoringPage onShowToast={showToast} />
+          ) : location.pathname === '/blocks' && requestRoleIsAdmin ? (
             <BlocklistPage />
           ) : location.pathname === '/requests' ? (
             <RequestsPage
