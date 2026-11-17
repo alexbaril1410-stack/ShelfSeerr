@@ -1515,3 +1515,15 @@ button[class*="bg-emerald-"]:disabled {
   opacity: 1 !important;
 }
 
+/* Discovery should end after its shelves instead of stretching to the viewport height. */
+.shelfseerr-content-shell:has(#search-section.search-initial-state) {
+  min-height: 0 !important;
+  flex: 0 0 auto !important;
+}
+.shelfseerr-content-shell:has(#search-section.search-initial-state) > main {
+  flex: 0 0 auto !important;
+}
+#search-section.search-initial-state {
+  flex: 0 0 auto !important;
+}
+
