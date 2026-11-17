@@ -491,6 +491,7 @@ export interface Release {
 interface SourceSearchInfo {
   search_type: 'isbn' | 'title_author' | 'categories' | 'expanded' | 'manual' | 'query';
   total_results?: number | string | null;
+  warnings?: string[];
 }
 
 // Response from /api/releases endpoint
