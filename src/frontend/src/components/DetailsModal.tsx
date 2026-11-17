@@ -96,7 +96,7 @@ export const DetailsModal = ({
     if (buttonState.state === 'blocked') {
       return 'bg-gray-500';
     }
-    return isMetadata ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-sky-700 hover:bg-sky-800';
+    return isMetadata ? 'bg-[#8057ef] text-white hover:bg-[#6941d5]' : 'bg-sky-700 hover:bg-sky-800';
   })();
   const publisherInfo = { label: t('Publisher'), value: book.publisher || '-' };
   const bookProvider = book.provider;
@@ -340,7 +340,7 @@ export const DetailsModal = ({
                             onSearchSeries(seriesName, book.series_id);
                             handleClose();
                           }}
-                          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
+                          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#8057ef] px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-[#6941d5]"
                         >
                           <svg
                             className="h-3 w-3"
@@ -424,7 +424,7 @@ export const DetailsModal = ({
                   disabled={
                     isMetadata ? buttonState.state === 'blocked' : buttonState.state !== 'download'
                   }
-                  className={`rounded-lg px-5 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                  className={`rounded-lg px-5 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-100 ${
                     downloadButtonClassName
                   }`}
                 >
