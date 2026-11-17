@@ -16,7 +16,7 @@ export const Footer = ({ buildVersion, releaseVersion, debug }: FooterProps) => 
 
   return (
     <footer
-      className="mt-8 py-4"
+      className="py-3"
       style={{
         paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))',
       }}
