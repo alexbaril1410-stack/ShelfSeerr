@@ -121,3 +121,34 @@ def test_author_match_works_for_long_titles_and_falls_back_when_missing():
         _release("Projet Dernière Chance.epub"), book
     )
     assert release_title_matches_book(_release("Projet Dernière Chance.epub"), book)
+
+
+
+def test_release_title_matching_tolerates_missing_apostrophe_in_french_elision():
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    assert release_title_matches_book(
+        _release("Dungeon Crawler Carl T02, Logive Du Jugement Dernier [EPUB]"),
+        book,
+    )
+
+
+def test_release_title_matching_accepts_exact_series_and_volume_variant():
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    book.series_name = "Dungeon Crawler Carl"
+    book.series_position = 2
+
+    assert release_title_matches_book(
+        _release("Dungeon Crawler Carl T02 [EPUB]"),
+        book,
+    )
+
+
+def test_release_title_matching_does_not_accept_wrong_series_volume():
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    book.series_name = "Dungeon Crawler Carl"
+    book.series_position = 2
+
+    assert not release_title_matches_book(
+        _release("Dungeon Crawler Carl T03 [EPUB]"),
+        book,
+    )
