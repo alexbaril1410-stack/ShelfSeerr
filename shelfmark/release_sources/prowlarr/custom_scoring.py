@@ -307,6 +307,28 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
     total = 0
     breakdown: list[dict[str, Any]] = []
 
+    # Keep multi-volume bundles visible, but rank them well below individual
+    # editions when the release explicitly advertises a tome range.
+    series_name = getattr(book, "series_name", None)
+    if series_name and _title_tokens(series_name):
+        normalized_release_title = str(release.title or "")
+        series_matches = _contains_title(
+            _title_tokens(normalized_release_title), _title_tokens(series_name)
+        )
+        bundle_range = re.search(
+            r"\\b(?:t|tome|vol(?:ume)?)\\.?\\s*0*\\d{1,2}\\s*[-–—à]\\s*(?:t|tome|vol(?:ume)?)?\\.?\\s*0*\\d{1,2}\\b",
+            normalized_release_title,
+            re.I,
+        )
+        if series_matches and bundle_range:
+            total -= 500
+            breakdown.append({
+                "name": "Compilation de plusieurs tomes",
+                "field": "volume",
+                "score": -500,
+                "matched_value": bundle_range.group(0),
+            })
+
     # Language is a hard relevance signal for a French request. Indexers often
     # omit Torznab language metadata, so inspect explicit release tags such as
     # [VO], [ENG], [FR] and [VFF] as well. Do not assume an untagged release is VO.
