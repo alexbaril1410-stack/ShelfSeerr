@@ -328,7 +328,7 @@ def test_audible_series_browse_loads_child_books_in_sequence_order(monkeypatch):
     assert result.books[0].series_count == 2
     assert result.total_found == 2
     assert result.has_more is True
-    assert calls[1][1]["asins"] == "B0BOOK0001"
+    assert calls[1][1]["asins"] == "B0BOOK0002,B0BOOK0001"
 
 
 def test_audible_series_browse_keeps_one_latest_french_edition_per_volume(monkeypatch):
