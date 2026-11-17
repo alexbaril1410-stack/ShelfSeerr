@@ -50,6 +50,7 @@ import { LoginPage } from './pages/LoginPage';
 import { RequestsPage } from './pages/RequestsPage';
 import { BlocklistPage } from './pages/BlocklistPage';
 import { ScoringPage } from './pages/ScoringPage';
+import { UsersPage } from './pages/UsersPage';
 import {
   getSourceRecordInfo,
   getMetadataBookInfo,
@@ -2704,12 +2705,9 @@ function App() {
               return;
             }
             if (path === '/users') {
-              if (config?.settings_enabled && authIsAdmin) {
+              if (authIsAdmin) {
                 void primeUsersCache();
-                void primeSettingsCache();
-                navigate('/settings');
-              } else {
-                handleSettingsClick();
+                navigate('/users');
               }
               return;
             }
@@ -2792,7 +2790,9 @@ function App() {
               : undefined
           }
         >
-          {location.pathname === '/scoring' && requestRoleIsAdmin ? (
+          {location.pathname === '/users' ? (
+            requestRoleIsAdmin ? <UsersPage onShowToast={showToast} /> : <Navigate to="/" replace />
+          ) : location.pathname === '/scoring' && requestRoleIsAdmin ? (
             <ScoringPage onShowToast={showToast} />
           ) : location.pathname === '/blocks' && requestRoleIsAdmin ? (
             <BlocklistPage />
