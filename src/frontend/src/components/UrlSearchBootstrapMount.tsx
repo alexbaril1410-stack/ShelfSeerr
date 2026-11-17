@@ -92,7 +92,9 @@ export const UrlSearchBootstrapMount = ({
       setActiveQueryTarget(urlSearchByOverride);
     }
 
-    if (!parsedParams.hasSearchParams) {
+    // A content-type-only deep link (for example #content_type=audiobook) must
+    // still launch the provider search after switching the active catalogue.
+    if (!parsedParams.hasSearchParams && !urlContentTypeOverride) {
       return;
     }
 
