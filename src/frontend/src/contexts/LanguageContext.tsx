@@ -13,12 +13,8 @@ export type AppLanguage = 'fr' | 'en';
 const LANGUAGE_STORAGE_KEY = 'shelfseerr-language';
 
 const FRENCH_TRANSLATIONS: Record<string, string> = {
-  'Automatic rules': 'Règles automatiques',
-  'Rules applied automatically by ShelfSeerr in addition to the configurable scoring profile.': 'Règles appliquées automatiquement par ShelfSeerr en complément du barème configurable.',
   'Multi-volume compilation': 'Compilation de plusieurs tomes',
-  'When a release title contains the requested series name and an explicit range of volumes, it remains available but is ranked lower than individual-volume releases.': 'Lorsqu’un titre de publication contient le nom de la série recherchée et une plage explicite de tomes, il reste disponible mais est classé derrière les publications correspondant à un tome individuel.',
-  'Applied to ebooks and audiobooks when series information is available.': 'Appliquée aux livres numériques et aux livres audio lorsque les informations de série sont disponibles.',
-  'points': 'points',
+  'Compilation de plusieurs tomes': 'Compilation de plusieurs tomes',
   'Some indexers could not be reached': 'Certains indexeurs sont temporairement indisponibles',
   'The results from the available indexers are shown below.': 'Les résultats des indexeurs disponibles sont affichés ci-dessous.',
   'Profile': 'Profil',
