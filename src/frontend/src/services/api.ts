@@ -701,7 +701,7 @@ export interface BlockedBook {
   id: number;
   provider: string;
   provider_id: string;
-  content_type: ContentType;
+  content_type: 'ebook' | 'audiobook';
   title: string;
   author?: string | null;
   preview?: string | null;
