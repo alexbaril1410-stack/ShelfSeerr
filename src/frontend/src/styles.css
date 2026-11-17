@@ -1527,3 +1527,8 @@ button[class*="bg-emerald-"]:disabled {
   flex: 0 0 auto !important;
 }
 
+/* On discovery, the global footer auto-margin was creating a large blank gap. */
+.shelfseerr-content-shell:has(#search-section.search-initial-state) footer,
+.shelfseerr-content-shell:has(#search-section.search-initial-state) > div {
+  margin-top: 0 !important;
+}
