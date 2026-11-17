@@ -152,3 +152,24 @@ def test_release_title_matching_does_not_accept_wrong_series_volume():
         _release("Dungeon Crawler Carl T03 [EPUB]"),
         book,
     )
+
+
+
+def test_release_title_matching_accepts_bundle_containing_requested_volume():
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    book.series_name = "Dungeon Crawler Carl"
+    book.series_position = 2
+    assert release_title_matches_book(
+        _release("Matt.Dinniman.Dungeon.Crawler.Carl.T01-T04.FRENCH.EPUB-NoTAG"),
+        book,
+    )
+
+
+def test_release_title_matching_rejects_bundle_not_containing_requested_volume():
+    book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
+    book.series_name = "Dungeon Crawler Carl"
+    book.series_position = 5
+    assert not release_title_matches_book(
+        _release("Matt.Dinniman.Dungeon.Crawler.Carl.T01-T04.FRENCH.EPUB-NoTAG"),
+        book,
+    )
