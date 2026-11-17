@@ -2429,97 +2429,73 @@ function App() {
     ],
   );
 
-  // Handle "View Series" - Audible uses its own ASIN-based series filter.
+  // Browse the series using the provider and media type of the opened book.
+  // The global search selector may currently be set to the opposite media type
+  // (for example, opening an audiobook from the Découvrir page while Livres is selected).
   const handleSearchSeries = useCallback(
-    (seriesName: string, seriesId?: string) => {
-      if (effectiveMetadataProvider === 'audible' && seriesId) {
+    async (book: Book, seriesName: string, seriesId?: string) => {
+      if (!book.provider || !book.series_name) {
+        return;
+      }
+
+      const bookContentType: ContentType =
+        book.content_type === 'audiobook' ? 'audiobook' : 'ebook';
+
+      try {
+        const metadataConfig = await getMetadataSearchConfig(bookContentType, book.provider);
+        let fieldKey: string;
+        let sort = 'popularity';
+        let fieldValue: string;
+
+        if (book.provider === 'audible') {
+          if (!seriesId) {
+            showToast('Identifiant de série Audible indisponible.', 'error');
+            return;
+          }
+          fieldKey = 'series';
+          fieldValue = `asin:${seriesId.replace(/^(?:asin:|id:)/i, '')}`;
+        } else {
+          const capability = metadataConfig.capabilities.find(
+            (item) => item.key === 'view_series' && item.field_key,
+          );
+          if (!capability?.field_key) {
+            showToast('La recherche par série n’est pas disponible pour ce fournisseur.', 'error');
+            return;
+          }
+          fieldKey = capability.field_key;
+          fieldValue = seriesId ? `id:${seriesId}` : seriesName;
+          sort = capability.sort || sort;
+        }
+
+        setContentType(bookContentType);
         setSearchInput('');
         setSelectedBook(null);
         setReleaseBook(null);
         clearTracking();
         setActiveQueryTarget('general');
-        setActiveResultsSort('popularity');
-        runSearchWithPolicyRefresh({
+        setActiveResultsSort(sort);
+
+        await handleSearch({
           query: '',
-          fieldValues: { series: `asin:${seriesId.replace(/^(?:asin:|id:)/i, '')}` },
-          searchModeOverride: 'universal',
-          providerOverride: 'audible',
-          sort: 'popularity',
+          config,
+          fieldValues: { [fieldKey]: fieldValue },
+          contentTypeOverride: bookContentType,
+          searchMode: 'universal',
+          providerOverride: book.provider,
+          sort,
         });
-        return;
+      } catch (error) {
+        console.error('Unable to browse book series:', error);
+        showToast('Impossible de charger cette série.', 'error');
       }
-
-      const seriesTarget = seriesBrowseTarget;
-      const seriesFieldKey = seriesTarget?.field?.key;
-      const seriesSort = seriesBrowseCapability?.sort;
-      if (!seriesTarget || !seriesFieldKey || !seriesSort) {
-        return;
-      }
-
-      // Clear UI state
-      setSearchInput('');
-      setSelectedBook(null);
-      setReleaseBook(null);
-      clearTracking();
-
-      const seriesFilters = { ...advancedFilters, sort: seriesSort };
-      setActiveResultsSort(seriesSort);
-
-      setActiveQueryTarget(seriesTarget.key);
-      updateSearchFieldValue(seriesFieldKey, seriesId ? `id:${seriesId}` : seriesName, seriesName);
-
-      const query = buildSearchQuery({
-        searchInput: '',
-        showAdvanced: true,
-        advancedFilters: seriesFilters,
-        bookLanguages,
-        defaultLanguage: defaultLanguageCodes,
-        searchMode: effectiveSearchMode,
-      });
-
-      runSearchWithPolicyRefresh({
-        query,
-        fieldValues: { [seriesFieldKey]: seriesId ? `id:${seriesId}` : seriesName },
-        searchModeOverride: effectiveSearchMode,
-        providerOverride: effectiveMetadataProvider ?? undefined,
-      });
     },
-    [
-      advancedFilters,
-      bookLanguages,
-      clearTracking,
-      defaultLanguageCodes,
-      effectiveMetadataProvider,
-      effectiveSearchMode,
-      runSearchWithPolicyRefresh,
-      setSearchInput,
-      seriesBrowseCapability?.sort,
-      seriesBrowseTarget,
-      updateSearchFieldValue,
-    ],
+    [clearTracking, config, handleSearch, setSearchInput, setContentType, showToast],
   );
 
   const canSearchSeriesForBook = useCallback(
-    (book: Book | null): boolean => {
-      if (!book?.provider || !book.series_name) {
-        return false;
-      }
-
-      if (!activeMetadataConfig?.provider || book.provider !== activeMetadataConfig.provider) {
-        return false;
-      }
-
-      // Audible series are browsed through the provider's dedicated ASIN filter,
-      // not through the generic series-browse capability.
-      if (book.provider === 'audible') {
-        return true;
-      }
-
-      return Boolean(seriesBrowseCapability?.sort && seriesBrowseTarget?.field);
-    },
-    // `activeMetadataConfig` whole: the body reads `.provider` off it unguarded on
-    // the last line, so that object is the dependency the compiler infers.
-    [activeMetadataConfig, seriesBrowseCapability?.sort, seriesBrowseTarget?.field],
+    (book: Book | null): boolean =>
+      Boolean(book && isMetadataBook(book) && book.provider && book.series_name),
+    [],
   );
 
   const handleManualSearch = useCallback(() => {
@@ -2890,7 +2866,7 @@ function App() {
                 setSelectedBook(null);
                 void handleGetReleases(book);
               }}
-              onSearchSeries={canSearchSeriesForBook(selectedBook) ? handleSearchSeries : undefined}
+              onSearchSeries={canSearchSeriesForBook(selectedBook) ? (seriesName, seriesId) => handleSearchSeries(selectedBook, seriesName, seriesId) : undefined}
               buttonState={
                 isMetadataBook(selectedBook)
                   ? getUniversalActionButtonState(selectedBook.id)
