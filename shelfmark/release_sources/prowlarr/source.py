@@ -439,6 +439,7 @@ class _IndexerSearchOutcome:
     failed: int = 0
     skipped: int = 0
     last_error: str | None = None
+    failed_indexers: list[tuple[int, str]] | None = None
 
 
 def _extract_format(title: str) -> str | None:
@@ -1289,6 +1290,9 @@ class ProwlarrSource(ReleaseSource):
                         # report a failed search instead of an empty one.
                         outcome.failed += 1
                         outcome.last_error = str(e)
+                        if outcome.failed_indexers is None:
+                            outcome.failed_indexers = []
+                        outcome.failed_indexers.append((indexer_id, str(e)))
                         continue
                     if raw:
                         outcome.results.extend(raw)
@@ -1301,6 +1305,7 @@ class ProwlarrSource(ReleaseSource):
             failed_searches = 0
             skipped_searches = 0
             last_search_error: str | None = None
+            failed_indexer_details: list[tuple[int, str]] = []
 
             for idx, variant in enumerate(variants, start=1):
                 _check_timeout()
@@ -1339,6 +1344,7 @@ class ProwlarrSource(ReleaseSource):
                 failed_searches += outcome.failed
                 skipped_searches += outcome.skipped
                 last_search_error = outcome.last_error or last_search_error
+                failed_indexer_details.extend(outcome.failed_indexers or [])
 
                 for r in outcome.results:
                     key = _result_dedup_key(r)
@@ -1349,6 +1355,18 @@ class ProwlarrSource(ReleaseSource):
                     all_results.append(r)
 
             if failed_searches:
+                indexer_names = {
+                    _coerce_indexer_id(indexer.get("id")): str(indexer.get("name") or "")
+                    for indexer in enabled_indexers
+                }
+                unique_failures: dict[int, str] = {}
+                for indexer_id, message in failed_indexer_details:
+                    unique_failures.setdefault(indexer_id, message)
+                self.last_search_warnings = []
+                for indexer_id, message in unique_failures.items():
+                    name = indexer_names.get(indexer_id) or ("Indexeur " + str(indexer_id))
+                    reason = "limitation temporaire (HTTP 429)" if "429" in message else "indisponible"
+                    self.last_search_warnings.append(name + " : " + reason)
                 logger.warning(
                     "Prowlarr: %s of %s indexer searches failed (%s)",
                     failed_searches,
