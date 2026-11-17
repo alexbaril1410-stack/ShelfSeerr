@@ -166,8 +166,15 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
     if series_name and requested_volume is not None:
         series_tokens = _title_tokens(series_name)
         if series_tokens and _contains_title(offered, series_tokens):
-            actual_volume = _volume_from_title(str(release.title or ""), str(series_name))
+            release_title = str(release.title or "")
             expected_volume = _num(requested_volume)
+            # A bundle such as T01-T04 is relevant when it contains the requested tome.
+            range_match = re.search(r"\\bt\\.?0*(\\d+)\\s*[-–—à]\\s*t?\\.?0*(\\d+)\\b", release_title, re.I)
+            if range_match and expected_volume is not None:
+                first_volume, last_volume = int(range_match.group(1)), int(range_match.group(2))
+                if first_volume <= expected_volume <= last_volume:
+                    return True
+            actual_volume = _volume_from_title(release_title, str(series_name))
             if actual_volume is not None and expected_volume is not None:
                 if actual_volume == expected_volume:
                     return True
