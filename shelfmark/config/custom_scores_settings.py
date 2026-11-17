@@ -26,6 +26,7 @@ _RULE_COLUMNS = [
             {"value": "title", "label": "Titre"},
             {"value": "series", "label": "Série"},
             {"value": "volume", "label": "Tome / volume"},
+            {"value": "multi_volume_bundle", "label": "Compilation de plusieurs tomes"},
             {"value": "author", "label": "Auteur"},
             {"value": "language", "label": "Langue"},
             {"value": "format", "label": "Format"},
@@ -60,6 +61,7 @@ _RULE_COLUMNS = [
 ]
 
 _DEFAULT_EBOOK_RULES = [
+    {"enabled": True, "name": "Compilation de plusieurs tomes", "field": "multi_volume_bundle", "operator": "equals", "value": "true", "score": -500},
     {"enabled": True, "name": "Titre exact", "field": "title", "operator": "equals", "value": "{{book_title}}", "score": 220},
     {"enabled": True, "name": "Titre correspondant", "field": "title", "operator": "contains", "value": "{{book_title}}", "score": 90},
     {"enabled": True, "name": "Série correspondante", "field": "series", "operator": "contains", "value": "{{series_name}}", "score": 15},
@@ -72,6 +74,7 @@ _DEFAULT_EBOOK_RULES = [
 ]
 
 _DEFAULT_AUDIOBOOK_RULES = [
+    {"enabled": True, "name": "Compilation de plusieurs tomes", "field": "multi_volume_bundle", "operator": "equals", "value": "true", "score": -500},
     {"enabled": True, "name": "Titre exact", "field": "title", "operator": "equals", "value": "{{book_title}}", "score": 120},
     {"enabled": True, "name": "Titre correspondant", "field": "title", "operator": "contains", "value": "{{book_title}}", "score": 70},
     {"enabled": True, "name": "Série correspondante", "field": "series", "operator": "contains", "value": "{{series_name}}", "score": 50},
