@@ -836,6 +836,7 @@ class ProwlarrSource(ReleaseSource):
     def __init__(self) -> None:
         """Initialize per-instance search state for Prowlarr."""
         self.last_search_type: str | None = None
+        self.last_search_warnings: list[str] = []
 
     def get_column_config(self) -> ReleaseColumnConfig:
         """Column configuration for Prowlarr releases."""
