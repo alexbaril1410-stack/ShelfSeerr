@@ -1495,3 +1495,38 @@ input, select, textarea { color-scheme:dark; }
     margin-left: 0 !important;
   }
 }
+
+
+/* ShelfSeerr accent unification: replace green/emerald utilities with the
+   same purple accent used by the selected navigation item. This stylesheet
+   is shared by desktop, mobile and the installed PWA. */
+[class*="bg-green-"],
+[class*="bg-emerald-"] {
+  background-color: #8057ef !important;
+}
+[class*="hover\\:bg-green-"]:hover,
+[class*="hover\\:bg-emerald-"]:hover {
+  background-color: #6941d5 !important;
+}
+[class*="text-green-"],
+[class*="text-emerald-"] {
+  color: #a78bfa !important;
+}
+[class*="hover\\:text-green-"]:hover,
+[class*="hover\\:text-emerald-"]:hover {
+  color: #c4b5fd !important;
+}
+[class*="border-green-"],
+[class*="border-emerald-"],
+[class*="ring-green-"],
+[class*="ring-emerald-"],
+[class*="outline-green-"],
+[class*="outline-emerald-"] {
+  border-color: #8057ef !important;
+  --tw-ring-color: #8057ef !important;
+  outline-color: #8057ef !important;
+}
+[class*="accent-green-"],
+[class*="accent-emerald-"] {
+  accent-color: #8057ef !important;
+}
