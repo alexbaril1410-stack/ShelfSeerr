@@ -2429,9 +2429,26 @@ function App() {
     ],
   );
 
-  // Handle "View Series" - trigger search with series field and series order sort
+  // Handle "View Series" - Audible uses its own ASIN-based series filter.
   const handleSearchSeries = useCallback(
     (seriesName: string, seriesId?: string) => {
+      if (effectiveMetadataProvider === 'audible' && seriesId) {
+        setSearchInput('');
+        setSelectedBook(null);
+        setReleaseBook(null);
+        clearTracking();
+        setActiveQueryTarget('general');
+        setActiveResultsSort('popularity');
+        runSearchWithPolicyRefresh({
+          query: '',
+          fieldValues: { series: `asin:${seriesId.replace(/^(?:asin:|id:)/i, '')}` },
+          searchModeOverride: 'universal',
+          providerOverride: 'audible',
+          sort: 'popularity',
+        });
+        return;
+      }
+
       const seriesTarget = seriesBrowseTarget;
       const seriesFieldKey = seriesTarget?.field?.key;
       const seriesSort = seriesBrowseCapability?.sort;
@@ -2488,15 +2505,17 @@ function App() {
         return false;
       }
 
-      if (
-        !seriesBrowseCapability?.sort ||
-        !seriesBrowseTarget?.field ||
-        !activeMetadataConfig?.provider
-      ) {
+      if (!activeMetadataConfig?.provider || book.provider !== activeMetadataConfig.provider) {
         return false;
       }
 
-      return book.provider === activeMetadataConfig.provider;
+      // Audible series are browsed through the provider's dedicated ASIN filter,
+      // not through the generic series-browse capability.
+      if (book.provider === 'audible') {
+        return true;
+      }
+
+      return Boolean(seriesBrowseCapability?.sort && seriesBrowseTarget?.field);
     },
     // `activeMetadataConfig` whole: the body reads `.provider` off it unguarded on
     // the last line, so that object is the dependency the compiler infers.
