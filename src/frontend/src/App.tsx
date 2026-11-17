@@ -1660,8 +1660,11 @@ function App() {
 
   // Universal-mode "Get" action (open releases, request-book, or block by policy).
   const handleGetReleases = async (book: Book) => {
-    let mode = getUniversalDefaultPolicyMode();
-    const normalizedContentType = toContentType(effectiveContentType);
+    // Actions launched from a metadata card must follow that card's media type,
+    // not the global search selector (which can be on the other catalogue).
+    const bookContentType = toContentType(book.content_type || effectiveContentType);
+    let mode = getDefaultMode(bookContentType);
+    const normalizedContentType = bookContentType;
     policyTrace('universal.get:start', {
       bookId: book.id,
       contentType: normalizedContentType,
@@ -1671,7 +1674,7 @@ function App() {
     try {
       const latestPolicy = await refreshRequestPolicy({ force: true });
       const effectiveIsAdmin = latestPolicy?.is_admin ?? requestRoleIsAdmin;
-      mode = resolveDefaultModeFromPolicy(latestPolicy, effectiveIsAdmin, effectiveContentType);
+      mode = resolveDefaultModeFromPolicy(latestPolicy, effectiveIsAdmin, bookContentType);
       policyTrace('universal.get:resolved', {
         bookId: book.id,
         contentType: normalizedContentType,
@@ -2566,7 +2569,9 @@ function App() {
   const isBrowseFulfilMode = fulfillingRequest !== null;
   const activeReleaseBook = fulfillingRequest?.book ?? releaseBook;
   const activeReleaseContentType =
-    fulfillingRequest?.contentType ?? effectiveCombinedState?.phase ?? effectiveContentType;
+    fulfillingRequest?.contentType ??
+    effectiveCombinedState?.phase ??
+    (releaseBook ? toContentType(releaseBook.content_type || effectiveContentType) : effectiveContentType);
   const combinedSelectionPhases = effectiveCombinedState
     ? getCombinedSelectionPhases(effectiveCombinedState)
     : [];
