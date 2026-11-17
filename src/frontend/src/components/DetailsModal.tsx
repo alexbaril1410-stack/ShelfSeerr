@@ -21,6 +21,9 @@ interface DetailsModalProps {
   buttonState: ButtonStateInfo;
   showReleaseSourceLinks?: boolean;
   onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
+  isAdmin?: boolean;
+  isBlocked?: boolean;
+  onToggleBlock?: (book: Book, blocked: boolean) => Promise<void>;
 }
 
 interface DetailsModalAutoCloseProps {
@@ -47,6 +50,9 @@ export const DetailsModal = ({
   buttonState,
   showReleaseSourceLinks = true,
   onShowToast,
+  isAdmin = false,
+  isBlocked = false,
+  onToggleBlock,
 }: DetailsModalProps) => {
   const { t } = useLanguage();
   const [isQueuing, setIsQueuing] = useState(false);
@@ -403,6 +409,15 @@ export const DetailsModal = ({
                 </a>
               )}
               <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:items-center">
+                {isAdmin && isMetadata && onToggleBlock && (
+                  <button
+                    type="button"
+                    onClick={() => void onToggleBlock(book, isBlocked)}
+                    className="rounded-lg border border-(--border-muted) px-4 py-2 text-sm font-medium transition-colors hover:bg-(--bg-soft)"
+                  >
+                    {isBlocked ? t('Unblock book') : t('Block book')}
+                  </button>
+                )}
                 {hasBookTargets && bookProvider && bookProviderId && (
                   <BookTargetDropdown
                     provider={bookProvider}
