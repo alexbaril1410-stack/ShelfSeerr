@@ -1138,6 +1138,7 @@ class ProwlarrSource(ReleaseSource):
         content_type: str = "ebook",
     ) -> list[Release]:
         """Search Prowlarr indexers for releases matching the book."""
+        self.last_search_warnings = []
         client = self._get_client()
         if not client:
             logger.warning("Prowlarr not configured - skipping search")
