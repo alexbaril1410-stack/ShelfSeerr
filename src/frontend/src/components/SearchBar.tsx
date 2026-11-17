@@ -905,7 +905,7 @@ export const SearchBar = forwardRef<SearchBarHandle, SearchBarProps>(
                         </span>
                         {isSelected && (
                           <svg
-                            className="h-4 w-4 shrink-0 text-emerald-500"
+                            className="h-4 w-4 shrink-0 text-[#8057ef] dark:text-[#a78bfa]"
                             fill="none"
                             viewBox="0 0 24 24"
                             strokeWidth="2.5"
