@@ -85,49 +85,93 @@ def release_author_matches_book(release: Release, book: Any) -> bool:
     return False
 
 
-def release_title_matches_book(release: Release, book: Any) -> bool:
-    """Reject obvious title false positives before scoring.
+def _title_tokens(value: object) -> list[str]:
+    """Normalize a title while tolerating a dropped French elision apostrophe.
 
-    Prowlarr searches are fuzzy and may return a result because a short query is
-    embedded in another word (Dune / d'une), or because a numeric title appears
-    only as a publication year (1984). Require the complete requested title as
-    a sequence of normalized words in the release title. Unknown metadata is
-    not treated as evidence of a match.
+    Trackers often flatten "L'Ogive" to "Logive". Treat "l ogive" and
+    "logive" as equivalent, without merging "d une" into "dune" (which would
+    create the well-known Dune / d'une false positive).
     """
-    requested = _first(
+    tokens = _text(value).split()
+    normalized: list[str] = []
+    index = 0
+    while index < len(tokens):
+        if tokens[index] == "l" and index + 1 < len(tokens):
+            normalized.append("l" + tokens[index + 1])
+            index += 2
+            continue
+        normalized.append(tokens[index])
+        index += 1
+    return normalized
+
+
+def _contains_title(offered: list[str], wanted: list[str]) -> bool:
+    if not wanted or len(wanted) > len(offered):
+        return False
+    width = len(wanted)
+    return any(offered[index:index + width] == wanted for index in range(len(offered) - width + 1))
+
+
+def release_title_matches_book(release: Release, book: Any) -> bool:
+    """Reject obvious title false positives while accepting common release naming variants.
+
+    Match the full book title (including localized alternatives), tolerate the
+    dropped apostrophe in French elisions, or accept an exact series + volume
+    match when the tracker prefixes the subtitle with its series name.
+    """
+    requested_titles = [
         getattr(book, "search_title", None),
         getattr(book, "title", None),
-    )
-    if not requested:
+        *list((getattr(book, "titles_by_language", {}) or {}).values()),
+    ]
+    wanted_titles = []
+    seen_titles: set[tuple[str, ...]] = set()
+    for value in requested_titles:
+        tokens = _title_tokens(value)
+        key = tuple(tokens)
+        if tokens and key not in seen_titles:
+            wanted_titles.append(tokens)
+            seen_titles.add(key)
+
+    if not wanted_titles:
         return True
 
-    wanted = _text(requested).split()
-    offered = _text(release.extra.get("book_title") or release.title).split()
-    if not wanted or not offered:
+    raw_title = release.extra.get("book_title") or release.title
+    offered = _title_tokens(raw_title)
+    if not offered:
         return False
 
-    width = len(wanted)
-    for index in range(len(offered) - width + 1):
-        if offered[index:index + width] != wanted:
+    for wanted in wanted_titles:
+        if not _contains_title(offered, wanted):
             continue
-
-        # Author relevance is applied as a second pass after indexer enrichment.
-        # Keeping title matching independent allows a title-only fallback when
-        # indexers do not expose author information.
 
         # A four-digit numeric book title is easily confused with a publication
         # year. Do not accept it when it is explicitly formatted as a year.
-        if width == 1 and wanted[0].isdigit() and len(wanted[0]) == 4:
-            raw = str(release.extra.get("book_title") or release.title or "")
-            year_only = re.search(
+        if len(wanted) == 1 and wanted[0].isdigit() and len(wanted[0]) == 4:
+            raw = str(raw_title or "")
+            if re.search(
                 rf"(?:\(\s*{re.escape(wanted[0])}\s*\)|"
                 rf"\[\s*{re.escape(wanted[0])}\s*\])",
                 raw,
                 re.I,
-            )
-            if year_only:
+            ):
                 continue
         return True
+
+    # Some trackers publish "Series T02 - Subtitle" instead of the standalone
+    # book title. Accept only when both the series name and the requested volume
+    # are explicitly present; a series-name match alone is never sufficient.
+    series_name = getattr(book, "series_name", None)
+    requested_volume = getattr(book, "series_position", None)
+    if series_name and requested_volume is not None:
+        series_tokens = _title_tokens(series_name)
+        if series_tokens and _contains_title(offered, series_tokens):
+            actual_volume = _volume_from_title(str(release.title or ""), str(series_name))
+            expected_volume = _num(requested_volume)
+            if actual_volume is not None and expected_volume is not None:
+                if actual_volume == expected_volume:
+                    return True
+
     return False
 
 
