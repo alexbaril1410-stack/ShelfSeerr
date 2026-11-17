@@ -208,7 +208,7 @@
   footer {
     text-align: center;
     padding: 1rem;
-    margin-top: auto;
+    margin-top: 0;
   }
 
   /* Disabled button styles for queued/downloading states */
@@ -1515,20 +1515,3 @@ button[class*="bg-emerald-"]:disabled {
   opacity: 1 !important;
 }
 
-/* Discovery should end after its shelves instead of stretching to the viewport height. */
-.shelfseerr-content-shell:has(#search-section.search-initial-state) {
-  min-height: 0 !important;
-  flex: 0 0 auto !important;
-}
-.shelfseerr-content-shell:has(#search-section.search-initial-state) > main {
-  flex: 0 0 auto !important;
-}
-#search-section.search-initial-state {
-  flex: 0 0 auto !important;
-}
-
-/* On discovery, the global footer auto-margin was creating a large blank gap. */
-.shelfseerr-content-shell:has(#search-section.search-initial-state) footer,
-.shelfseerr-content-shell:has(#search-section.search-initial-state) > div {
-  margin-top: 0 !important;
-}
