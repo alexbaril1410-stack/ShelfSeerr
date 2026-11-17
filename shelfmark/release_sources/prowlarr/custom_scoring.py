@@ -175,6 +175,17 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
     return False
 
 
+def _is_multi_volume_bundle(release: Release, book: Any) -> str | None:
+    """Return the volume range for a bundle in the requested series."""
+    series_name = getattr(book, "series_name", None)
+    if not series_name:
+        return None
+    title = str(release.title or "")
+    if not _contains_title(_title_tokens(title), _title_tokens(series_name)):
+        return None
+    match = re.search(r"\b(?:t|tome|vol(?:ume)?)\.?\s*0*\d{1,2}\s*[-–—à]\s*(?:t|tome|vol(?:ume)?)?\.?\s*0*\d{1,2}\b", title, re.I)
+    return match.group(0) if match else None
+
 def _release_language_signal(release: Release) -> str | None:
     """Infer an explicit language marker from the release title when metadata is absent."""
     title = str(release.title or "")
@@ -209,6 +220,8 @@ def _actual(release: Release, field: str, book: Any) -> object | None:
             return value
         series = getattr(book, "series_name", None)
         return _volume_from_title(release.title or "", str(series) if series else None)
+    if field == "multi_volume_bundle":
+        return "true" if _is_multi_volume_bundle(release, book) else "false"
     if field == "author":
         return extra.get("author")
     if field == "language":
@@ -302,32 +315,10 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
 
     allowed = {
         "title", "series", "volume", "author", "language", "format", "indexer",
-        "bitrate", "sample_rate", "codec", "channels", "duration",
+        "bitrate", "sample_rate", "codec", "channels", "duration", "multi_volume_bundle",
     }
     total = 0
     breakdown: list[dict[str, Any]] = []
-
-    # Keep multi-volume bundles visible, but rank them well below individual
-    # editions when the release explicitly advertises a tome range.
-    series_name = getattr(book, "series_name", None)
-    if series_name and _title_tokens(series_name):
-        normalized_release_title = str(release.title or "")
-        series_matches = _contains_title(
-            _title_tokens(normalized_release_title), _title_tokens(series_name)
-        )
-        bundle_range = re.search(
-            r"\\b(?:t|tome|vol(?:ume)?)\\.?\\s*0*\\d{1,2}\\s*[-–—à]\\s*(?:t|tome|vol(?:ume)?)?\\.?\\s*0*\\d{1,2}\\b",
-            normalized_release_title,
-            re.I,
-        )
-        if series_matches and bundle_range:
-            total -= 500
-            breakdown.append({
-                "name": "Compilation de plusieurs tomes",
-                "field": "volume",
-                "score": -500,
-                "matched_value": bundle_range.group(0),
-            })
 
     # Language is a hard relevance signal for a French request. Indexers often
     # omit Torznab language metadata, so inspect explicit release tags such as
