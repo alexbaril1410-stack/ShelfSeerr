@@ -95,6 +95,7 @@ export const SearchSection = ({
   const [recentRequests, setRecentRequests] = useState<RequestRecord[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const requestsRailRef = useRef<HTMLDivElement>(null);
+  const discoveryRailRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (!showDiscoveryShelves) return;
@@ -128,6 +129,25 @@ export const SearchSection = ({
       behavior: 'smooth',
     });
   };
+
+  const scrollDiscoveryRail = (key: string, direction: -1 | 1) => {
+    const rail = discoveryRailRefs.current[key];
+    rail?.scrollBy({
+      left: direction * Math.max(320, rail.clientWidth * 0.8),
+      behavior: 'smooth',
+    });
+  };
+
+  const renderCarouselControls = (onScroll: (direction: -1 | 1) => void, label: string) => (
+    <div className="flex shrink-0 items-center gap-2">
+      <button type="button" onClick={() => onScroll(-1)} aria-label={`${t('Previous')} ${label}`} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-indigo-400 hover:text-indigo-500 dark:border-white/10 dark:text-gray-300">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+      <button type="button" onClick={() => onScroll(1)} aria-label={`${t('Next')} ${label}`} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-indigo-400 hover:text-indigo-500 dark:border-white/10 dark:text-gray-300">
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
+      </button>
+    </div>
+  );
 
   const requestCardItems = useMemo(
     () => recentRequests.map((record) => ({
@@ -278,11 +298,14 @@ export const SearchSection = ({
                 <div>
                   <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
                 </div>
-                {shelfBooks.length > 0 && (
-                  <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">{shelfBooks.length} {t('titles')}</span>
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {shelfBooks.length > 0 && (
+                    <span className="hidden text-xs text-gray-500 dark:text-gray-400 sm:inline">{shelfBooks.length} {t('titles')}</span>
+                  )}
+                  {renderCarouselControls((direction) => scrollDiscoveryRail(shelf.key, direction), t(shelf.title))}
+                </div>
               </div>
-              <div className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
+              <div ref={(element) => { discoveryRailRefs.current[shelf.key] = element; }} className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
                 {isDiscoveryLoading && shelfBooks.length === 0
                   ? Array.from({ length: 6 }, (_, index) => (
                       <div key={index} className="w-[124px] shrink-0 animate-pulse sm:w-[142px]">
