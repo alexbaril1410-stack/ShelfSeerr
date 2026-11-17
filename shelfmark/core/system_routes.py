@@ -150,6 +150,15 @@ def register_system_routes(
             mimetype="image/png",
         )
 
+    @app.route("/shelfseerr-app-icon-512-noir.png")
+    def shelfseerr_app_icon_noir() -> Response:
+        """Serve the black-background 512px ShelfSeerr app icon."""
+        return send_from_directory(
+            get_frontend_dist(),
+            "shelfseerr-app-icon-512-noir.png",
+            mimetype="image/png",
+        )
+
     @app.route("/favicon.ico")
     @app.route("/favico<path:_>")
     def favicon(_: Any = None) -> Response:
