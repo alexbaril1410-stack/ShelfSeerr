@@ -65,7 +65,7 @@ let cachedSettingsLoadError: string | null = null;
 let settingsCacheLoadPromise: Promise<SettingsResponse> | null = null;
 
 const hydrateSettingsResponse = (response: SettingsResponse): HydratedSettingsState => {
-  const tabs = response.tabs.map((tab) => {
+  const tabs = response.tabs.filter((tab) => tab.name !== 'custom_scores').map((tab) => {
     if (tab.name === 'general') {
       return {
         ...tab,
