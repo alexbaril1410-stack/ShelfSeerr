@@ -3127,6 +3127,11 @@ function App() {
         advancedFilters={advancedFilters}
         resolvedMetadataDefaultSort={resolvedMetadataDefaultSort}
         resolvedMetadataSortOptions={resolvedMetadataSortOptions}
+        providerOverride={
+          (parsedParams?.contentType ?? routeContentType ?? contentType) === 'audiobook'
+            ? configuredAudiobookMetadataProvider ?? undefined
+            : configuredMetadataProvider ?? undefined
+        }
         setContentType={setContentType}
         setCombinedMode={setCombinedMode}
         setSearchInput={setSearchInput}
