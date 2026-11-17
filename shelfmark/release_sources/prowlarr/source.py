@@ -1339,6 +1339,10 @@ class ProwlarrSource(ReleaseSource):
                     outcome.attempted += expanded.attempted
                     outcome.failed += expanded.failed
                     outcome.skipped += expanded.skipped
+                    if expanded.failed_indexers:
+                        if outcome.failed_indexers is None:
+                            outcome.failed_indexers = []
+                        outcome.failed_indexers.extend(expanded.failed_indexers)
                     outcome.last_error = expanded.last_error or outcome.last_error
                     self.last_search_type = "expanded"
 
