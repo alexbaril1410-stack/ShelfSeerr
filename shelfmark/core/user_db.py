@@ -74,6 +74,23 @@ ON download_requests (user_id, status, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_download_requests_status_created_at
 ON download_requests (status, created_at DESC);
 
+
+CREATE TABLE IF NOT EXISTS blocked_books (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    provider TEXT NOT NULL,
+    provider_id TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    author TEXT,
+    preview TEXT,
+    source_url TEXT,
+    book_data TEXT NOT NULL,
+    blocked_by INTEGER REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(provider, provider_id, content_type)
+);
+CREATE INDEX IF NOT EXISTS idx_blocked_books_created_at ON blocked_books(created_at DESC);
+
 CREATE TABLE IF NOT EXISTS download_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     task_id TEXT UNIQUE NOT NULL,
@@ -1209,3 +1226,66 @@ class UserDB:
             return int(row["count"]) if row else 0
         finally:
             conn.close()
+
+    def list_blocked_books(self) -> list[dict[str, Any]]:
+        """Return the shared book blocklist, newest entries first."""
+        conn = self._connect()
+        try:
+            rows = conn.execute("SELECT * FROM blocked_books ORDER BY created_at DESC, id DESC").fetchall()
+            results = []
+            for row in rows:
+                item = dict(row)
+                try:
+                    item["book_data"] = json.loads(item.get("book_data") or "{}")
+                except (TypeError, ValueError):
+                    item["book_data"] = {}
+                results.append(item)
+            return results
+        finally:
+            conn.close()
+
+    def get_blocked_book(self, provider: str, provider_id: str, content_type: str) -> dict[str, Any] | None:
+        """Find a blocked metadata book by provider identity and media type."""
+        conn = self._connect()
+        try:
+            row = conn.execute(
+                "SELECT * FROM blocked_books WHERE provider = ? AND provider_id = ? AND content_type = ?",
+                (provider, provider_id, content_type),
+            ).fetchone()
+            return dict(row) if row else None
+        finally:
+            conn.close()
+
+    def add_blocked_book(self, book: dict[str, Any], blocked_by: int) -> dict[str, Any]:
+        """Add a metadata book to the shared blocklist; idempotent for duplicates."""
+        provider = str(book.get("provider") or "").strip().lower()
+        provider_id = str(book.get("provider_id") or "").strip()
+        content_type = str(book.get("content_type") or "ebook").strip().lower()
+        title = str(book.get("title") or "").strip()
+        if not provider or not provider_id or not title or content_type not in {"ebook", "audiobook"}:
+            raise ValueError("A valid provider, provider_id, title and content_type are required")
+        serialized = json.dumps(book, ensure_ascii=False, separators=(",", ":"))
+        with self._lock:
+            conn = self._connect()
+            try:
+                conn.execute(
+                    """INSERT INTO blocked_books (provider, provider_id, content_type, title, author, preview, source_url, book_data, blocked_by)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(provider, provider_id, content_type) DO NOTHING""",
+                    (provider, provider_id, content_type, title, book.get("author"), book.get("preview"), book.get("source_url"), serialized, blocked_by),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+        return self.get_blocked_book(provider, provider_id, content_type) or {}
+
+    def remove_blocked_book(self, blocked_id: int) -> bool:
+        """Remove an entry from the shared blocklist."""
+        with self._lock:
+            conn = self._connect()
+            try:
+                cursor = conn.execute("DELETE FROM blocked_books WHERE id = ?", (blocked_id,))
+                conn.commit()
+                return cursor.rowcount > 0
+            finally:
+                conn.close()
