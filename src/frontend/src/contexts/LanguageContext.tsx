@@ -14,6 +14,7 @@ const LANGUAGE_STORAGE_KEY = 'shelfseerr-language';
 
 const FRENCH_TRANSLATIONS: Record<string, string> = {
   'Profile': 'Profil',
+  'View full selection': 'Voir toute la sélection',
   'Previous': 'Précédent',
   'Recent requests': 'Demandes récentes',
   'requests': 'demandes',
