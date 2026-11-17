@@ -499,7 +499,7 @@ const ReleaseRow = ({
                 href={release.info_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hover:text-emerald-600 hover:underline dark:hover:text-emerald-400"
+                className="hover:text-[#8057ef] hover:underline dark:hover:text-[#a78bfa]"
                 onClick={(e) => e.stopPropagation()}
               >
                 {release.title}
@@ -546,7 +546,7 @@ const ReleaseRow = ({
                 href={release.info_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-medium hover:text-emerald-600 hover:underline dark:hover:text-emerald-400"
+                className="font-medium hover:text-[#8057ef] hover:underline dark:hover:text-[#a78bfa]"
                 onClick={(e) => e.stopPropagation()}
               >
                 {release.title}
@@ -1730,7 +1730,7 @@ const ReleaseModalSession = ({
                             onSearchSeries(seriesName, book.series_id);
                             handleClose();
                           }}
-                          className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-600 transition-colors hover:bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/40"
+                          className="inline-flex items-center gap-1 rounded-full bg-[#8057ef]/10 px-2 py-1 text-xs font-medium text-[#8057ef] transition-colors hover:bg-[#8057ef]/20 dark:bg-[#8057ef]/15 dark:text-[#a78bfa] dark:hover:bg-[#8057ef]/25"
                         >
                           <svg
                             className="h-3 w-3"
@@ -1762,7 +1762,7 @@ const ReleaseModalSession = ({
                             <button
                               type="button"
                               onClick={() => setDescriptionExpanded(false)}
-                              className="inline font-medium text-emerald-600 hover:underline dark:text-emerald-400"
+                              className="inline font-medium text-[#8057ef] hover:underline dark:text-[#a78bfa]"
                             >
                               {t('Show less')}
                             </button>
@@ -1773,7 +1773,7 @@ const ReleaseModalSession = ({
                         <button
                           type="button"
                           onClick={() => setDescriptionExpanded(true)}
-                          className="absolute right-0 bottom-0 bg-linear-to-r from-transparent via-(--bg) to-(--bg) pl-8 font-medium text-emerald-600 hover:underline sm:via-(--bg-soft) sm:to-(--bg-soft) dark:text-emerald-400"
+                          className="absolute right-0 bottom-0 bg-linear-to-r from-transparent via-(--bg) to-(--bg) pl-8 font-medium text-[#8057ef] hover:underline sm:via-(--bg-soft) sm:to-(--bg-soft) dark:text-[#a78bfa]"
                         >
                           {t('More')}
                         </button>
@@ -1793,7 +1793,7 @@ const ReleaseModalSession = ({
                         href={book.source_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-emerald-600 hover:underline dark:text-emerald-400"
+                        className="inline-flex items-center gap-1 text-[#8057ef] hover:underline dark:text-[#a78bfa]"
                       >
                         {t('View on')} {providerDisplay}
                         <svg
@@ -1881,7 +1881,7 @@ const ReleaseModalSession = ({
                     <div className="relative flex gap-1">
                       {/* Sliding indicator */}
                       <div
-                        className="absolute bottom-0 h-0.5 bg-emerald-600 transition-all duration-300 ease-out"
+                        className="absolute bottom-0 h-0.5 bg-[#8057ef] transition-all duration-300 ease-out"
                         style={{
                           left: tabIndicatorStyle.left,
                           width: tabIndicatorStyle.width,
@@ -1897,7 +1897,7 @@ const ReleaseModalSession = ({
                           onClick={(event) => selectTab(tab.name, event.currentTarget)}
                           className={`border-b-2 border-transparent px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors ${
                             activeTab === tab.name
-                              ? 'text-emerald-600 dark:text-emerald-400'
+                              ? 'text-[#8057ef] dark:text-[#a78bfa]'
                               : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
                           }`}
                         >
@@ -1949,7 +1949,7 @@ const ReleaseModalSession = ({
                         type="button"
                         onClick={() => setMultiBook((prev) => !prev)}
                         className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
-                          multiBook ? 'text-emerald-600 dark:text-emerald-400' : ''
+                          multiBook ? 'text-[#8057ef] dark:text-[#a78bfa]' : ''
                         }`}
                         aria-label={t('Multi-book pack')}
                         aria-pressed={multiBook}
@@ -1982,7 +1982,7 @@ const ReleaseModalSession = ({
                         type="button"
                         onClick={() => setChooseFormats((prev) => !prev)}
                         className={`hover-surface relative rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
-                          chooseFormats ? 'text-emerald-600 dark:text-emerald-400' : ''
+                          chooseFormats ? 'text-[#8057ef] dark:text-[#a78bfa]' : ''
                         }`}
                         aria-label={t('Choose formats')}
                         aria-pressed={chooseFormats}
@@ -2014,7 +2014,7 @@ const ReleaseModalSession = ({
                       type="button"
                       onClick={toggleManualQuery}
                       className={`hover-surface rounded-full p-2.5 text-zinc-500 transition-colors dark:text-zinc-400 ${
-                        manualQuery.trim() ? 'text-emerald-600 dark:text-emerald-400' : ''
+                        manualQuery.trim() ? 'text-[#8057ef] dark:text-[#a78bfa]' : ''
                       }`}
                       aria-label={t('Manual search query')}
                       title={t('Manual query')}
