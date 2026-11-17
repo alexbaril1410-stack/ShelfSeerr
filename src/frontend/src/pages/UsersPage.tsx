@@ -12,6 +12,7 @@ interface UsersPageProps {
 
 const usersField = {
   key: 'users_management',
+  label: 'Users',
   type: 'CustomComponentField',
   component: 'users_management',
 } as CustomComponentFieldConfig;
