@@ -48,6 +48,7 @@ const ResultsSection = lazy(() => import('./components/ResultsSection').then((mo
 const SearchSection = lazy(() => import('./components/SearchSection').then((module) => ({ default: module.SearchSection })));
 import { LoginPage } from './pages/LoginPage';
 import { RequestsPage } from './pages/RequestsPage';
+import { BlocklistPage } from './pages/BlocklistPage';
 import {
   getSourceRecordInfo,
   getMetadataBookInfo,
@@ -64,6 +65,9 @@ import {
   isApiResponseError,
   updateSelfUser,
   setBookTargetState,
+  fetchBlockedBooks,
+  addBlockedBook,
+  removeBlockedBook,
 } from './services/api';
 import type {
   Book,
@@ -641,6 +645,7 @@ function App() {
     audiobook: { trending: [], popular: [] },
   });
   const [isDiscoveryLoading, setIsDiscoveryLoading] = useState(false);
+  const [blockedBookKeys, setBlockedBookKeys] = useState<Set<string>>(() => new Set());
   const [configuredMetadataProvider, setConfiguredMetadataProvider] = useState<string | null>(null);
   const [configuredAudiobookMetadataProvider, setConfiguredAudiobookMetadataProvider] = useState<
     string | null
@@ -742,6 +747,37 @@ function App() {
       });
     }
   }, [config, configuredAudiobookMetadataProvider, configuredMetadataProvider, handleResetSearch, handleSearch, navigate, setActiveQueryTarget, setActiveResultsSort, setContentType]);
+
+  useEffect(() => {
+    if (!requestRoleIsAdmin || !isAuthenticated) {
+      setBlockedBookKeys(new Set());
+      return;
+    }
+    let active = true;
+    void fetchBlockedBooks().then((items) => {
+      if (active) setBlockedBookKeys(new Set(items.map((item) => `${item.provider}:${item.provider_id}:${item.content_type}`)));
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, [isAuthenticated, requestRoleIsAdmin]);
+
+  const getBlockKey = useCallback((book: Book) => `${book.provider || ''}:${book.provider_id || ''}:${book.content_type === 'audiobook' ? 'audiobook' : 'ebook'}`, []);
+  const handleToggleBookBlock = useCallback(async (book: Book, blocked: boolean) => {
+    try {
+      if (blocked) {
+        const items = await fetchBlockedBooks();
+        const match = items.find((item) => item.provider === book.provider && item.provider_id === book.provider_id && item.content_type === (book.content_type === 'audiobook' ? 'audiobook' : 'ebook'));
+        if (match) await removeBlockedBook(match.id);
+        setBlockedBookKeys((current) => { const next = new Set(current); next.delete(getBlockKey(book)); return next; });
+        showToast(t('Book unblocked'), 'success');
+      } else {
+        await addBlockedBook(book);
+        setBlockedBookKeys((current) => new Set(current).add(getBlockKey(book)));
+        showToast(t('Book blocked'), 'success');
+      }
+    } catch {
+      showToast(t('Unable to update blocklist'), 'error');
+    }
+  }, [getBlockKey, showToast, t]);
 
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   useShowOnboardingDebug({
@@ -2755,7 +2791,9 @@ function App() {
               : undefined
           }
         >
-          {location.pathname === '/requests' ? (
+          {location.pathname === '/blocks' && requestRoleIsAdmin ? (
+            <BlocklistPage />
+          ) : location.pathname === '/requests' ? (
             <RequestsPage
               isAdmin={requestRoleIsAdmin}
               onApprove={(record) => { void handleRequestApprove(record.id, record); }}
@@ -2864,6 +2902,9 @@ function App() {
               onClose={() => setSelectedBook(null)}
               onDownload={handleDownload}
               onShowToast={showToast}
+              isAdmin={requestRoleIsAdmin}
+              isBlocked={blockedBookKeys.has(getBlockKey(selectedBook))}
+              onToggleBlock={handleToggleBookBlock}
               onFindDownloads={(book) => {
                 setSelectedBook(null);
                 void handleGetReleases(book);
