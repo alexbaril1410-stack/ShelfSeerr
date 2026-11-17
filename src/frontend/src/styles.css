@@ -1530,3 +1530,9 @@ input, select, textarea { color-scheme:dark; }
 [class*="accent-emerald-"] {
   accent-color: #8057ef !important;
 }
+
+/* Keep the label readable when green action buttons are recolored violet. */
+button[class*="bg-green-"],
+button[class*="bg-emerald-"] {
+  color: #ffffff !important;
+}
