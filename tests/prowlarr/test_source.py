@@ -350,7 +350,7 @@ class TestProwlarrLocalizedQueries:
         plan = build_release_search_plan(book, languages=["en"], manual_query="my custom")
         source.search(book, plan, content_type="audiobook")
 
-        assert fake_client.calls == [("my custom", [3030])]
+        assert fake_client.calls == [("Anything", [3030]), ("my custom", [3030])]
 
     def test_manual_query_expand_removes_categories(self, monkeypatch):
         import shelfmark.release_sources.prowlarr.source as prowlarr_source
@@ -380,7 +380,7 @@ class TestProwlarrLocalizedQueries:
         plan = build_release_search_plan(book, languages=["en"], manual_query="my custom")
         source.search(book, plan, expand_search=True, content_type="audiobook")
 
-        assert fake_client.calls == [("my custom", None)]
+        assert fake_client.calls == [("Anything", None), ("my custom", None)]
 
     def test_search_attaches_configured_seed_time_minutes_to_release(self, monkeypatch):
         import shelfmark.release_sources.prowlarr.source as prowlarr_source
