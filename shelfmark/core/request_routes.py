@@ -362,6 +362,17 @@ def _prepare_request_create_arguments(
         release_data=release_data,
     )
 
+    # The shared blocklist restricts end users only; administrators retain access.
+    if not session.get("is_admin", False):
+        provider = normalize_optional_text(book_data.get("provider"))
+        provider_id = _normalize_optional_source_id(book_data.get("provider_id"))
+        if provider and provider_id and user_db.get_blocked_book(provider.lower(), provider_id, content_type):
+            raise RequestServiceError(
+                "This book is blocked by an administrator",
+                status_code=403,
+                code="book_blocked",
+            )
+
     global_settings, user_settings, effective, requests_enabled = _resolve_effective_policy(
         user_db,
         db_user_id=target_user_id,
@@ -588,6 +599,37 @@ def register_request_routes(
     activity_view_state_service: ActivityViewStateService | None = None,
 ) -> None:
     """Register request policy and request lifecycle routes."""
+
+    @app.route("/api/admin/blocklist", methods=["GET"])
+    def api_admin_blocklist() -> ResponseReturnValue:
+        _admin_user_id, admin_gate = _require_admin_user_id()
+        if admin_gate is not None:
+            return admin_gate
+        return jsonify({"items": user_db.list_blocked_books()})
+
+    @app.route("/api/admin/blocklist", methods=["POST"])
+    def api_admin_add_blocklist_item() -> ResponseReturnValue:
+        admin_user_id, admin_gate = _require_admin_user_id()
+        if admin_gate is not None or admin_user_id is None:
+            return admin_gate or _error_response("Admin access required", 403)
+        data = request.get_json(silent=True)
+        book_data = data.get("book_data") if isinstance(data, dict) else None
+        if not isinstance(book_data, dict):
+            return _error_response("book_data must be an object", 400)
+        try:
+            item = user_db.add_blocked_book(book_data, admin_user_id)
+        except (TypeError, ValueError) as exc:
+            return _error_response(str(exc), 400)
+        return jsonify({"item": item}), 201
+
+    @app.route("/api/admin/blocklist/<int:item_id>", methods=["DELETE"])
+    def api_admin_remove_blocklist_item(item_id: int) -> ResponseReturnValue:
+        _admin_user_id, admin_gate = _require_admin_user_id()
+        if admin_gate is not None:
+            return admin_gate
+        if not user_db.remove_blocked_book(item_id):
+            return _error_response("Blocklist item not found", 404)
+        return jsonify({"success": True})
 
     @app.route("/api/request-policy", methods=["GET"])
     def api_request_policy() -> ResponseReturnValue:
