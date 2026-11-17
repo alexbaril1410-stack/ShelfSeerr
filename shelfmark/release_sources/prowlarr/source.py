@@ -1393,9 +1393,9 @@ class ProwlarrSource(ReleaseSource):
             affinity_by_source_id: dict[str, int] = {}
             mam_releases: list[Release] = []
             mam_indexer: dict | None = None
-            # A manual query is the user's own words; ranking it against the
-            # metadata author would second-guess what they typed.
-            wanted_author = plan.author
+            # Manual searches intentionally preserve the user's broader matches:
+            # don't reject them against metadata title/author variants.
+            wanted_author = "" if plan.manual_query else plan.author
             hide_unsupported_formats = config.get("PROWLARR_HIDE_UNSUPPORTED_FORMATS", True)
             hidden_unsupported = 0
 
@@ -1421,8 +1421,9 @@ class ProwlarrSource(ReleaseSource):
                 )
                 # Prowlarr can return fuzzy matches that are not the requested
                 # book (e.g. "d'une" for "Dune", or "(1984)" as a publication year).
-                # Manual searches are intentionally left untouched.
-                if not release_title_matches_book(release, book):
+                # Keep this guard for automatic searches only: a manual query is
+                # explicitly supplied to find alternate tracker title spellings.
+                if not plan.manual_query and not release_title_matches_book(release, book):
                     logger.debug(
                         "Prowlarr: hiding unrelated title for '%s': '%s'",
                         book.search_title or book.title,
