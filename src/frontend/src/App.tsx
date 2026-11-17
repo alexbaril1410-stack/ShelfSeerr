@@ -49,6 +49,7 @@ const SearchSection = lazy(() => import('./components/SearchSection').then((modu
 import { LoginPage } from './pages/LoginPage';
 import { RequestsPage } from './pages/RequestsPage';
 import { BlocklistPage } from './pages/BlocklistPage';
+import { ScoringPage } from './pages/ScoringPage';
 import {
   getSourceRecordInfo,
   getMetadataBookInfo,
