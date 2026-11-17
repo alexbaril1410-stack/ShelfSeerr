@@ -668,6 +668,7 @@ function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerObserverRef = useRef<ResizeObserver | null>(null);
   const isDesktopViewport = useMediaQuery('(min-width: 1024px)');
+  const isStandalonePwa = useMediaQuery('(display-mode: standalone)');
   const openDownloadsSidebar = useCallback(() => {
     setDownloadsSidebarOpen(true);
     prefetchActivityHistory();
@@ -2754,7 +2755,11 @@ function App() {
                 right: '25rem',
                 zIndex: 20,
               }
-            : { paddingTop: isDesktopViewport ? 0 : `${headerHeight}px` }
+            : {
+                paddingTop: isDesktopViewport
+                  ? 0
+                  : `${Math.max(0, headerHeight - (isStandalonePwa ? 64 : 0))}px`,
+              }
         }
       >
         <AdvancedFilters
