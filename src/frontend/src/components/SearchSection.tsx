@@ -313,9 +313,9 @@ export const SearchSection = ({
                   <a
                     href={withBasePath(
                       shelf.key === 'ebook-trending'
-                        ? '/books#sort=trending'
+                        ? '/books#content_type=ebook&sort=trending'
                         : shelf.key === 'ebook-popular'
-                          ? '/books'
+                          ? '/books#content_type=ebook'
                           : shelf.key === 'audiobook-trending'
                             ? '/audiobooks#content_type=audiobook'
                             : '/audiobooks#content_type=audiobook&sort=popularity',
