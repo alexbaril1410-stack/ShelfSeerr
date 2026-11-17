@@ -2164,17 +2164,6 @@ function App() {
       ) ?? null,
     [activeMetadataConfig?.capabilities],
   );
-  const seriesBrowseTarget = useMemo(
-    () =>
-      seriesBrowseCapability?.field_key
-        ? (queryTargets.find((target) => target.field?.key === seriesBrowseCapability.field_key) ??
-          null)
-        : null,
-    // `seriesBrowseCapability` whole: the body reads `.field_key` off it unguarded
-    // inside the ternary, so that object is the dependency the compiler infers.
-    [queryTargets, seriesBrowseCapability],
-  );
-
   const activeQueryValue = useMemo(() => {
     if (
       !activeQueryOption ||
@@ -2907,7 +2896,8 @@ function App() {
               onSearchSeries={
                 isBrowseFulfilMode || !canSearchSeriesForBook(activeReleaseBook)
                   ? undefined
-                  : handleSearchSeries
+                  : (seriesName, seriesId) =>
+                      handleSearchSeries(activeReleaseBook, seriesName, seriesId)
               }
               defaultShowManualQuery={
                 isBrowseFulfilMode || activeReleaseBook?.provider === 'manual'
