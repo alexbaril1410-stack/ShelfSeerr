@@ -257,7 +257,7 @@ export const ResultsSection = ({
           onGetReleases={onGetReleases}
           getButtonState={getButtonState}
           getUniversalButtonState={getUniversalButtonState}
-          showSeriesPosition={sortValue === 'series_order'}
+          showSeriesPosition={books.some((item) => item.series_position != null)}
           onShowToast={onShowToast}
         />
       ) : (
@@ -284,7 +284,7 @@ export const ResultsSection = ({
                 onGetReleases={onGetReleases}
                 buttonState={buttonState}
                 animationDelay={animationDelay}
-                showSeriesPosition={sortValue === 'series_order'}
+                showSeriesPosition={book.series_position != null}
                 onShowToast={onShowToast}
               />
             ) : (
@@ -298,7 +298,7 @@ export const ResultsSection = ({
                 buttonState={buttonState}
                 showDetailsButton={!isDesktop}
                 animationDelay={animationDelay}
-                showSeriesPosition={sortValue === 'series_order'}
+                showSeriesPosition={book.series_position != null}
                 onShowToast={onShowToast}
               />
             );
