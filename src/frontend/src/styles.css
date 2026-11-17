@@ -988,7 +988,7 @@ input, select, textarea { color-scheme:dark; }
 /* Seerr-style mobile navigation: the icon-only bar is rendered separately in Header. */
 @media (max-width:1023px) {
   nav.shelfseerr-primary-nav { display:none !important; }
-  .shelfseerr-content-shell > main { padding-bottom:calc(92px + env(safe-area-inset-bottom)) !important; }
+  .shelfseerr-content-shell > main { padding-bottom:calc(64px + env(safe-area-inset-bottom)) !important; }
 }
 
 
