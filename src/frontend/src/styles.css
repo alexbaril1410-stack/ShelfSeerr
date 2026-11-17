@@ -1497,42 +1497,19 @@ input, select, textarea { color-scheme:dark; }
 }
 
 
-/* ShelfSeerr accent unification: replace green/emerald utilities with the
-   same purple accent used by the selected navigation item. This stylesheet
-   is shared by desktop, mobile and the installed PWA. */
-[class*="bg-green-"],
-[class*="bg-emerald-"] {
+/* Accent violet appliqué uniquement aux anciens fonds verts.
+   Les états désactivés gardent un fond distinct et un texte blanc lisible. */
+[class*="bg-green-600"], [class*="bg-emerald-600"] {
   background-color: #8057ef !important;
 }
-[class*="hover\\:bg-green-"]:hover,
-[class*="hover\\:bg-emerald-"]:hover {
+[class*="hover\\:bg-green-700"]:hover,
+[class*="hover\\:bg-emerald-700"]:hover {
   background-color: #6941d5 !important;
 }
-[class*="text-green-"],
-[class*="text-emerald-"] {
-  color: #a78bfa !important;
-}
-[class*="hover\\:text-green-"]:hover,
-[class*="hover\\:text-emerald-"]:hover {
-  color: #c4b5fd !important;
-}
-[class*="border-green-"],
-[class*="border-emerald-"],
-[class*="ring-green-"],
-[class*="ring-emerald-"],
-[class*="outline-green-"],
-[class*="outline-emerald-"] {
-  border-color: #8057ef !important;
-  --tw-ring-color: #8057ef !important;
-  outline-color: #8057ef !important;
-}
-[class*="accent-green-"],
-[class*="accent-emerald-"] {
-  accent-color: #8057ef !important;
+button[class*="bg-green-"]:disabled,
+button[class*="bg-emerald-"]:disabled {
+  background-color: #51416f !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
 }
 
-/* Keep the label readable when green action buttons are recolored violet. */
-button[class*="bg-green-"],
-button[class*="bg-emerald-"] {
-  color: #ffffff !important;
-}
