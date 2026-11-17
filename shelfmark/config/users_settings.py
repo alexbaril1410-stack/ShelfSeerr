@@ -352,20 +352,10 @@ def _on_save_users(values: dict[str, object]) -> dict[str, object]:
 register_on_save("users", _on_save_users)
 
 
-@register_settings("users", "Users & Requests", icon="users", order=6)
+@register_settings("users", "Requests", icon="users", order=6)
 def users_settings() -> list[SettingsField]:
-    """User management tab - rendered as a custom component on the frontend."""
+    """Request settings and visibility of personal settings sections."""
     return [
-        HeadingField(
-            key="users_heading",
-            title="Users",
-            description=_USERS_HEADING_DESCRIPTION_BY_AUTH_MODE["default"],
-            description_by_auth_mode=_USERS_HEADING_DESCRIPTION_BY_AUTH_MODE,
-        ),
-        CustomComponentField(
-            key="users_management",
-            component="users_management",
-        ),
         MultiSelectField(
             key="VISIBLE_SELF_SETTINGS_SECTIONS",
             label="Visible Self-Settings Sections",
