@@ -20,7 +20,6 @@ interface CardViewProps {
   buttonState: ButtonStateInfo;
   animationDelay?: number;
   showSeriesPosition?: boolean;
-  onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
 }
 
 export const CardView = ({
@@ -102,6 +101,7 @@ export const CardView = ({
           }
         }}
         role="button"
+        aria-busy={isLoadingDetails}
         tabIndex={0}
         aria-label={t('Open book details')}
       >
