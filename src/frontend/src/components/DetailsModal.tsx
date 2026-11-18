@@ -99,13 +99,18 @@ export const DetailsModal = ({
       return book.author || t('Unknown author');
     }
 
-    // Audible may append a translator to the author string, for example:
-    // "J.R.R. Tolkien, Daniel Lauzon — Translator".
+    // Keep only author names in Audible audiobook details. Audible may append
+    // a translator to the same comma-separated author string.
     const authors = book.authors?.filter((name) => name.trim()).join(', ');
     const author = authors || book.author || '';
-    const translatorLabel = '(?:translator|traduct\\w*|translat\\w*|adaptat\\w*|übersetz\\w*|traducc\\w*|traduz\\w*)';
-    const combinedTranslator = new RegExp(
-      '\\s*(?:,|;|\\|)\\s*[^,;|]+?\\s*[—–-]\\s*' + translatorLabel + '\\b.*
+    const nonAuthorRole = /translator|traduct|translat|adaptat|übersetz|traducc|traduz/i;
+    const cleanedAuthor = author
+      .split(',')
+      .map((name) => name.trim())
+      .filter((name) => name && !nonAuthorRole.test(name))
+      .join(', ');
+    return cleanedAuthor || t('Unknown author');
+  })();
   const metadataActionText =
     isMetadata && buttonState.state === 'download' && buttonState.text === 'Get'
       ? t('Find Downloads')
