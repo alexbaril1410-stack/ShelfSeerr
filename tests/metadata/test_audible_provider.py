@@ -487,6 +487,28 @@ def test_audible_separate_translator_entry_is_removed_entirely():
     assert _names(["Lisa Jewell", "Cécile Arbus - traducteur"]) == ["Lisa Jewell"]
 
 
+def test_audible_adaptation_label_is_removed():
+    assert _names(["Matt Dinniman, Chloé Atangana - adaptation"]) == ["Matt Dinniman"]
+    assert _names(["Chloé Atangana - adaptation"]) == []
+
+
+def test_audible_adaptation_role_is_not_treated_as_author():
+    book = _parse_product(
+        {
+            "asin": "B0ADAPTATION1",
+            "title": "Livre adapté",
+            "contributors": [
+                {"name": "Auteur original", "role": "Author"},
+                {"name": "Adaptateur", "role": "Adaptation"},
+            ],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Auteur original"]
+
+
 def test_audible_translation_label_variants_are_removed():
     assert _names(["Michael Wood, Cécile Arbus - traduction"]) == ["Michael Wood"]
     assert _names(["Michael Wood, Cécile Arbus - translation"]) == ["Michael Wood"]
