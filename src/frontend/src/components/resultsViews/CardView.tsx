@@ -4,9 +4,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useSearchMode } from '../../contexts/SearchModeContext';
 import type { Book, ButtonStateInfo, ContentType } from '../../types';
 import { getDownloadsCount } from '../../types';
-import { bookSupportsTargets } from '../../utils/bookTargetLoader';
 import { BookActionButton } from '../BookActionButton';
-import { BookTargetDropdown } from '../BookTargetDropdown';
 import { DisplayFieldBadges, LibraryBadge } from '../shared';
 
 const SkeletonLoader = () => (
@@ -44,13 +42,8 @@ export const CardView = ({
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showInfoOnTouch, setShowInfoOnTouch] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const targetProvider = book.provider;
-  const targetBookId = book.provider_id;
   let zIndex: number | undefined;
-  if (dropdownOpen) {
-    zIndex = 20;
-  } else if (isHovered) {
+  if (isHovered) {
     zIndex = 10;
   }
 
@@ -79,7 +72,7 @@ export const CardView = ({
       style={{
         background: 'var(--bg-soft)',
         borderRadius: '.75rem',
-        boxShadow: isHovered || dropdownOpen ? '0 10px 30px rgba(0, 0, 0, 0.15)' : 'none',
+        boxShadow: isHovered ? '0 10px 30px rgba(0, 0, 0, 0.15)' : 'none',
         zIndex,
         animationDelay: `${animationDelay}ms`,
         animationFillMode: 'both',
@@ -113,11 +106,13 @@ export const CardView = ({
         aria-label={t('Open book details')}
       >
         <div className="absolute inset-0 overflow-hidden max-sm:rounded-l-[.75rem] sm:rounded-t-[.75rem]">
-          {/* Series position badge */}
+          {/* Series position badge: shown with the card information */}
           {showSeriesPosition && book.series_position != null && (
             <div
-              className="absolute top-2 left-2 z-10 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white"
+              className="absolute top-2 left-2 z-20 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white transition-opacity duration-200"
               style={{
+                opacity: isHovered || showInfoOnTouch ? 1 : 0,
+                pointerEvents: 'none',
                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3)',
                 textShadow: '0 1px 2px rgba(0, 0, 0, 0.3)',
               }}
@@ -159,7 +154,7 @@ export const CardView = ({
 
           <div
             className="pointer-events-none absolute inset-0 bg-white transition-opacity duration-300"
-            style={{ opacity: isHovered || dropdownOpen ? 0.02 : 0 }}
+            style={{ opacity: isHovered ? 0.02 : 0 }}
           />
           <div
             className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/95 via-black/65 to-transparent px-2.5 pb-3 pt-16 text-white transition-opacity duration-200"
@@ -169,34 +164,37 @@ export const CardView = ({
               {book.year || '—'}
             </p>
             <h3
-              className="line-clamp-2 text-sm leading-tight font-bold"
+              className="line-clamp-4 text-sm leading-tight font-bold"
               title={book.title || t('Untitled')}
             >
               {book.title || t('Untitled')}
             </h3>
-            <p className="mt-1 line-clamp-2 text-xs leading-tight text-white/85">
+            <p className="mt-1 line-clamp-3 text-xs leading-tight text-white/85">
               {book.author || t('Unknown author')}
             </p>
           </div>
         </div>
 
         <div
-          className="absolute right-2 bottom-2 z-10 flex flex-col gap-1.5 transition-all duration-300 max-sm:hidden"
+          className="absolute inset-x-2 bottom-2 z-20 transition-opacity duration-200"
           style={{
-            opacity: isHovered || dropdownOpen || isLoadingDetails ? 1 : 0,
-            pointerEvents: isHovered || dropdownOpen || isLoadingDetails ? 'auto' : 'none',
+            opacity: isHovered || showInfoOnTouch ? 1 : 0,
+            pointerEvents: isHovered || showInfoOnTouch ? 'auto' : 'none',
           }}
+          onClick={(event) => event.stopPropagation()}
         >
-          {bookSupportsTargets(book) && targetProvider && targetBookId && (
-            <BookTargetDropdown
-              provider={targetProvider}
-              bookId={targetBookId}
-              onShowToast={onShowToast}
-              variant="icon"
-              className="h-8 w-8 bg-white/95 shadow-lg hover:scale-110 dark:bg-neutral-800/95"
-              onOpenChange={setDropdownOpen}
-            />
-          )}
+          <BookActionButton
+            book={book}
+            buttonState={buttonState}
+            onDownload={onDownload}
+            onGetReleases={(selectedBook) => {
+              void handleGetReleases(selectedBook);
+            }}
+            isLoadingReleases={isLoadingReleases}
+            size="sm"
+            className="w-full shadow-lg"
+            fullWidth
+          />
         </div>
       </div>
 
@@ -246,52 +244,10 @@ export const CardView = ({
           )}
         </div>
 
-        <div className="flex gap-1.5 sm:hidden">
-          <button
-            type="button"
-            className="flex flex-1 items-center justify-center gap-1 rounded-sm border px-2 py-1.5 text-xs"
-            onClick={() => {
-              void handleDetails(book.id);
-            }}
-            style={{ borderColor: 'var(--border-muted)' }}
-            disabled={isLoadingDetails}
-          >
-            <span className="details-button-text">
-              {isLoadingDetails ? t('Loading') : t('Details')}
-            </span>
-            <div
-              className={`details-spinner h-3 w-3 rounded-full border-2 border-current border-t-transparent ${isLoadingDetails ? '' : 'hidden'}`}
-            />
-          </button>
-          <BookActionButton
-            book={book}
-            buttonState={buttonState}
-            onDownload={onDownload}
-            onGetReleases={(selectedBook) => {
-              void handleGetReleases(selectedBook);
-            }}
-            isLoadingReleases={isLoadingReleases}
-            size="sm"
-            className="flex-1"
-          />
-        </div>
+
       </div>
 
-      <BookActionButton
-        book={book}
-        buttonState={buttonState}
-        onDownload={onDownload}
-        onGetReleases={(selectedBook) => {
-          void handleGetReleases(selectedBook);
-        }}
-        isLoadingReleases={isLoadingReleases}
-        className="hidden rounded-none sm:flex"
-        fullWidth
-        style={{
-          borderBottomLeftRadius: '.75rem',
-          borderBottomRightRadius: '.75rem',
-        }}
-      />
+
     </article>
   );
 };
