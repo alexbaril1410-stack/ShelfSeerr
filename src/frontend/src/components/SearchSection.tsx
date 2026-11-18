@@ -368,9 +368,7 @@ export const SearchSection = ({
                       const cardId = `${shelf.key}:${book.id}`;
                       const isCardActive = activeDiscoveryCardId === cardId;
                       const isAudiobook = shelf.key.startsWith('audiobook');
-                      const creator = isAudiobook
-                        ? book.narrators?.filter(Boolean).join(', ') || book.author
-                        : book.author;
+                      const creator = book.author;
                       return (
                         <article
                           key={book.id}
@@ -430,7 +428,7 @@ export const SearchSection = ({
                                 {book.title}
                               </h3>
                               <p className="mt-1 line-clamp-3 text-[10px] leading-tight text-white/85 sm:text-xs">
-                                {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
+                                {creator || t('Unknown author')}
                               </p>
                             </div>
                           </div>
