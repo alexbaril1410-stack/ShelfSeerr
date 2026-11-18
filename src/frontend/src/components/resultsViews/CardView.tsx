@@ -70,7 +70,7 @@ export const CardView = ({
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- mouse handlers drive a decorative hover shadow only; no interactive behavior requiring keyboard support
     <article
-      className={`book-card space-between animate-pop-up relative flex h-full w-full flex-col transition-shadow duration-300 max-sm:h-[180px] max-sm:flex-row sm:flex-col ${isAudiobook ? 'sm:max-w-[192px]' : 'sm:max-w-[176px]'}`}
+      className={`book-card space-between animate-pop-up relative flex h-full w-full flex-col transition-shadow duration-300 max-sm:h-[180px] max-sm:flex-row sm:flex-col ${isAudiobook ? 'sm:max-w-[220px]' : 'sm:max-w-[176px]'}`}
       style={{
         background: 'var(--bg-soft)',
         borderRadius: '.75rem',
@@ -83,7 +83,7 @@ export const CardView = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`relative w-full max-sm:h-full max-sm:shrink-0 sm:w-full ${isAudiobook ? 'max-sm:w-[132px]' : 'max-sm:w-[120px]'}`}
+        className={`relative w-full max-sm:h-full max-sm:shrink-0 sm:w-full ${isAudiobook ? 'max-sm:w-[160px]' : 'max-sm:w-[120px]'}`}
         style={{ aspectRatio: book.cover_aspect === 'square' ? '1/1' : '2/3' }}
         onClick={() => {
           const isTouchLayout =
