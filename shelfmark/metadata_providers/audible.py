@@ -120,17 +120,21 @@ def _names(value: Any) -> list[str]:
         name = _text(item)
         if not name:
             continue
+        translator_label = (
+            r"(?:traduct\\w*|translat\\w*|übersetz\\w*|"
+            r"traductor\\w*|traducción|traduzione|tradutor\\w*)"
+        )
+        # Audible uses several localized forms, including "traduction" and
+        # "translation", and may append them to a combined author string.
         name = re.split(
-            r"\s*(?:,|;|\|)\s*[^,;|]+?\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b.*$",
+            rf"\\s*(?:,|;|\\|)\\s*[^,;|]+?\\s*[-–(]\\s*{translator_label}\\b.*$",
             name,
             maxsplit=1,
             flags=re.IGNORECASE,
         )[0].strip()
-        # A contributor item that is itself labelled as a translator must
-        # be discarded entirely; removing only the role would keep the
-        # translator's name and reproduce the bug in the cover overlay.
+        # If this item is itself a translator entry, discard the whole name.
         if re.search(
-            r"\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b",
+            rf"\\s*[-–(]\\s*{translator_label}\\b",
             name,
             flags=re.IGNORECASE,
         ):
