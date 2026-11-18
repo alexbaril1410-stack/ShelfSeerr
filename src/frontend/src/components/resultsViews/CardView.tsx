@@ -139,6 +139,20 @@ export const CardView = ({
             className="pointer-events-none absolute inset-0 bg-white transition-opacity duration-300"
             style={{ opacity: isHovered || dropdownOpen ? 0.02 : 0 }}
           />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-black/95 via-black/65 to-transparent px-2.5 pb-3 pt-16 text-white sm:block">
+            <p className="mb-1 text-xs font-semibold leading-tight text-white/90">
+              {book.year || '—'}
+            </p>
+            <h3
+              className="line-clamp-2 text-sm leading-tight font-bold"
+              title={book.title || t('Untitled')}
+            >
+              {book.title || t('Untitled')}
+            </h3>
+            <p className="mt-1 line-clamp-2 text-xs leading-tight text-white/85">
+              {book.author || t('Unknown author')}
+            </p>
+          </div>
         </div>
 
         <div
@@ -184,7 +198,7 @@ export const CardView = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 p-4 max-sm:min-w-0 max-sm:flex-1 max-sm:justify-between max-sm:gap-2 max-sm:p-3 max-sm:py-2 sm:flex sm:flex-1 sm:flex-col sm:justify-end">
+      <div className="flex flex-col gap-3 p-4 max-sm:min-w-0 max-sm:flex-1 max-sm:justify-between max-sm:gap-2 max-sm:p-3 max-sm:py-2 sm:hidden">
         <div className="space-y-1 max-sm:min-w-0 max-sm:space-y-0.5">
           <h3
             className="line-clamp-2 text-base leading-tight font-semibold max-sm:line-clamp-3 max-sm:min-w-0"
