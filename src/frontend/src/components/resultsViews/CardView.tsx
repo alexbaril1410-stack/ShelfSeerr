@@ -36,7 +36,15 @@ export const CardView = ({
   const { t } = useLanguage();
   const isAudiobook = contentType === 'audiobook';
   const creatorLabel = isAudiobook
-    ? book.authors?.filter((author) => author.trim()).join(', ')
+    ? (book.authors?.length ? book.authors : book.author ? [book.author] : [])
+        .flatMap((author) => author.split(/,\\s*/))
+        .map((author) => author.trim())
+        .filter(
+          (author) =>
+            author &&
+            !/(translator|translat|traduct|adaptat|übersetz|traducc|traduz)/i.test(author),
+        )
+        .join(', ')
     : book.author;
   const detailsLabel = isAudiobook ? t('Open audiobook details') : t('Open book details');
   const coverLabel = isAudiobook ? t('Audiobook cover') : t('Book cover');
