@@ -111,7 +111,7 @@ export const ResultsSection = ({
   return (
     <section id="results-section" className="mb-4 w-full sm:mb-8">
       <div className="relative z-10 mb-2 flex items-center sm:mb-3">
-        {/* Left: Sort control or Hardcover link */}
+        {/* Left: Sort control only; external Hardcover list link intentionally removed. */}
         <div>
           {showSortControl && (
             <SortControl
