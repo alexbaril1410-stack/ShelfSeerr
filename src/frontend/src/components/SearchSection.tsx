@@ -369,7 +369,15 @@ export const SearchSection = ({
                       const isCardActive = activeDiscoveryCardId === cardId;
                       const isAudiobook = shelf.key.startsWith('audiobook');
                       const creator = isAudiobook
-                        ? book.authors?.filter((author) => author.trim()).join(', ')
+                        ? (book.authors?.length ? book.authors : book.author ? [book.author] : [])
+                            .flatMap((author) => author.split(/,\\s*/))
+                            .map((author) => author.trim())
+                            .filter(
+                              (author) =>
+                                author &&
+                                !/(translator|translat|traduct|adaptat|übersetz|traducc|traduz)/i.test(author),
+                            )
+                            .join(', ')
                         : book.author;
                       return (
                         <article
