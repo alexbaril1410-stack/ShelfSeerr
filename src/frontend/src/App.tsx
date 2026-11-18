@@ -2822,6 +2822,13 @@ function App() {
             discoveryShelves={discoveryShelves}
             isDiscoveryLoading={isDiscoveryLoading}
             onDiscoveryBookSelect={handleDiscoveryBookSelect}
+            onDiscoveryDownload={handleDownload}
+            onDiscoveryGetReleases={handleGetReleases}
+            getDiscoveryButtonState={(book) =>
+              isMetadataBook(book)
+                ? getUniversalActionButtonState(book.id)
+                : getDirectActionButtonState(book.id)
+            }
             searchPageTitle={config?.search_page_title || 'ShelfSeerr'}
             bookLanguages={bookLanguages}
             defaultLanguage={defaultLanguageCodes}
