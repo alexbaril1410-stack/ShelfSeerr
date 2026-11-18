@@ -90,16 +90,27 @@ export const CardView = ({
       <div
         className="relative w-full max-sm:h-full max-sm:w-[120px] max-sm:shrink-0 sm:w-full"
         style={{ aspectRatio: book.cover_aspect === 'square' ? '1/1' : '2/3' }}
-        onClick={() => setShowInfoOnTouch((visible) => !visible)}
+        onClick={() => {
+          const isTouchLayout =
+            typeof window !== 'undefined' &&
+            window.matchMedia('(hover: none), (pointer: coarse)').matches;
+          if (!isTouchLayout) {
+            void handleDetails(book.id);
+          } else if (!showInfoOnTouch) {
+            setShowInfoOnTouch(true);
+          } else {
+            void handleDetails(book.id);
+          }
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            setShowInfoOnTouch((visible) => !visible);
+            void handleDetails(book.id);
           }
         }}
         role="button"
         tabIndex={0}
-        aria-label={t('Show book information')}
+        aria-label={t('Open book details')}
       >
         <div className="absolute inset-0 overflow-hidden max-sm:rounded-l-[.75rem] sm:rounded-t-[.75rem]">
           {/* Series position badge */}
@@ -186,29 +197,6 @@ export const CardView = ({
               onOpenChange={setDropdownOpen}
             />
           )}
-          <button
-            type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/95 shadow-lg transition-all duration-300 hover:scale-110 dark:bg-neutral-800/95"
-            onClick={(e) => {
-              e.stopPropagation();
-              void handleDetails(book.id);
-            }}
-            disabled={isLoadingDetails}
-            aria-label={t('Book details')}
-          >
-            {isLoadingDetails ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            ) : (
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-            )}
-          </button>
         </div>
       </div>
 
