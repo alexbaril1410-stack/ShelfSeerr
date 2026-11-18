@@ -35,7 +35,9 @@ export const CardView = ({
   const { searchMode } = useSearchMode();
   const { t } = useLanguage();
   const isAudiobook = contentType === 'audiobook';
-  const creatorLabel = book.author;
+  const creatorLabel = isAudiobook
+    ? book.authors?.filter((author) => author.trim()).join(', ') || book.author
+    : book.author;
   const detailsLabel = isAudiobook ? t('Open audiobook details') : t('Open book details');
   const coverLabel = isAudiobook ? t('Audiobook cover') : t('Book cover');
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
