@@ -403,7 +403,7 @@ export const SearchSection = ({
                                 src={book.preview}
                                 alt={book.title}
                                 loading="lazy"
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
@@ -421,8 +421,8 @@ export const SearchSection = ({
                                 #{book.series_position}
                               </span>
                             )}
-                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100" />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-[54px] pt-16 text-left text-white opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
+                            <div className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? "opacity-100" : ""}`} />
+                            <div className={`pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-[54px] pt-16 text-left text-white opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? "opacity-100" : ""}`}>
                               <p className="mb-1 text-[11px] font-semibold leading-tight text-white/90 sm:text-xs">
                                 {book.year || '—'}
                               </p>
@@ -435,7 +435,7 @@ export const SearchSection = ({
                             </div>
                           </div>
                           <div
-                            className="absolute inset-x-2 bottom-2 z-30"
+                            className={`absolute inset-x-2 bottom-2 z-30 opacity-0 pointer-events-none transition-opacity duration-200 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 ${isCardActive ? "pointer-events-auto opacity-100" : ""}`}
                             onClick={(event) => event.stopPropagation()}
                           >
                             <BookGetButton
