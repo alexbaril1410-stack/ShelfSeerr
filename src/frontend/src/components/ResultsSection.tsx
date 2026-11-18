@@ -1,20 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchMode } from '../contexts/SearchModeContext';
 import { SORT_OPTIONS } from '../data/filterOptions';
-import { useMediaQuery } from '../hooks/useMediaQuery';
 import type { Book, ButtonStateInfo, ContentType, SortOption } from '../types';
 import { Dropdown } from './Dropdown';
 import { CardView } from './resultsViews/CardView';
-import { CompactView } from './resultsViews/CompactView';
-import { ListView } from './resultsViews/ListView';
 
-// Grid layout classes by view mode
+// Une seule présentation en cartes, sur ordinateur comme sur mobile.
 const GRID_CLASSES = {
-  mobile: 'grid-cols-1 items-start',
-  card: 'grid-cols-[repeat(auto-fill,minmax(156px,176px))] justify-between items-stretch',
-  compact: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 items-start',
+  ebook: 'grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(156px,176px))] justify-between items-stretch',
+  audiobook: 'grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(192px,220px))] justify-between items-stretch',
 } as const;
 
 interface ResultsSectionProps {
@@ -62,26 +58,9 @@ export const ResultsSection = ({
 }: ResultsSectionProps) => {
   const { t } = useLanguage();
   const { searchMode } = useSearchMode();
-  const activeViewClasses =
-    searchMode === 'universal'
-      ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-      : 'bg-sky-700 text-white hover:bg-sky-800';
-  const [viewMode, setViewMode] = useState<'card' | 'compact' | 'list'>(() => {
-    if (typeof window === 'undefined') {
-      return 'card';
-    }
-
-    try {
-      const saved = window.localStorage.getItem('bookViewMode');
-      return saved === 'card' || saved === 'compact' || saved === 'list' ? saved : 'card';
-    } catch {
-      return 'card';
-    }
-  });
-  const isDesktop = useMediaQuery('(min-width: 640px)');
   const cardGridClass = contentType === 'audiobook'
-    ? 'grid-cols-[repeat(auto-fill,minmax(192px,220px))] justify-between items-stretch'
-    : GRID_CLASSES.card;
+    ? GRID_CLASSES.audiobook
+    : GRID_CLASSES.ebook;
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -99,14 +78,7 @@ export const ResultsSection = ({
     return () => observer.disconnect();
   }, [searchMode, hasMore, onLoadMore, isLoadingMore]);
 
-  const updateViewMode = (nextViewMode: 'card' | 'compact' | 'list') => {
-    setViewMode(nextViewMode);
-    try {
-      window.localStorage.setItem('bookViewMode', nextViewMode);
-    } catch {
-      // Best effort only.
-    }
-  };
+
 
   if (!visible) return null;
 
@@ -150,150 +122,34 @@ export const ResultsSection = ({
           })()}
         </div>
 
-        {/* Right: View toggle buttons - Desktop: show all 3, Mobile: show Compact and List only */}
-        <div className="ml-auto flex items-center gap-2">
-          {isDesktop && (
-            <button
-              type="button"
-              onClick={() => updateViewMode('card')}
-              className={`rounded-full p-2 transition-all duration-200 ${
-                viewMode === 'card'
-                  ? activeViewClasses
-                  : 'hover-action text-gray-900 dark:text-gray-100'
-              }`}
-              title={t('Card view')}
-              aria-label={t('Card view')}
-              aria-pressed={viewMode === 'card'}
-            >
-              <svg
-                className="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
-                />
-              </svg>
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => updateViewMode('compact')}
-            className={`rounded-full p-2 transition-all duration-200 ${
-              viewMode === 'compact'
-                ? activeViewClasses
-                : 'hover-action text-gray-900 dark:text-gray-100'
-            }`}
-            title={t('Compact view')}
-            aria-label={t('Compact view')}
-            aria-pressed={viewMode === 'compact'}
-          >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-            >
-              <rect x="3.75" y="4.5" width="6" height="6" rx="1.125" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6h8.25M12 8.25h6" />
-              <rect x="3.75" y="13.5" width="6" height="6" rx="1.125" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15h8.25M12 17.25h6" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => updateViewMode('list')}
-            className={`rounded-full p-2 transition-all duration-200 ${
-              viewMode === 'list'
-                ? activeViewClasses
-                : 'hover-action text-gray-900 dark:text-gray-100'
-            }`}
-            title={t('List view')}
-            aria-label={t('List view')}
-            aria-pressed={viewMode === 'list'}
-          >
-            <svg
-              className="h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-              />
-            </svg>
-          </button>
-        </div>
+
       </div>
-      {viewMode === 'list' ? (
-        <ListView
-          books={books}
-          contentType={contentType}
-          onDetails={onDetails}
-          onDownload={onDownload}
-          onGetReleases={onGetReleases}
-          getButtonState={getButtonState}
-          getUniversalButtonState={getUniversalButtonState}
-          showSeriesPosition={books.some((item) => item.series_position != null)}
-          onShowToast={onShowToast}
-        />
-      ) : (
-        <div
-          id="results-grid"
-          className={`grid gap-8 ${!isDesktop ? GRID_CLASSES.mobile : (viewMode === 'card' ? cardGridClass : GRID_CLASSES[viewMode])}`}
-        >
-          {books.map((book, index) => {
-            const shouldUseCardLayout = isDesktop && viewMode === 'card';
-            const animationDelay = index * 50;
-            // Use appropriate button state function based on search mode
-            const buttonState =
-              searchMode === 'universal'
-                ? getUniversalButtonState(book.id)
-                : getButtonState(book.id);
+      <div
+        id="results-grid"
+        className={`grid gap-8 ${cardGridClass}`}
+      >
+        {books.map((book, index) => {
+          const animationDelay = index * 50;
+          const buttonState =
+            searchMode === 'universal'
+              ? getUniversalButtonState(book.id)
+              : getButtonState(book.id);
 
-            return shouldUseCardLayout ? (
-              <CardView
-                key={book.id}
-                book={book}
-                contentType={contentType}
-                onDetails={onDetails}
-                onDownload={onDownload}
-                onGetReleases={onGetReleases}
-                buttonState={buttonState}
-                animationDelay={animationDelay}
-                showSeriesPosition={book.series_position != null}
-              />
-            ) : (
-              <CompactView
-                key={book.id}
-                book={book}
-                contentType={contentType}
-                onDetails={onDetails}
-                onDownload={onDownload}
-                onGetReleases={onGetReleases}
-                buttonState={buttonState}
-                showDetailsButton={!isDesktop}
-                animationDelay={animationDelay}
-                showSeriesPosition={book.series_position != null}
-                onShowToast={onShowToast}
-              />
-            );
-          })}
-        </div>
-      )}
-      {books.length === 0 && (
-        <div className="mt-4 text-sm opacity-80">{t('No results found.')}</div>
-      )}
-
-      {/* Infinite scroll sentinel: pages are fetched silently as the user approaches the end. */}
+          return (
+            <CardView
+              key={book.id}
+              book={book}
+              contentType={contentType}
+              onDetails={onDetails}
+              onDownload={onDownload}
+              onGetReleases={onGetReleases}
+              buttonState={buttonState}
+              animationDelay={animationDelay}
+              showSeriesPosition={book.series_position != null}
+            />
+          );
+        })}
+      </div>
       {searchMode === 'universal' && hasMore && onLoadMore && (
         <div ref={loadMoreSentinelRef} className="flex min-h-12 items-center justify-center py-4" aria-live="polite">
           {isLoadingMore && (
