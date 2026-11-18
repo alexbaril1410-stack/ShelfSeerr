@@ -18,7 +18,7 @@ import { withBasePath } from '../utils/basePath';
 import { AdvancedFilters } from './AdvancedFilters';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from './SearchBar';
-import { BookActionButton } from './BookActionButton';
+import { BookGetButton } from './BookGetButton';
 import { LibraryBadge } from './shared';
 
 interface SearchSectionProps {
@@ -27,7 +27,6 @@ interface SearchSectionProps {
   showDiscoveryShelves: boolean;
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
-  onDiscoveryDownload: (book: Book) => Promise<void>;
   onDiscoveryGetReleases: (book: Book) => Promise<void>;
   getDiscoveryButtonState: (book: Book) => ButtonStateInfo;
   isLoading: boolean;
@@ -68,7 +67,6 @@ export const SearchSection = ({
   showDiscoveryShelves,
   isDiscoveryLoading,
   onDiscoveryBookSelect,
-  onDiscoveryDownload,
   onDiscoveryGetReleases,
   getDiscoveryButtonState,
   isInitialState,
@@ -425,10 +423,9 @@ export const SearchSection = ({
                             className="absolute inset-x-2 bottom-2 z-30"
                             onClick={(event) => event.stopPropagation()}
                           >
-                            <BookActionButton
+                            <BookGetButton
                               book={book}
                               buttonState={getDiscoveryButtonState(book)}
-                              onDownload={onDiscoveryDownload}
                               onGetReleases={onDiscoveryGetReleases}
                               size="sm"
                               className="w-full shadow-lg"
