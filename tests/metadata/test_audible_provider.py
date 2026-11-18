@@ -421,6 +421,44 @@ def test_audible_discovery_maps_popular_and_trending_to_native_charts(monkeypatc
     assert catalogue_calls[0][1]["asins"] == "B0BOOK0001,B0BOOK0002"
 
 
+def test_parse_audible_author_role_cleans_combined_translator_names():
+    book = _parse_product(
+        {
+            "asin": "B0COMBINEDAUTHOR1",
+            "title": "Dungeon Crawler Carl",
+            "contributors": [
+                {
+                    "name": "Matt Dinniman, Chloé Atangana - traducteur",
+                    "role": "Author",
+                }
+            ],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Matt Dinniman"]
+
+
+def test_parse_audible_author_role_cleans_translation_label():
+    book = _parse_product(
+        {
+            "asin": "B0COMBINEDTRANSLATION1",
+            "title": "Livre traduit",
+            "contributors": [
+                {
+                    "name": "Michael Wood, Cécile Arbus - traduction",
+                    "role": "Author",
+                }
+            ],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Michael Wood"]
+
+
 def test_parse_audible_product_excludes_translators_from_authors():
     book = _parse_product(
         {
