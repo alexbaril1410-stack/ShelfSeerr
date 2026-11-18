@@ -121,20 +121,20 @@ def _names(value: Any) -> list[str]:
         if not name:
             continue
         translator_label = (
-            r"(?:traduct\\w*|translat\\w*|übersetz\\w*|"
-            r"traductor\\w*|traducción|traduzione|tradutor\\w*)"
+            r"(?:traduct\w*|translat\w*|übersetz\w*|"
+            r"traductor\w*|traducción|traduzione|tradutor\w*)"
         )
         # Audible uses several localized forms, including "traduction" and
         # "translation", and may append them to a combined author string.
         name = re.split(
-            rf"\\s*(?:,|;|\\|)\\s*[^,;|]+?\\s*[-–(]\\s*{translator_label}\\b.*$",
+            rf"\s*(?:,|;|\|)\s*[^,;|]+?\s*[-–(]\s*{translator_label}\b.*$",
             name,
             maxsplit=1,
             flags=re.IGNORECASE,
         )[0].strip()
         # If this item is itself a translator entry, discard the whole name.
         if re.search(
-            rf"\\s*[-–(]\\s*{translator_label}\\b",
+            rf"\s*[-–(]\s*{translator_label}\b",
             name,
             flags=re.IGNORECASE,
         ):
