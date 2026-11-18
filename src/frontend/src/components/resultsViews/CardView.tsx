@@ -34,6 +34,10 @@ export const CardView = ({
 }: CardViewProps) => {
   const { searchMode } = useSearchMode();
   const { t } = useLanguage();
+  const isAudiobook = contentType === 'audiobook';
+  const creatorLabel = isAudiobook ? (book.narrators?.filter(Boolean).join(', ') || book.author) : book.author;
+  const detailsLabel = isAudiobook ? t('Open audiobook details') : t('Open book details');
+  const coverLabel = isAudiobook ? t('Audiobook cover') : t('Book cover');
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [isLoadingReleases, setIsLoadingReleases] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -102,7 +106,7 @@ export const CardView = ({
         role="button"
         aria-busy={isLoadingDetails}
         tabIndex={0}
-        aria-label={t('Open book details')}
+        aria-label={detailsLabel}
       >
         <div className="absolute inset-0 overflow-hidden max-sm:rounded-l-[.75rem] sm:rounded-t-[.75rem]">
           {/* Series position badge: shown with the card information */}
@@ -129,7 +133,7 @@ export const CardView = ({
               )}
               <img
                 src={book.preview}
-                alt={book.title || t('Book cover')}
+                alt={book.title || coverLabel}
                 className="h-full w-full"
                 loading="lazy"
                 style={{
@@ -169,7 +173,7 @@ export const CardView = ({
               {book.title || t('Untitled')}
             </h3>
             <p className="mt-1 line-clamp-3 text-xs leading-tight text-white/85">
-              {book.author || t('Unknown author')}
+              {creatorLabel || (isAudiobook ? t('Unknown narrator') : t('Unknown author'))}
             </p>
           </div>
         </div>
