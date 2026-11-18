@@ -121,7 +121,7 @@ def _names(value: Any) -> list[str]:
         if not name:
             continue
         translator_label = (
-            r"(?:traduct\w*|translat\w*|übersetz\w*|"
+            r"(?:traduct\w*|translat\w*|adaptat\w*|übersetz\w*|"
             r"traductor\w*|traducción|traduzione|tradutor\w*)"
         )
         # Audible uses several localized forms, including "traduction" and
