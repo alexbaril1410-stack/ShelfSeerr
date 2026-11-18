@@ -101,8 +101,14 @@ export const SearchSection = ({
   const { t } = useLanguage();
   const [recentRequests, setRecentRequests] = useState<RequestRecord[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
+  const [activeDiscoveryCardId, setActiveDiscoveryCardId] = useState<string | null>(null);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
   const requestsRailRef = useRef<HTMLDivElement>(null);
   const discoveryRailRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    setIsTouchDevice(window.matchMedia('(hover: none), (pointer: coarse)').matches);
+  }, []);
 
   useEffect(() => {
     if (!showDiscoveryShelves) return;
@@ -359,6 +365,8 @@ export const SearchSection = ({
                       </div>
                     ))
                   : shelfBooks.map((book) => {
+                      const cardId = `${shelf.key}:${book.id}`;
+                      const isCardActive = activeDiscoveryCardId === cardId;
                       const isAudiobook = shelf.key.startsWith('audiobook');
                       const creator = isAudiobook
                         ? book.narrators?.filter(Boolean).join(', ') || book.author
@@ -371,7 +379,14 @@ export const SearchSection = ({
                           <div
                             role="button"
                             tabIndex={0}
-                            onClick={() => onDiscoveryBookSelect(book)}
+                            onClick={() => {
+                              if (isTouchDevice && !isCardActive) {
+                                setActiveDiscoveryCardId(cardId);
+                                return;
+                              }
+                              onDiscoveryBookSelect(book);
+                              setActiveDiscoveryCardId(null);
+                            }}
                             onKeyDown={(event) => {
                               if (event.key === 'Enter' || event.key === ' ') {
                                 event.preventDefault();
@@ -402,7 +417,7 @@ export const SearchSection = ({
                               className="absolute top-2 right-2 z-20"
                             />
                             {book.series_position != null && (
-                              <span className="absolute top-2 left-2 z-20 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white shadow-lg">
+                              <span className={`absolute top-2 left-2 z-20 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white shadow-lg opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? 'opacity-100' : ''}`}>
                                 #{book.series_position}
                               </span>
                             )}
