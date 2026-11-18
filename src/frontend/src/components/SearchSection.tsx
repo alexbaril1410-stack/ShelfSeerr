@@ -369,7 +369,7 @@ export const SearchSection = ({
                       const isCardActive = activeDiscoveryCardId === cardId;
                       const isAudiobook = shelf.key.startsWith('audiobook');
                       const creator = isAudiobook
-                        ? book.authors?.filter((author) => author.trim()).join(', ') || book.author
+                        ? book.authors?.filter((author) => author.trim()).join(', ')
                         : book.author;
                       return (
                         <article
