@@ -368,7 +368,9 @@ export const SearchSection = ({
                       const cardId = `${shelf.key}:${book.id}`;
                       const isCardActive = activeDiscoveryCardId === cardId;
                       const isAudiobook = shelf.key.startsWith('audiobook');
-                      const creator = book.author;
+                      const creator = isAudiobook
+                        ? book.authors?.filter((author) => author.trim()).join(', ') || book.author
+                        : book.author;
                       return (
                         <article
                           key={book.id}
