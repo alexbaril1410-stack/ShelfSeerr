@@ -163,10 +163,16 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
             # Audible.fr may localize contributor roles. Only explicit author
             # roles belong in the author list; translators must never be used
             # as a fallback author.
-            if any(term in role for term in ("translat", "traduct", "übersetz")):
+            if any(term in role for term in ("translat", "traduct", "übersetz", "traducc", "traduz")):
                 continue
-            if any(term in role for term in ("author", "auteur", "autor")) and name not in authors:
-                authors.append(name)
+            if any(term in role for term in ("author", "auteur", "autor")):
+                # Author-role entries can still contain a combined display
+                # value such as "Matt Dinniman, Chloé Atangana - traducteur".
+                # Always run them through the same name cleaner as other
+                # Audible author fields before exposing them to the UI.
+                for author in _names(name):
+                    if author not in authors:
+                        authors.append(author)
             if any(term in role for term in ("narrat", "sprecher", "lecteur")) and name not in narrators:
                 narrators.append(name)
 
