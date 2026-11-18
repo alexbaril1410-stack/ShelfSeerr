@@ -441,6 +441,41 @@ def test_parse_audible_product_excludes_translators_from_authors():
 
 
 
+def test_parse_audible_product_uses_french_author_role_and_never_falls_back_to_translator():
+    book = _parse_product(
+        {
+            "asin": "B0AUTEURFR1",
+            "title": "Livre traduit",
+            "authors": [{"name": "Traducteur repris dans le champ générique"}],
+            "contributors": [
+                {"name": "Auteur original", "role": "Auteur"},
+                {"name": "Traducteur", "role": "Traducteur"},
+                {"name": "Narrateur", "role": "Narrateur"},
+            ],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == ["Auteur original"]
+    assert book.narrators == ["Narrateur"]
+
+
+def test_parse_audible_product_does_not_promote_unknown_contributors_to_authors():
+    book = _parse_product(
+        {
+            "asin": "B0UNKNOWNROLE1",
+            "title": "Livre audio",
+            "authors": [{"name": "Traducteur"}],
+            "contributors": [{"name": "Traducteur", "role": "Traducteur"}],
+        },
+        "fr",
+    )
+
+    assert book is not None
+    assert book.authors == []
+
+
 def test_audible_catalogue_supports_narrator_filter(monkeypatch):
     provider = AudibleProvider(marketplace="fr")
     calls = []
