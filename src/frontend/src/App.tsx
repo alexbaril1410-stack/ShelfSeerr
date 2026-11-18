@@ -668,10 +668,6 @@ function App() {
   const [headerHeight, setHeaderHeight] = useState(0);
   const headerObserverRef = useRef<ResizeObserver | null>(null);
   const isDesktopViewport = useMediaQuery('(min-width: 1024px)');
-  const isStandalonePwa =
-    useMediaQuery('(display-mode: standalone)') ||
-    (typeof navigator !== 'undefined' &&
-      Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
   const openDownloadsSidebar = useCallback(() => {
     setDownloadsSidebarOpen(true);
     prefetchActivityHistory();
