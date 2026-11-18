@@ -93,6 +93,14 @@ export const DetailsModal = ({
 
   // Determine if this is a metadata book (Universal mode) vs a release (Direct Download)
   const isMetadata = isMetadataBook(book);
+  const isAudiobook = book.content_type === 'audiobook' || book.provider === 'audible';
+  const displayAuthor = isAudiobook
+    ? (book.authors?.length ? book.authors.join(', ') : book.author || '')
+        .split(',')
+        .map((name) => name.trim())
+        .filter((name) => name && !/(translator|translat|traduct|adaptat|übersetz|traducc|traduz)/i.test(name))
+        .join(', ') || t('Unknown author')
+    : book.author || t('Unknown author');
   const showBookSourceLink = Boolean(book.source_url) && (isMetadata || showReleaseSourceLinks);
   const metadataActionText =
     isMetadata && buttonState.state === 'download' && buttonState.text === 'Get'
@@ -186,7 +194,7 @@ export const DetailsModal = ({
                 {book.title || t('Untitled')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                {book.author || t('Unknown author')}
+                {displayAuthor}
               </p>
             </div>
             <button
