@@ -127,19 +127,28 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
         for entry in raw:
             if not isinstance(entry, dict):
                 continue
-            role = str(entry.get("role") or entry.get("role_name") or "").casefold()
+            role = str(entry.get("role") or entry.get("role_name") or "").strip().casefold()
             name = _text(entry)
-            if not name or "translat" in role:
+            if not name:
                 continue
-            if "author" in role and name not in authors:
+
+            # Audible.fr may localize contributor roles. Only explicit author
+            # roles belong in the author list; translators must never be used
+            # as a fallback author.
+            if any(term in role for term in ("translat", "traduct", "übersetz")):
+                continue
+            if any(term in role for term in ("author", "auteur", "autor")) and name not in authors:
                 authors.append(name)
-            if "narrat" in role and name not in narrators:
+            if any(term in role for term in ("narrat", "sprecher", "lecteur")) and name not in narrators:
                 narrators.append(name)
 
-    if not authors:
-        authors = _names(product.get("authors") or product.get("author"))
-    if not narrators:
-        narrators = _names(product.get("narrators") or product.get("narrator"))
+    # Untyped product-level fields are only safe when Audible returned no
+    # contributor list. Never promote an unrecognized contributor to author.
+    if raw is None:
+        if not authors:
+            authors = _names(product.get("authors") or product.get("author"))
+        if not narrators:
+            narrators = _names(product.get("narrators") or product.get("narrator"))
     return authors, narrators
 
 
