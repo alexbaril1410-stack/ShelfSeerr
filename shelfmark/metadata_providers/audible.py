@@ -110,7 +110,28 @@ def _names(value: Any) -> list[str]:
         return []
     names = []
     for item in value:
+        # Some Audible.fr responses put the author and translator in one
+        # display string instead of returning separate contributor roles:
+        # "Lisa Jewell, Cécile Arbus - traducteur".
+        if isinstance(item, dict):
+            role = str(item.get("role") or item.get("role_name") or "").strip().casefold()
+            if any(term in role for term in ("translat", "traduct", "übersetz")):
+                continue
         name = _text(item)
+        if not name:
+            continue
+        name = re.split(
+            r"\\s*(?:,|;|\\|)\\s*[^,;|]+?\\s*[-–(]\\s*(?:traducteur|traductrice|translator|übersetzer)\\b.*$",
+            name,
+            maxsplit=1,
+            flags=re.IGNORECASE,
+        )[0].strip()
+        name = re.sub(
+            r"\\s*[-–(]\\s*(?:traducteur|traductrice|translator|übersetzer)\\b.*$",
+            "",
+            name,
+            flags=re.IGNORECASE,
+        ).strip()
         if name and name not in names:
             names.append(name)
     return names
