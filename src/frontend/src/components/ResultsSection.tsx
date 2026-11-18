@@ -267,7 +267,6 @@ export const ResultsSection = ({
                 buttonState={buttonState}
                 animationDelay={animationDelay}
                 showSeriesPosition={book.series_position != null}
-                onShowToast={onShowToast}
               />
             ) : (
               <CompactView
