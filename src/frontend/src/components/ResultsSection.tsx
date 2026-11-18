@@ -79,6 +79,9 @@ export const ResultsSection = ({
     }
   });
   const isDesktop = useMediaQuery('(min-width: 640px)');
+  const cardGridClass = contentType === 'audiobook'
+    ? 'grid-cols-[repeat(auto-fill,minmax(168px,192px))] justify-between items-stretch'
+    : GRID_CLASSES.card;
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -245,7 +248,7 @@ export const ResultsSection = ({
       ) : (
         <div
           id="results-grid"
-          className={`grid gap-8 ${!isDesktop ? GRID_CLASSES.mobile : GRID_CLASSES[viewMode]}`}
+          className={`grid gap-8 ${!isDesktop ? GRID_CLASSES.mobile : (viewMode === 'card' ? cardGridClass : GRID_CLASSES[viewMode])}`}
         >
           {books.map((book, index) => {
             const shouldUseCardLayout = isDesktop && viewMode === 'card';
