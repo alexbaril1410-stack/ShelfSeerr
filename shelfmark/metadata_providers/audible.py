@@ -121,13 +121,13 @@ def _names(value: Any) -> list[str]:
         if not name:
             continue
         name = re.split(
-            r"\s*(?:,|;|\|)\s*[^,;|]+?\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\\b.*$",
+            r"\s*(?:,|;|\|)\s*[^,;|]+?\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b.*$",
             name,
             maxsplit=1,
             flags=re.IGNORECASE,
         )[0].strip()
         name = re.sub(
-            r"\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\\b.*$",
+            r"\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b.*$",
             "",
             name,
             flags=re.IGNORECASE,
