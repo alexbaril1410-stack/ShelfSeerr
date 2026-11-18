@@ -31,7 +31,6 @@ export const CardView = ({
   buttonState,
   animationDelay = 0,
   showSeriesPosition = false,
-  onShowToast,
 }: CardViewProps) => {
   const { searchMode } = useSearchMode();
   const { t } = useLanguage();
