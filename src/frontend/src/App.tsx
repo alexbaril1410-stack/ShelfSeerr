@@ -2759,9 +2759,7 @@ function App() {
                 zIndex: 20,
               }
             : {
-                paddingTop: isDesktopViewport
-                  ? 0
-                  : `${Math.max(0, headerHeight - (isStandalonePwa ? 32 : 0))}px`,
+                paddingTop: isDesktopViewport ? 0 : `${headerHeight}px`,
               }
         }
       >
