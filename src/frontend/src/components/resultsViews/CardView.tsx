@@ -43,6 +43,7 @@ export const CardView = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [showInfoOnTouch, setShowInfoOnTouch] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const targetProvider = book.provider;
   const targetBookId = book.provider_id;
@@ -89,6 +90,16 @@ export const CardView = ({
       <div
         className="relative w-full max-sm:h-full max-sm:w-[120px] max-sm:shrink-0 sm:w-full"
         style={{ aspectRatio: book.cover_aspect === 'square' ? '1/1' : '2/3' }}
+        onClick={() => setShowInfoOnTouch((visible) => !visible)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            setShowInfoOnTouch((visible) => !visible);
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={t('Show book information')}
       >
         <div className="absolute inset-0 overflow-hidden max-sm:rounded-l-[.75rem] sm:rounded-t-[.75rem]">
           {/* Series position badge */}
@@ -139,7 +150,10 @@ export const CardView = ({
             className="pointer-events-none absolute inset-0 bg-white transition-opacity duration-300"
             style={{ opacity: isHovered || dropdownOpen ? 0.02 : 0 }}
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-black/95 via-black/65 to-transparent px-2.5 pb-3 pt-16 text-white sm:block">
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-black/95 via-black/65 to-transparent px-2.5 pb-3 pt-16 text-white transition-opacity duration-200"
+            style={{ opacity: isHovered || showInfoOnTouch ? 1 : 0 }}
+          >
             <p className="mb-1 text-xs font-semibold leading-tight text-white/90">
               {book.year || '—'}
             </p>
