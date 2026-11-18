@@ -115,7 +115,7 @@ def _names(value: Any) -> list[str]:
         # "Lisa Jewell, Cécile Arbus - traducteur".
         if isinstance(item, dict):
             role = str(item.get("role") or item.get("role_name") or "").strip().casefold()
-            if any(term in role for term in ("translat", "traduct", "übersetz")):
+            if any(term in role for term in ("translat", "traduct", "adaptat", "übersetz")):
                 continue
         name = _text(item)
         if not name:
@@ -163,7 +163,7 @@ def _contributors(product: dict[str, Any]) -> tuple[list[str], list[str]]:
             # Audible.fr may localize contributor roles. Only explicit author
             # roles belong in the author list; translators must never be used
             # as a fallback author.
-            if any(term in role for term in ("translat", "traduct", "übersetz", "traducc", "traduz")):
+            if any(term in role for term in ("translat", "traduct", "adaptat", "übersetz", "traducc", "traduz")):
                 continue
             if any(term in role for term in ("author", "auteur", "autor")):
                 # Author-role entries can still contain a combined display
