@@ -342,46 +342,66 @@ export const SearchSection = ({
               <div ref={(element) => { discoveryRailRefs.current[shelf.key] = element; }} className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
                 {isDiscoveryLoading && shelfBooks.length === 0
                   ? Array.from({ length: 6 }, (_, index) => (
-                      <div key={index} className="w-[124px] shrink-0 animate-pulse sm:w-[142px]">
+                      <div
+                        key={index}
+                        className={`shrink-0 animate-pulse ${shelf.key.startsWith('audiobook') ? 'w-[144px] sm:w-[192px]' : 'w-[132px] sm:w-[176px]'}`}
+                      >
                         <div className="aspect-[2/3] rounded-xl bg-gray-200 dark:bg-slate-800" />
                         <div className="mt-2 h-3 rounded bg-gray-200 dark:bg-slate-800" />
                         <div className="mt-1 h-2.5 w-2/3 rounded bg-gray-100 dark:bg-slate-800/70" />
                       </div>
                     ))
-                  : shelfBooks.map((book) => (
-                      <button
-                        key={book.id}
-                        type="button"
-                        onClick={() => onDiscoveryBookSelect(book)}
-                        className="group w-[124px] shrink-0 snap-start text-left sm:w-[142px]"
-                        title={`${t('Search')} ${book.title}`}
-                      >
-                        <div
-                          className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl dark:bg-slate-800 dark:ring-white/10"
-                          style={{ aspectRatio: book.cover_aspect === 'square' ? '1 / 1' : '2 / 3' }}
+                  : shelfBooks.map((book) => {
+                      const isAudiobook = shelf.key.startsWith('audiobook');
+                      const creator = isAudiobook
+                        ? book.narrators?.filter(Boolean).join(', ') || book.author
+                        : book.author;
+                      return (
+                        <button
+                          key={book.id}
+                          type="button"
+                          onClick={() => onDiscoveryBookSelect(book)}
+                          className={`group shrink-0 snap-start text-left ${isAudiobook ? 'w-[144px] sm:w-[192px]' : 'w-[132px] sm:w-[176px]'}`}
+                          title={`${t('Search')} ${book.title}`}
                         >
-                          {book.preview ? (
-                            <img
-                              src={book.preview}
-                              alt={book.title}
-                              loading="lazy"
-                              className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
-                              {book.title}
+                          <div
+                            className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl dark:bg-slate-800 dark:ring-white/10"
+                            style={{ aspectRatio: book.cover_aspect === 'square' ? '1 / 1' : '2 / 3' }}
+                          >
+                            {book.preview ? (
+                              <img
+                                src={book.preview}
+                                alt={book.title}
+                                loading="lazy"
+                                className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
+                                {book.title}
+                              </div>
+                            )}
+                            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100" />
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-3 pt-16 text-left text-white opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
+                              <p className="mb-1 text-[11px] font-semibold leading-tight text-white/90 sm:text-xs">
+                                {book.year || '—'}
+                              </p>
+                              <h3 className="line-clamp-4 text-xs leading-tight font-bold sm:text-sm" title={book.title}>
+                                {book.title}
+                              </h3>
+                              <p className="mt-1 line-clamp-3 text-[10px] leading-tight text-white/85 sm:text-xs">
+                                {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
+                              </p>
                             </div>
-                          )}
-                          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-                        </div>
-                        <span className="mt-2 block h-12 line-clamp-3 text-xs font-semibold leading-4 text-gray-900 group-hover:text-indigo-600 dark:text-gray-100 dark:group-hover:text-indigo-300 sm:text-sm">
-                          {book.title}
-                        </span>
-                        <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:text-xs">
-                          {book.author || t('Unknown author')}
-                        </span>
-                      </button>
-                    ))}
+                          </div>
+                          <span className="mt-2 block h-10 line-clamp-2 text-xs font-semibold leading-4 text-gray-900 dark:text-gray-100 sm:hidden">
+                            {book.title}
+                          </span>
+                          <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:hidden">
+                            {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
+                          </span>
+                        </button>
+                      );
+                    })}
               </div>
             </section>
           );
