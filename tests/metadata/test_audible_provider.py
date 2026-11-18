@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from shelfmark.metadata_providers import MetadataSearchOptions, SearchType, SortOrder, get_provider
-from shelfmark.metadata_providers.audible import AudibleProvider, _parse_product
+from shelfmark.metadata_providers.audible import AudibleProvider, _names, _parse_product
 
 
 def test_parse_audible_product_maps_audiobook_metadata():
@@ -439,6 +439,10 @@ def test_parse_audible_product_excludes_translators_from_authors():
     assert book.authors == ["Auteur original"]
     assert book.narrators == ["Narrateur"]
 
+
+
+def test_audible_combined_author_display_removes_translator_suffix():
+    assert _names("Lisa Jewell, Cécile Arbus - traducteur") == ["Lisa Jewell"]
 
 
 def test_parse_audible_product_uses_french_author_role_and_never_falls_back_to_translator():
