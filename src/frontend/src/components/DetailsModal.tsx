@@ -93,6 +93,223 @@ export const DetailsModal = ({
 
   // Determine if this is a metadata book (Universal mode) vs a release (Direct Download)
   const isMetadata = isMetadataBook(book);
+  const isAudiobook = book.content_type === 'audiobook' || book.provider === 'audible';
+  const displayAuthor = (() => {
+    if (!isAudiobook) {
+      return book.author || t('Unknown author');
+    }
+
+    // Audible can return the translator appended to the author display name,
+    // e.g. "J.R.R. Tolkien, Daniel Lauzon — Translator". The details header
+    // should show the author only, just like the audiobook cover overlay.
+    const authors = book.authors?.filter((name) => name.trim()).join(', ');
+    const author = authors || book.author || '';
+    const translatorLabel =
+      '(?:translator|traduct\\w*|translat\\w*|adaptat\\w*|übersetz\\w*|traducc\\w*|traduz\\w*)';
+    const cleanedAuthor = author
+      .replace(
+        new RegExp(
+          String.raw`\\s*(?:,|;|\\|)\\s*[^,;|]+?\\s*[—–-]\\s*${translatorLabel}\\b.*import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
+
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useMountEffect } from '../hooks/useMountEffect';
+import { useLanguage } from '../contexts/LanguageContext';
+import type { Book, ButtonStateInfo } from '../types';
+import { isMetadataBook } from '../types';
+import { bookSupportsTargets } from '../utils/bookTargetLoader';
+import { isUserCancelledError } from '../utils/errors';
+import { BookTargetDropdown } from './BookTargetDropdown';
+import { LibraryBadge, isInLibrary } from './shared';
+
+interface DetailsModalProps {
+  book: Book | null;
+  onClose: () => void;
+  onDownload: (book: Book) => Promise<void>;
+  onFindDownloads?: (book: Book) => void; // For Universal mode
+  onSearchSeries?: (seriesName: string, seriesId?: string) => void; // Callback to search for series
+  buttonState: ButtonStateInfo;
+  showReleaseSourceLinks?: boolean;
+  onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
+  isAdmin?: boolean;
+  isBlocked?: boolean;
+  onToggleBlock?: (book: Book, blocked: boolean) => Promise<void>;
+}
+
+interface DetailsModalAutoCloseProps {
+  clearQueuing: () => void;
+  closeModal: () => void;
+}
+
+const DetailsModalAutoClose = ({ clearQueuing, closeModal }: DetailsModalAutoCloseProps) => {
+  useMountEffect(() => {
+    clearQueuing();
+    const timer = window.setTimeout(closeModal, 500);
+    return () => window.clearTimeout(timer);
+  });
+
+  return null;
+};
+
+export const DetailsModal = ({
+  book,
+  onClose,
+  onDownload,
+  onFindDownloads,
+  onSearchSeries,
+  buttonState,
+  showReleaseSourceLinks = true,
+  onShowToast,
+  isAdmin = false,
+  isBlocked = false,
+  onToggleBlock,
+}: DetailsModalProps) => {
+  const { t } = useLanguage();
+  const [isQueuing, setIsQueuing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 150);
+  }, [onClose]);
+
+  useBodyScrollLock(Boolean(book));
+  useEscapeKey(Boolean(book), handleClose);
+
+  const hasBookTargets = Boolean(book && isMetadataBook(book) && bookSupportsTargets(book));
+
+  if (!book && !isClosing) return null;
+  if (!book) return null;
+
+  const titleId = `book-details-title-${book.id}`;
+
+  const handleDownload = async () => {
+    setIsQueuing(true);
+    try {
+      await onDownload(book);
+      // Don't close here - wait for button state to change
+    } catch (error) {
+      setIsQueuing(false);
+      if (isUserCancelledError(error)) {
+        return;
+      }
+      // Close on error
+      setTimeout(handleClose, 300);
+    }
+  };
+
+  // Determine if this is a metadata book (Universal mode) vs a release (Direct Download)
+,
+          'i',
+        ),
+        '',
+      )
+      .replace(
+        new RegExp(String.raw`\\s*[—–-]\\s*${translatorLabel}\\b.*import { useCallback, useState } from 'react';
+import { createPortal } from 'react-dom';
+
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
+import { useEscapeKey } from '../hooks/useEscapeKey';
+import { useMountEffect } from '../hooks/useMountEffect';
+import { useLanguage } from '../contexts/LanguageContext';
+import type { Book, ButtonStateInfo } from '../types';
+import { isMetadataBook } from '../types';
+import { bookSupportsTargets } from '../utils/bookTargetLoader';
+import { isUserCancelledError } from '../utils/errors';
+import { BookTargetDropdown } from './BookTargetDropdown';
+import { LibraryBadge, isInLibrary } from './shared';
+
+interface DetailsModalProps {
+  book: Book | null;
+  onClose: () => void;
+  onDownload: (book: Book) => Promise<void>;
+  onFindDownloads?: (book: Book) => void; // For Universal mode
+  onSearchSeries?: (seriesName: string, seriesId?: string) => void; // Callback to search for series
+  buttonState: ButtonStateInfo;
+  showReleaseSourceLinks?: boolean;
+  onShowToast?: (message: string, type: 'success' | 'error' | 'info') => void;
+  isAdmin?: boolean;
+  isBlocked?: boolean;
+  onToggleBlock?: (book: Book, blocked: boolean) => Promise<void>;
+}
+
+interface DetailsModalAutoCloseProps {
+  clearQueuing: () => void;
+  closeModal: () => void;
+}
+
+const DetailsModalAutoClose = ({ clearQueuing, closeModal }: DetailsModalAutoCloseProps) => {
+  useMountEffect(() => {
+    clearQueuing();
+    const timer = window.setTimeout(closeModal, 500);
+    return () => window.clearTimeout(timer);
+  });
+
+  return null;
+};
+
+export const DetailsModal = ({
+  book,
+  onClose,
+  onDownload,
+  onFindDownloads,
+  onSearchSeries,
+  buttonState,
+  showReleaseSourceLinks = true,
+  onShowToast,
+  isAdmin = false,
+  isBlocked = false,
+  onToggleBlock,
+}: DetailsModalProps) => {
+  const { t } = useLanguage();
+  const [isQueuing, setIsQueuing] = useState(false);
+  const [isClosing, setIsClosing] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 150);
+  }, [onClose]);
+
+  useBodyScrollLock(Boolean(book));
+  useEscapeKey(Boolean(book), handleClose);
+
+  const hasBookTargets = Boolean(book && isMetadataBook(book) && bookSupportsTargets(book));
+
+  if (!book && !isClosing) return null;
+  if (!book) return null;
+
+  const titleId = `book-details-title-${book.id}`;
+
+  const handleDownload = async () => {
+    setIsQueuing(true);
+    try {
+      await onDownload(book);
+      // Don't close here - wait for button state to change
+    } catch (error) {
+      setIsQueuing(false);
+      if (isUserCancelledError(error)) {
+        return;
+      }
+      // Close on error
+      setTimeout(handleClose, 300);
+    }
+  };
+
+  // Determine if this is a metadata book (Universal mode) vs a release (Direct Download)
+, 'i'),
+        '',
+      )
+      .trim();
+
+    return cleanedAuthor || t('Unknown author');
+  })();
   const showBookSourceLink = Boolean(book.source_url) && (isMetadata || showReleaseSourceLinks);
   const metadataActionText =
     isMetadata && buttonState.state === 'download' && buttonState.text === 'Get'
@@ -186,7 +403,7 @@ export const DetailsModal = ({
                 {book.title || t('Untitled')}
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                {book.author || t('Unknown author')}
+                {displayAuthor}
               </p>
             </div>
             <button
