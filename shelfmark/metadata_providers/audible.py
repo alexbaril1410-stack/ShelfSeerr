@@ -126,12 +126,15 @@ def _names(value: Any) -> list[str]:
             maxsplit=1,
             flags=re.IGNORECASE,
         )[0].strip()
-        name = re.sub(
-            r"\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b.*$",
-            "",
+        # A contributor item that is itself labelled as a translator must
+        # be discarded entirely; removing only the role would keep the
+        # translator's name and reproduce the bug in the cover overlay.
+        if re.search(
+            r"\s*[-–(]\s*(?:traducteur|traductrice|translator|übersetzer)\b",
             name,
             flags=re.IGNORECASE,
-        ).strip()
+        ):
+            continue
         if name and name not in names:
             names.append(name)
     return names
