@@ -449,6 +449,12 @@ def test_audible_separate_translator_entry_is_removed_entirely():
     assert _names(["Lisa Jewell", "Cécile Arbus - traducteur"]) == ["Lisa Jewell"]
 
 
+def test_audible_translation_label_variants_are_removed():
+    assert _names(["Michael Wood, Cécile Arbus - traduction"]) == ["Michael Wood"]
+    assert _names(["Michael Wood, Cécile Arbus - translation"]) == ["Michael Wood"]
+    assert _names(["Cécile Arbus - traduction"]) == []
+
+
 def test_parse_audible_product_uses_french_author_role_and_never_falls_back_to_translator():
     book = _parse_product(
         {
