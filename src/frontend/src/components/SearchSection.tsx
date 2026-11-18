@@ -10,6 +10,7 @@ import type {
   MetadataProviderSummary,
   Book,
   RequestRecord,
+  ButtonStateInfo,
 } from '../types';
 import { listRequests } from '../services/api';
 import { requestToActivityItem } from './activity/activityMappers';
@@ -17,6 +18,8 @@ import { withBasePath } from '../utils/basePath';
 import { AdvancedFilters } from './AdvancedFilters';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from './SearchBar';
+import { BookActionButton } from './BookActionButton';
+import { LibraryBadge } from './shared';
 
 interface SearchSectionProps {
   onSearch: () => void;
@@ -24,6 +27,9 @@ interface SearchSectionProps {
   showDiscoveryShelves: boolean;
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
+  onDiscoveryDownload: (book: Book) => Promise<void>;
+  onDiscoveryGetReleases: (book: Book) => Promise<void>;
+  getDiscoveryButtonState: (book: Book) => ButtonStateInfo;
   isLoading: boolean;
   isInitialState: boolean;
   searchPageTitle: string;
@@ -62,6 +68,9 @@ export const SearchSection = ({
   showDiscoveryShelves,
   isDiscoveryLoading,
   onDiscoveryBookSelect,
+  onDiscoveryDownload,
+  onDiscoveryGetReleases,
+  getDiscoveryButtonState,
   isInitialState,
   searchPageTitle,
   bookLanguages,
@@ -344,7 +353,7 @@ export const SearchSection = ({
                   ? Array.from({ length: 6 }, (_, index) => (
                       <div
                         key={index}
-                        className={`shrink-0 animate-pulse ${shelf.key.startsWith('audiobook') ? 'w-[144px] sm:w-[192px]' : 'w-[132px] sm:w-[176px]'}`}
+                        className={`shrink-0 animate-pulse ${shelf.key.startsWith('audiobook') ? 'w-[160px] sm:w-[220px]' : 'w-[132px] sm:w-[176px]'}`}
                       >
                         <div className="aspect-[2/3] rounded-xl bg-gray-200 dark:bg-slate-800" />
                         <div className="mt-2 h-3 rounded bg-gray-200 dark:bg-slate-800" />
@@ -357,31 +366,50 @@ export const SearchSection = ({
                         ? book.narrators?.filter(Boolean).join(', ') || book.author
                         : book.author;
                       return (
-                        <button
+                        <article
                           key={book.id}
-                          type="button"
-                          onClick={() => onDiscoveryBookSelect(book)}
-                          className={`group shrink-0 snap-start text-left ${isAudiobook ? 'w-[144px] sm:w-[192px]' : 'w-[132px] sm:w-[176px]'}`}
-                          title={`${t('Search')} ${book.title}`}
+                          className={`group relative shrink-0 snap-start overflow-hidden rounded-xl bg-gray-100 text-left shadow-sm ring-1 ring-black/5 transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900 dark:ring-white/10 ${isAudiobook ? 'w-[160px] sm:w-[220px]' : 'w-[132px] sm:w-[176px]'}`}
                         >
                           <div
-                            className="relative overflow-hidden rounded-xl bg-gray-100 shadow-sm ring-1 ring-black/5 transition duration-200 group-hover:-translate-y-1 group-hover:shadow-xl dark:bg-slate-800 dark:ring-white/10"
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => onDiscoveryBookSelect(book)}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                onDiscoveryBookSelect(book);
+                              }
+                            }}
+                            className="relative block w-full cursor-pointer overflow-hidden bg-slate-200 dark:bg-slate-800"
                             style={{ aspectRatio: book.cover_aspect === 'square' ? '1 / 1' : '2 / 3' }}
+                            title={`${t('Search')} ${book.title}`}
+                            aria-label={book.title}
                           >
                             {book.preview ? (
                               <img
                                 src={book.preview}
                                 alt={book.title}
                                 loading="lazy"
-                                className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.04]"
+                                className="h-full w-full object-contain"
                               />
                             ) : (
                               <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
                                 {book.title}
                               </div>
                             )}
+                            <LibraryBadge
+                              library={book.library}
+                              contentType={isAudiobook ? 'audiobook' : 'ebook'}
+                              overlay
+                              className="absolute top-2 right-2 z-20"
+                            />
+                            {book.series_position != null && (
+                              <span className="absolute top-2 left-2 z-20 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white shadow-lg">
+                                #{book.series_position}
+                              </span>
+                            )}
                             <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100" />
-                            <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-3 pt-16 text-left text-white opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-[54px] pt-16 text-left text-white opacity-100 transition-opacity duration-200 sm:opacity-0 sm:group-hover:opacity-100">
                               <p className="mb-1 text-[11px] font-semibold leading-tight text-white/90 sm:text-xs">
                                 {book.year || '—'}
                               </p>
@@ -393,13 +421,29 @@ export const SearchSection = ({
                               </p>
                             </div>
                           </div>
-                          <span className="mt-2 block h-10 line-clamp-2 text-xs font-semibold leading-4 text-gray-900 dark:text-gray-100 sm:hidden">
-                            {book.title}
-                          </span>
-                          <span className="mt-1 block truncate text-[11px] text-gray-500 dark:text-gray-400 sm:hidden">
-                            {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
-                          </span>
-                        </button>
+                          <div
+                            className="absolute inset-x-2 bottom-2 z-30"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            <BookActionButton
+                              book={book}
+                              buttonState={getDiscoveryButtonState(book)}
+                              onDownload={onDiscoveryDownload}
+                              onGetReleases={onDiscoveryGetReleases}
+                              size="sm"
+                              className="w-full shadow-lg"
+                              fullWidth
+                            />
+                          </div>
+                          <div className="px-2.5 py-2 sm:hidden">
+                            <p className="line-clamp-2 text-xs font-semibold leading-tight text-gray-900 dark:text-gray-100">
+                              {book.title}
+                            </p>
+                            <p className="mt-1 truncate text-[11px] text-gray-500 dark:text-gray-400">
+                              {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
+                            </p>
+                          </div>
+                        </article>
                       );
                     })}
               </div>
