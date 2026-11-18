@@ -13,7 +13,7 @@ import { ListView } from './resultsViews/ListView';
 // Grid layout classes by view mode
 const GRID_CLASSES = {
   mobile: 'grid-cols-1 items-start',
-  card: 'grid-cols-[repeat(auto-fill,minmax(124px,142px))] justify-between items-stretch',
+  card: 'grid-cols-[repeat(auto-fill,minmax(140px,160px))] justify-between items-stretch',
   compact: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 items-start',
 } as const;
 
