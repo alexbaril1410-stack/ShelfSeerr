@@ -447,14 +447,6 @@ export const SearchSection = ({
                               fullWidth
                             />
                           </div>
-                          <div className="px-2.5 py-2 sm:hidden">
-                            <p className="line-clamp-2 text-xs font-semibold leading-tight text-gray-900 dark:text-gray-100">
-                              {book.title}
-                            </p>
-                            <p className="mt-1 truncate text-[11px] text-gray-500 dark:text-gray-400">
-                              {creator || t(isAudiobook ? 'Unknown narrator' : 'Unknown author')}
-                            </p>
-                          </div>
                         </article>
                       );
                     })}
