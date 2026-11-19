@@ -106,7 +106,7 @@ export const CardView = ({
           if (!isTouchLayout) {
             void handleDetails(book.id);
           } else if (!showInfoOnTouch) {
-            setShowInfoOnTouch(true);
+            onActivateTouchCard(book.id);
           } else {
             void handleDetails(book.id);
           }
