@@ -1,5 +1,6 @@
 from unittest.mock import Mock
 
+from shelfmark.core.cache import get_metadata_cache
 from shelfmark.metadata_providers import MetadataSearchOptions, SearchType, SortOrder, get_provider
 from shelfmark.metadata_providers.audible import AudibleProvider, _names, _parse_product
 
@@ -655,3 +656,63 @@ def test_audible_catalogue_wildcard_is_sent_to_catalogue_endpoint(monkeypatch):
     assert [book.provider_id for book in result.books] == ["B0WILDCARD1"]
     assert calls[0][0] == "catalog/products"
     assert calls[0][1]["keywords"] == "*"
+
+
+
+def test_audible_discovery_chart_and_catalogue_are_cached(monkeypatch):
+    provider = AudibleProvider(marketplace="fr", french_only=True)
+    cache = get_metadata_cache()
+    cache.clear()
+    chart_calls = []
+    catalogue_calls = []
+
+    class FakeResponse:
+        text = '<div data-asin="B0CACHE0001"></div>'
+
+        def raise_for_status(self):
+            return None
+
+    def fake_get(url, **kwargs):
+        chart_calls.append(url)
+        return FakeResponse()
+
+    def fake_request(path, params):
+        catalogue_calls.append((path, dict(params)))
+        return {"products": [
+            {"asin": "B0CACHE0001", "title": "Livre français", "language": "French"}
+        ]}
+
+    monkeypatch.setattr("shelfmark.metadata_providers.audible.requests.get", fake_get)
+    monkeypatch.setattr(provider, "_request", fake_request)
+
+    first = provider.discover("popular", limit=1)
+    second = provider.discover("popular", limit=1)
+
+    assert [book.provider_id for book in first.books] == ["B0CACHE0001"]
+    assert [book.provider_id for book in second.books] == ["B0CACHE0001"]
+    assert len(chart_calls) == 1
+    assert len(catalogue_calls) == 1
+    cache.clear()
+
+
+def test_audible_series_suggestions_are_cached_by_marketplace(monkeypatch):
+    cache = get_metadata_cache()
+    cache.clear()
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {"products": [
+            {"series": [{"asin": "B0SERIES999", "title": "Dungeon Crawler Carl"}]}
+        ]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    first = provider.get_search_field_options("series", "Dungeon")
+    second = provider.get_search_field_options("series", "Dungeon")
+
+    assert first == second == [
+        {"value": "asin:B0SERIES999", "label": "Dungeon Crawler Carl"}
+    ]
+    assert len(calls) == 1
+    cache.clear()
