@@ -28,7 +28,7 @@ interface SearchSectionProps {
   isDiscoveryLoading: boolean;
   onDiscoveryBookSelect: (book: Book) => void;
   onDiscoveryGetReleases: (book: Book) => Promise<void>;
-  getDiscoveryButtonState: (book: Book) => ButtonStateInfo;
+  getDiscoveryButtonState: (bookId: string) => ButtonStateInfo;
   isLoading: boolean;
   isInitialState: boolean;
   searchPageTitle: string;
@@ -149,7 +149,6 @@ export const SearchSection = ({
     })),
     [isAdmin, recentRequests],
   );
-  const getDiscoveryButtonStateLatest = useLatestCallback(getDiscoveryButtonState);
   const onDiscoveryBookSelectLatest = useLatestCallback(onDiscoveryBookSelect);
   const onDiscoveryGetReleasesLatest = useLatestCallback(onDiscoveryGetReleases);
 
@@ -312,7 +311,7 @@ export const SearchSection = ({
             isTouchDevice={isTouchDevice}
             activeDiscoveryCardId={activeDiscoveryCardId}
             onActivateCard={setActiveDiscoveryCardId}
-            getButtonState={getDiscoveryButtonStateLatest}
+            getButtonState={getDiscoveryButtonState}
             onBookSelect={onDiscoveryBookSelectLatest}
             onGetReleases={onDiscoveryGetReleasesLatest}
           />
