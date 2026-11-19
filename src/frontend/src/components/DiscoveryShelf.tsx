@@ -184,7 +184,6 @@ export const DiscoveryShelf = memo(({
   const activateCard = useCallback((id: string) => {
     onActivateCard(id ? shelfKey + ':' + id : null);
   }, [onActivateCard, shelfKey]);
-  const getButtonStateLatest = useLatestCallback(getButtonState);
   const onBookSelectLatest = useLatestCallback(onBookSelect);
   const onGetReleasesLatest = useLatestCallback(onGetReleases);
   const isAudiobook = shelfKey.startsWith('audiobook');
@@ -255,7 +254,7 @@ export const DiscoveryShelf = memo(({
                 isAudiobook={isAudiobook}
                 isTouchDevice={isTouchDevice}
                 isActive={activeDiscoveryCardId === shelfKey + ':' + book.id}
-                buttonState={getButtonStateLatest(book.id)}
+                buttonState={getButtonState(book.id)}
                 onActivate={activateCard}
                 onSelect={onBookSelectLatest}
                 onGetReleases={onGetReleasesLatest}
