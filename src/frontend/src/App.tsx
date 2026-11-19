@@ -1071,34 +1071,64 @@ function App() {
 
     let isCurrent = true;
     setIsDiscoveryLoading(true);
-    Promise.all([
-      discoverMetadata('trending', 'ebook'),
-      discoverMetadata('popular', 'ebook'),
-      discoverMetadata('trending', 'audiobook'),
-      discoverMetadata('popular', 'audiobook'),
-    ])
-      .then(([ebookTrending, ebookPopular, audiobookTrending, audiobookPopular]) => {
-        if (isCurrent) {
-          setDiscoveryShelves({
-            ebook: { trending: ebookTrending, popular: ebookPopular },
-            audiobook: { trending: audiobookTrending, popular: audiobookPopular },
-          });
+
+    // Load each shelf independently so a slow provider or failed request does
+    // not hold back the other carousels. Keep existing data visible while refreshing.
+    const shelfRequests = [
+      {
+        key: 'ebook-trending',
+        load: () => discoverMetadata('trending', 'ebook'),
+        update: (books: Book[]) =>
+          setDiscoveryShelves((current) => ({
+            ...current,
+            ebook: { ...current.ebook, trending: books },
+          })),
+      },
+      {
+        key: 'ebook-popular',
+        load: () => discoverMetadata('popular', 'ebook'),
+        update: (books: Book[]) =>
+          setDiscoveryShelves((current) => ({
+            ...current,
+            ebook: { ...current.ebook, popular: books },
+          })),
+      },
+      {
+        key: 'audiobook-trending',
+        load: () => discoverMetadata('trending', 'audiobook'),
+        update: (books: Book[]) =>
+          setDiscoveryShelves((current) => ({
+            ...current,
+            audiobook: { ...current.audiobook, trending: books },
+          })),
+      },
+      {
+        key: 'audiobook-popular',
+        load: () => discoverMetadata('popular', 'audiobook'),
+        update: (books: Book[]) =>
+          setDiscoveryShelves((current) => ({
+            ...current,
+            audiobook: { ...current.audiobook, popular: books },
+          })),
+      },
+    ];
+
+    void Promise.allSettled(
+      shelfRequests.map(async (shelf) => {
+        try {
+          const books = await shelf.load();
+          if (isCurrent) {
+            shelf.update(books);
+          }
+        } catch (error) {
+          console.warn(`Unable to load discovery shelf ${shelf.key}:`, error);
         }
-      })
-      .catch((error: unknown) => {
-        console.warn('Unable to load homepage discovery shelves:', error);
-        if (isCurrent) {
-          setDiscoveryShelves({
-            ebook: { trending: [], popular: [] },
-            audiobook: { trending: [], popular: [] },
-          });
-        }
-      })
-      .finally(() => {
-        if (isCurrent) {
-          setIsDiscoveryLoading(false);
-        }
-      });
+      }),
+    ).then(() => {
+      if (isCurrent) {
+        setIsDiscoveryLoading(false);
+      }
+    });
 
     return () => {
       isCurrent = false;
