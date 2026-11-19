@@ -1,7 +1,11 @@
+from types import SimpleNamespace
+
 import pytest
 
 from shelfmark.release_sources.prowlarr.scoring_evaluator import (
     MatchState,
+    build_book_context,
+    build_release_metadata,
     evaluate_conditions,
 )
 from shelfmark.release_sources.prowlarr.scoring_models import Condition, ConditionGroup
@@ -185,3 +189,60 @@ def test_condition_tree_keeps_a_detailed_breakdown():
     assert result.tree.children[0].state == MatchState.MATCH
     assert result.tree.children[1].field == "codec"
     assert result.tree.children[1].state == MatchState.UNKNOWN
+
+
+
+def test_release_adapter_maps_only_available_source_metadata():
+    release = SimpleNamespace(
+        title="Saga - Tome 02",
+        format="epub",
+        language="fr",
+        indexer="MyIndexer",
+        extra={
+            "author": "Ursula Le Guin",
+            "series_name": "Les Archives",
+            "series_position": 2,
+            "bitrate_value": 256,
+            "codec": "flac",
+            "sample_rate": None,
+        },
+    )
+
+    metadata = build_release_metadata(release)
+
+    assert metadata == {
+        "title": "Saga - Tome 02",
+        "format": "epub",
+        "language": "fr",
+        "indexer": "MyIndexer",
+        "author": "Ursula Le Guin",
+        "series": "Les Archives",
+        "volume": 2,
+        "bitrate": 256,
+        "codec": "flac",
+    }
+    assert "sample_rate" not in metadata
+    assert "channels" not in metadata
+
+
+def test_release_adapter_does_not_guess_volume_or_audio_metadata():
+    release = SimpleNamespace(
+        title="Saga 2 - La suite",
+        format=None,
+        language=None,
+        indexer=None,
+        extra={},
+    )
+
+    metadata = build_release_metadata(release)
+
+    assert metadata == {"title": "Saga 2 - La suite"}
+
+
+def test_book_context_resolves_author_and_requested_volume():
+    book = SimpleNamespace(search_author=None, authors=["Ursula Le Guin", "Traducteur"])
+
+    assert build_book_context(book, requested_volume=2) == {
+        "book_author": "Ursula Le Guin, Traducteur",
+        "requested_volume": 2,
+    }
