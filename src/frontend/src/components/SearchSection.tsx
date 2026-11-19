@@ -18,8 +18,8 @@ import { withBasePath } from '../utils/basePath';
 import { AdvancedFilters } from './AdvancedFilters';
 import { useLanguage } from '../contexts/LanguageContext';
 import { SearchBar } from './SearchBar';
-import { BookGetButton } from './BookGetButton';
-import { LibraryBadge } from './shared';
+import { DiscoveryShelf } from './DiscoveryShelf';
+import { useLatestCallback } from '../hooks/useLatestCallback';
 
 interface SearchSectionProps {
   onSearch: () => void;
@@ -101,10 +101,8 @@ export const SearchSection = ({
   const { t } = useLanguage();
   const [recentRequests, setRecentRequests] = useState<RequestRecord[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
-  const [activeDiscoveryCardId, setActiveDiscoveryCardId] = useState<string | null>(null);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const requestsRailRef = useRef<HTMLDivElement>(null);
-  const discoveryRailRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(hover: none), (pointer: coarse)').matches);
@@ -143,25 +141,6 @@ export const SearchSection = ({
     });
   };
 
-  const scrollDiscoveryRail = (key: string, direction: -1 | 1) => {
-    const rail = discoveryRailRefs.current[key];
-    rail?.scrollBy({
-      left: direction * Math.max(320, rail.clientWidth * 0.8),
-      behavior: 'smooth',
-    });
-  };
-
-  const renderCarouselControls = (onScroll: (direction: -1 | 1) => void, label: string) => (
-    <div className="flex shrink-0 items-center gap-2">
-      <button type="button" onClick={() => onScroll(-1)} aria-label={`${t('Previous')} ${label}`} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-indigo-400 hover:text-indigo-500 dark:border-white/10 dark:text-gray-300">
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 18-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-      <button type="button" onClick={() => onScroll(1)} aria-label={`${t('Next')} ${label}`} className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 text-gray-600 transition hover:border-indigo-400 hover:text-indigo-500 dark:border-white/10 dark:text-gray-300">
-        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 18 6-6-6-6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-      </button>
-    </div>
-  );
-
   const requestCardItems = useMemo(
     () => recentRequests.map((record) => ({
       record,
@@ -169,12 +148,17 @@ export const SearchSection = ({
     })),
     [isAdmin, recentRequests],
   );
+  const getDiscoveryButtonStateLatest = useLatestCallback(getDiscoveryButtonState);
+  const onDiscoveryBookSelectLatest = useLatestCallback(onDiscoveryBookSelect);
+  const onDiscoveryGetReleasesLatest = useLatestCallback(onDiscoveryGetReleases);
+
   const discoverySections = [
     { key: 'ebook-trending', title: 'Tendances – Livres', books: discoveryShelves.ebook.trending },
     { key: 'ebook-popular', title: 'Populaire – Livres', books: discoveryShelves.ebook.popular },
     { key: 'audiobook-trending', title: 'Tendances – Livres audio', books: discoveryShelves.audiobook.trending },
     { key: 'audiobook-popular', title: 'Populaire – Livres audio', books: discoveryShelves.audiobook.popular },
   ] as const;
+
 
   return (
     <section
@@ -317,151 +301,19 @@ export const SearchSection = ({
             </div>
           </section>
         )}
-        {showDiscoveryShelves && discoverySections.map((shelf) => {
-          const shelfBooks = shelf.books;
-
-          return (
-            <section key={shelf.key} className="min-w-0">
-              <div className="mb-3 flex items-end justify-between gap-3">
-                <div className="flex min-w-0 items-center gap-2">
-                  <h2 className="text-lg font-bold tracking-tight text-gray-900 dark:text-white sm:text-xl">{t(shelf.title)}</h2>
-                  <a
-                    href={withBasePath(
-                      shelf.key === 'ebook-trending'
-                        ? '/books#content_type=ebook&sort=trending'
-                        : shelf.key === 'ebook-popular'
-                          ? '/books#content_type=ebook'
-                          : shelf.key === 'audiobook-trending'
-                            ? '/audiobooks#content_type=audiobook'
-                            : '/audiobooks#content_type=audiobook&sort=popularity',
-                    )}
-                    aria-label={`${t('View full selection')} – ${t(shelf.title)}`}
-                    title={t('View full selection')}
-                    className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-gray-100 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-white/10 dark:hover:text-indigo-300"
-                  >
-                    <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <circle cx="12" cy="12" r="9" />
-                      <path d="m10 8 4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </a>
-                </div>
-                <div className="flex shrink-0 items-center gap-3">
-                  {shelfBooks.length > 0 && (
-                    <span className="hidden text-xs text-gray-500 dark:text-gray-400 sm:inline">{shelfBooks.length} {t('titles')}</span>
-                  )}
-                  {renderCarouselControls((direction) => scrollDiscoveryRail(shelf.key, direction), t(shelf.title))}
-                </div>
-              </div>
-              <div ref={(element) => { discoveryRailRefs.current[shelf.key] = element; }} className="shelfseerr-discovery-rail flex snap-x snap-mandatory gap-3 overflow-x-auto pb-3 sm:gap-4">
-                {isDiscoveryLoading && shelfBooks.length === 0
-                  ? Array.from({ length: 6 }, (_, index) => (
-                      <div
-                        key={index}
-                        className={`shrink-0 animate-pulse ${shelf.key.startsWith('audiobook') ? 'w-[160px] sm:w-[220px]' : 'w-[132px] sm:w-[176px]'}`}
-                      >
-                        <div className="aspect-[2/3] rounded-xl bg-gray-200 dark:bg-slate-800" />
-                        <div className="mt-2 h-3 rounded bg-gray-200 dark:bg-slate-800" />
-                        <div className="mt-1 h-2.5 w-2/3 rounded bg-gray-100 dark:bg-slate-800/70" />
-                      </div>
-                    ))
-                  : shelfBooks.map((book) => {
-                      const cardId = `${shelf.key}:${book.id}`;
-                      const isCardActive = activeDiscoveryCardId === cardId;
-                      const isAudiobook = shelf.key.startsWith('audiobook');
-                      const creator = isAudiobook
-                        ? (book.authors?.length ? book.authors : book.author ? [book.author] : [])
-                            .flatMap((author) => author.split(/,\\s*/))
-                            .map((author) => author.trim())
-                            .filter(
-                              (author) =>
-                                author &&
-                                !/(translator|translat|traduct|adaptat|übersetz|traducc|traduz)/i.test(author),
-                            )
-                            .join(', ')
-                        : book.author;
-                      return (
-                        <article
-                          key={book.id}
-                          className={`group relative shrink-0 snap-start overflow-hidden rounded-xl bg-gray-100 text-left shadow-sm ring-1 ring-black/5 transition duration-200 hover:-translate-y-1 hover:shadow-xl dark:bg-slate-900 dark:ring-white/10 ${isAudiobook ? 'w-[160px] sm:w-[220px]' : 'w-[132px] sm:w-[176px]'}`}
-                        >
-                          <div
-                            role="button"
-                            tabIndex={0}
-                            onClick={() => {
-                              if (isTouchDevice && !isCardActive) {
-                                setActiveDiscoveryCardId(cardId);
-                                return;
-                              }
-                              onDiscoveryBookSelect(book);
-                              setActiveDiscoveryCardId(null);
-                            }}
-                            onKeyDown={(event) => {
-                              if (event.key === 'Enter' || event.key === ' ') {
-                                event.preventDefault();
-                                onDiscoveryBookSelect(book);
-                              }
-                            }}
-                            className="relative block w-full cursor-pointer overflow-hidden bg-slate-200 dark:bg-slate-800"
-                            style={{ aspectRatio: book.cover_aspect === 'square' ? '1 / 1' : '2 / 3' }}
-                            title={`${t('Search')} ${book.title}`}
-                            aria-label={book.title}
-                          >
-                            {book.preview ? (
-                              <img
-                                src={book.preview}
-                                alt={book.title}
-                                loading="lazy"
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full items-center justify-center px-3 text-center text-xs text-gray-500 dark:text-gray-400">
-                                {book.title}
-                              </div>
-                            )}
-                            <LibraryBadge
-                              library={book.library}
-                              contentType={isAudiobook ? 'audiobook' : 'ebook'}
-                              overlay
-                              className="absolute top-2 right-2 z-20"
-                            />
-                            {book.series_position != null && (
-                              <span className={`absolute top-2 left-2 z-20 rounded-md border border-emerald-700 bg-emerald-600 px-2 py-1 text-xs font-bold text-white shadow-lg opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? 'opacity-100' : ''}`}>
-                                #{book.series_position}
-                              </span>
-                            )}
-                            <div className={`pointer-events-none absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 to-transparent opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? "opacity-100" : ""}`} />
-                            <div className={`pointer-events-none absolute inset-x-0 bottom-0 px-2.5 pb-[54px] pt-16 text-left text-white opacity-0 transition-opacity duration-200 sm:group-hover:opacity-100 ${isCardActive ? "opacity-100" : ""}`}>
-                              <p className="mb-1 text-[11px] font-semibold leading-tight text-white/90 sm:text-xs">
-                                {book.year || '—'}
-                              </p>
-                              <h3 className="line-clamp-4 text-xs leading-tight font-bold sm:text-sm" title={book.title}>
-                                {book.title}
-                              </h3>
-                              <p className="mt-1 line-clamp-3 text-[10px] leading-tight text-white/85 sm:text-xs">
-                                {creator || t('Unknown author')}
-                              </p>
-                            </div>
-                          </div>
-                          <div
-                            className={`absolute inset-x-2 bottom-2 z-30 opacity-0 pointer-events-none transition-opacity duration-200 sm:group-hover:pointer-events-auto sm:group-hover:opacity-100 ${isCardActive ? "pointer-events-auto opacity-100" : ""}`}
-                            onClick={(event) => event.stopPropagation()}
-                          >
-                            <BookGetButton
-                              book={book}
-                              buttonState={getDiscoveryButtonState(book)}
-                              onGetReleases={onDiscoveryGetReleases}
-                              size="sm"
-                              className="w-full shadow-lg"
-                              fullWidth
-                            />
-                          </div>
-                        </article>
-                      );
-                    })}
-              </div>
-            </section>
-          );
-        })}
+        {showDiscoveryShelves && discoverySections.map((shelf) => (
+          <DiscoveryShelf
+            key={shelf.key}
+            shelfKey={shelf.key}
+            title={shelf.title}
+            books={shelf.books}
+            isLoading={isDiscoveryLoading}
+            isTouchDevice={isTouchDevice}
+            getButtonState={getDiscoveryButtonStateLatest}
+            onBookSelect={onDiscoveryBookSelectLatest}
+            onGetReleases={onDiscoveryGetReleasesLatest}
+          />
+        ))}
 
 
       </div>
