@@ -4,6 +4,7 @@ from shelfmark.release_sources.prowlarr.custom_scoring import (
     release_title_matches_book,
     release_author_matches_book,
     score_release,
+    minimum_score,
 )\nfrom shelfmark.metadata_providers import BookMetadata
 
 
@@ -195,3 +196,85 @@ def test_multi_volume_bundle_remains_visible_but_receives_large_penalty(monkeypa
     # still must not receive the +300 points for an individual requested tome.
     values["CUSTOM_SCORES_EBOOK_RULES"][1]["enabled"] = False
     assert score_release(_release("Dungeon.Crawler.Carl.T01.a.T04.FR.EPUB"), book, "ebook") == 0
+
+
+
+def test_disabled_scoring_disables_its_minimum_threshold(monkeypatch):
+    import shelfmark.release_sources.prowlarr.custom_scoring as scoring
+
+    values = {
+        "CUSTOM_SCORES_EBOOKS_ENABLED": False,
+        "CUSTOM_SCORES_EBOOK_MINIMUM": 250,
+        "CUSTOM_SCORES_AUDIOBOOKS_ENABLED": False,
+        "CUSTOM_SCORES_AUDIOBOOK_MINIMUM": 250,
+    }
+    monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
+
+    assert minimum_score("ebook") == 0
+    assert minimum_score("audiobook") == 0
+
+
+def test_enabled_scoring_keeps_its_configured_minimum_threshold(monkeypatch):
+    import shelfmark.release_sources.prowlarr.custom_scoring as scoring
+
+    values = {
+        "CUSTOM_SCORES_EBOOKS_ENABLED": True,
+        "CUSTOM_SCORES_EBOOK_MINIMUM": 125,
+        "CUSTOM_SCORES_AUDIOBOOKS_ENABLED": True,
+        "CUSTOM_SCORES_AUDIOBOOK_MINIMUM": 175,
+    }
+    monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
+
+    assert minimum_score("ebook") == 125
+    assert minimum_score("audiobook") == 175
+
+
+def test_french_release_bonus_is_not_implicitly_added_twice(monkeypatch):
+    import shelfmark.release_sources.prowlarr.custom_scoring as scoring
+
+    values = {
+        "CUSTOM_SCORES_EBOOKS_ENABLED": True,
+        "CUSTOM_SCORES_EBOOK_RULES": [
+            {
+                "enabled": True,
+                "name": "Langue française",
+                "field": "language",
+                "operator": "equals",
+                "value": "fr",
+                "score": 40,
+            }
+        ],
+    }
+    monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
+
+    book = _book("Dune")
+    book.language = "fr"
+    release = _release("Dune.FR.EPUB")
+    release.language = "fr"
+
+    assert score_release(release, book, "ebook") == 40
+    assert release.extra["custom_score_breakdown"] == [
+        {
+            "name": "Langue française",
+            "field": "language",
+            "score": 40,
+            "matched_value": "fr",
+        }
+    ]
+
+
+def test_original_language_penalty_remains_for_french_requests(monkeypatch):
+    import shelfmark.release_sources.prowlarr.custom_scoring as scoring
+
+    values = {
+        "CUSTOM_SCORES_EBOOKS_ENABLED": True,
+        "CUSTOM_SCORES_EBOOK_RULES": [],
+    }
+    monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
+
+    book = _book("Dune")
+    book.language = "fr"
+    release = _release("Dune [ENG].EPUB")
+
+    assert score_release(release, book, "ebook") == -300
+    assert release.extra["custom_score_breakdown"][0]["name"] == "Version originale (non française)"
