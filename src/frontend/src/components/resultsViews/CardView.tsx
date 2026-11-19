@@ -20,6 +20,8 @@ interface CardViewProps {
   buttonState: ButtonStateInfo;
   animationDelay?: number;
   showSeriesPosition?: boolean;
+  activeTouchCardId: string | null;
+  onActivateTouchCard: (id: string) => void;
 }
 
 export const CardView = ({
@@ -31,6 +33,8 @@ export const CardView = ({
   buttonState,
   animationDelay = 0,
   showSeriesPosition = false,
+  activeTouchCardId,
+  onActivateTouchCard,
 }: CardViewProps) => {
   const { searchMode } = useSearchMode();
   const { t } = useLanguage();
@@ -53,7 +57,7 @@ export const CardView = ({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [showInfoOnTouch, setShowInfoOnTouch] = useState(false);
+  const showInfoOnTouch = activeTouchCardId === book.id;
   let zIndex: number | undefined;
   if (isHovered) {
     zIndex = 10;
