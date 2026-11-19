@@ -925,6 +925,11 @@ class AudibleProvider(MetadataProvider):
         asin = book_id.strip().upper()
         if not asin:
             return None
+        return self._get_book_cached(self.marketplace, asin)
+
+    @cacheable(ttl_key="METADATA_CACHE_BOOK_TTL", ttl_default=600, key_prefix="audible:book:v1")
+    def _get_book_cached(self, marketplace: str, asin: str) -> BookMetadata | None:
+        """Cache book details by marketplace and ASIN."""
         payload = self._request(
             f"catalog/products/{quote(asin)}",
             {"response_groups": _RESPONSE_GROUPS},
@@ -934,7 +939,7 @@ class AudibleProvider(MetadataProvider):
             product = payload.get("product")
             if isinstance(product, dict):
                 products = [product]
-        return _parse_product(products[0], self.marketplace) if products else None
+        return _parse_product(products[0], marketplace) if products else None
 
     def search_by_isbn(self, isbn: str) -> BookMetadata | None:
         # Audible identifies audiobook editions by ASIN, not ISBN.
