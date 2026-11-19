@@ -19,6 +19,8 @@ interface DiscoveryShelfProps {
   books: Book[];
   isLoading: boolean;
   isTouchDevice: boolean;
+  activeDiscoveryCardId: string | null;
+  onActivateCard: (id: string | null) => void;
   getButtonState: (book: Book) => ButtonStateInfo;
   onBookSelect: (book: Book) => void;
   onGetReleases: (book: Book) => Promise<void>;
@@ -170,13 +172,17 @@ export const DiscoveryShelf = memo(({
   books,
   isLoading,
   isTouchDevice,
+  activeDiscoveryCardId,
+  onActivateCard,
   getButtonState,
   onBookSelect,
   onGetReleases,
 }: DiscoveryShelfProps) => {
   const { t } = useLanguage();
   const railRef = useRef<HTMLDivElement>(null);
-  const [activeCardId, setActiveCardId] = useState('');
+  const activateCard = useCallback((id: string) => {
+    onActivateCard(id ? shelfKey + ':' + id : null);
+  }, [onActivateCard, shelfKey]);
   const getButtonStateLatest = useLatestCallback(getButtonState);
   const onBookSelectLatest = useLatestCallback(onBookSelect);
   const onGetReleasesLatest = useLatestCallback(onGetReleases);
@@ -247,9 +253,9 @@ export const DiscoveryShelf = memo(({
                 book={book}
                 isAudiobook={isAudiobook}
                 isTouchDevice={isTouchDevice}
-                isActive={activeCardId === book.id}
+                isActive={activeDiscoveryCardId === shelfKey + ':' + book.id}
                 buttonState={getButtonStateLatest(book)}
-                onActivate={setActiveCardId}
+                onActivate={activateCard}
                 onSelect={onBookSelectLatest}
                 onGetReleases={onGetReleasesLatest}
               />
