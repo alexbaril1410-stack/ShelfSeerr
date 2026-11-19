@@ -1,4 +1,5 @@
-from shelfmark.metadata_providers import SearchResult, SortOrder
+from shelfmark.core.cache import get_metadata_cache
+from shelfmark.metadata_providers import MetadataSearchOptions, SearchResult, SortOrder
 from shelfmark.metadata_providers.hardcover import (
     HARDCOVER_BOOKS_BY_IDS_QUERY,
     HARDCOVER_TRENDING_BOOKS_QUERY,
@@ -73,3 +74,32 @@ def test_discover_popular_uses_hardcover_users_count_sort(monkeypatch):
         "sort": SortOrder.POPULARITY,
         "limit": 40,
     }
+
+
+
+def test_hardcover_catalogue_rankings_are_cached(monkeypatch):
+    provider = HardcoverProvider(api_key="test-token")
+    cache = get_metadata_cache()
+    cache.clear()
+    calls = []
+
+    def fake_execute(query, variables):
+        calls.append((query, variables))
+        if query == HARDCOVER_TRENDING_BOOKS_QUERY:
+            return {"books_trending": {"ids": [1]}}
+        return {"books": [_book(1, "Book One")]}
+
+    monkeypatch.setattr(provider, "_execute_query", fake_execute)
+    monkeypatch.setattr(
+        "shelfmark.metadata_providers.hardcover.app_config.get",
+        lambda key, default=None: False if key == "HARDCOVER_FRENCH_ONLY" else default,
+    )
+    options = MetadataSearchOptions(query="*", limit=1, page=1, sort=SortOrder.TRENDING)
+
+    first = provider.search_paginated(options)
+    second = provider.search_paginated(options)
+
+    assert [book.title for book in first.books] == ["Book One"]
+    assert [book.title for book in second.books] == ["Book One"]
+    assert len(calls) == 2
+    cache.clear()
