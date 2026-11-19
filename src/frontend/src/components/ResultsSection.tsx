@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchMode } from '../contexts/SearchModeContext';
@@ -61,6 +61,7 @@ export const ResultsSection = ({
     ? GRID_CLASSES.audiobook
     : GRID_CLASSES.ebook;
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [activeTouchCardId, setActiveTouchCardId] = useState<string | null>(null);
 
   useEffect(() => {
     if (searchMode !== 'universal' || !hasMore || !onLoadMore || isLoadingMore) return;
