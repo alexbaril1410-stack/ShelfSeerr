@@ -1,4 +1,5 @@
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef } from 'react';
+import type { KeyboardEvent } from 'react';
 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useLatestCallback } from '../hooks/useLatestCallback';
@@ -77,7 +78,7 @@ const DiscoveryBookCard = memo(({
     onActivate('');
   }, [book, isActive, isTouchDevice, onActivate, selectLatest]);
 
-  const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       selectLatest(book);
