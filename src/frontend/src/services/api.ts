@@ -295,11 +295,12 @@ async function fetchJSON<T>(
 // API functions
 export const searchBooks = async (
   query: string,
+  signal?: AbortSignal,
 ): Promise<{ books: Book[]; totalResults: number | string | null }> => {
   if (!query) return { books: [], totalResults: null };
   const response = await fetchJSON<ReleasesResponse>(
     `${API_BASE}/releases?source=direct_download&${query}`,
-    {},
+    { signal },
     searchTimeoutMs,
   );
   // Extract total count from search_info if available
