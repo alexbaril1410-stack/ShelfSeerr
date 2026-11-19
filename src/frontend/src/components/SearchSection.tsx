@@ -102,7 +102,6 @@ export const SearchSection = ({
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [activeDiscoveryCardId, setActiveDiscoveryCardId] = useState<string | null>(null);
-  const requestsRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setIsTouchDevice(window.matchMedia('(hover: none), (pointer: coarse)').matches);
