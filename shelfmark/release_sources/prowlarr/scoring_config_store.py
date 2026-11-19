@@ -12,6 +12,7 @@ from shelfmark.core.settings_registry import load_config_file, save_config_file
 from shelfmark.release_sources.prowlarr.scoring_models import (
     Condition,
     ConditionGroup,
+    ContentType,
     CustomFormat,
     ProfileFormatScore,
     ScoringConfiguration,
@@ -94,7 +95,11 @@ def default_scoring_configuration() -> ScoringConfiguration:
     ebook_formats = ("language-french", "ebook-epub", "ebook-matching-author", "requested-volume", "multi-volume-bundle")
     audio_formats = ("language-french", "ebook-matching-author", "requested-volume", "multi-volume-bundle", "audio-flac", "audio-high-bitrate")
     profiles = []
-    for content_type, format_ids in (("ebook", ebook_formats), ("audiobook", audio_formats)):
+    content_profiles: tuple[tuple[ContentType, tuple[str, ...]], ...] = (
+        ("ebook", ebook_formats),
+        ("audiobook", audio_formats),
+    )
+    for content_type, format_ids in content_profiles:
         label = "ebooks" if content_type == "ebook" else "livres audio"
         for profile_id, profile_name, weights in (
             ("equilibre", "Équilibré", (40, 25, 60, 120, -500, 25, 20)),
