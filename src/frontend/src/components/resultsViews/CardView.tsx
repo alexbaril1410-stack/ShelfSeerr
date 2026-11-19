@@ -19,6 +19,8 @@ interface CardViewProps {
   onGetReleases: (book: Book) => Promise<void>;
   buttonState: ButtonStateInfo;
   animationDelay?: number;
+  imageLoading?: 'eager' | 'lazy';
+  imagePriority?: boolean;
   showSeriesPosition?: boolean;
   activeTouchCardId: string | null;
   onActivateTouchCard: (id: string) => void;
@@ -32,6 +34,8 @@ export const CardView = ({
   onGetReleases,
   buttonState,
   animationDelay = 0,
+  imageLoading = 'lazy',
+  imagePriority = false,
   showSeriesPosition = false,
   activeTouchCardId,
   onActivateTouchCard,
@@ -153,7 +157,9 @@ export const CardView = ({
                 src={book.preview}
                 alt={book.title || coverLabel}
                 className="h-full w-full"
-                loading="lazy"
+                loading={imageLoading}
+                decoding="async"
+                fetchPriority={imagePriority ? 'high' : 'auto'}
                 style={{
                   opacity: imageLoaded ? 1 : 0,
                   transition: 'opacity 0.3s ease-in-out',
