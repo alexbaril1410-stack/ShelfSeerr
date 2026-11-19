@@ -99,18 +99,23 @@ def register_system_routes(
             with index_path.open(encoding="utf-8") as handle:
                 html = handle.read()
         except OSError:
-            return send_from_directory(frontend_dist, "index.html")
+            response = send_from_directory(frontend_dist, "index.html")
+            response.headers["Cache-Control"] = "no-store"
+            return response
 
         if get_base_path() and _BASE_TAG in html:
             html = html.replace(_BASE_TAG, f'<base href="{_base_href()}" data-shelfmark-base />', 1)
 
-        return Response(html, mimetype="text/html")
+        response = Response(html, mimetype="text/html")
+        response.headers["Cache-Control"] = "no-store"
+        return response
 
     # Serve frontend static files
     @app.route("/assets/<path:filename>")
     def serve_frontend_assets(filename: str) -> Response:
         """Serve static assets from the built frontend."""
-        return send_from_directory(get_frontend_dist() / "assets", filename)
+        # Vite emits content-hashed filenames in /assets, so these files are immutable.
+        return send_from_directory(get_frontend_dist() / "assets", filename, max_age=31536000)
 
     @app.route("/")
     def index() -> Response:
