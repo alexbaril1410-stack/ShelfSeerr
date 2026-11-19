@@ -1,10 +1,5 @@
 import pytest
 
-from shelfmark.release_sources.prowlarr.scoring_models import (
-    ProfileFormatScore,
-    ScoringConfiguration,
-    ScoringProfile,
-)
 from shelfmark.release_sources.prowlarr import scoring_config_store as store
 
 
