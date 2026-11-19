@@ -86,7 +86,7 @@ def test_unknown_positive_and_negative_formats_create_score_interval():
     assert result.known_score == 50
     assert result.minimum_possible_score == -50
     assert result.maximum_possible_score == 70
-    assert result.decision == ScoreDecision.ACCEPTABLE
+    assert result.decision == ScoreDecision.UNKNOWN
 
 
 def test_unknown_positive_format_can_make_minimum_threshold_uncertain():
