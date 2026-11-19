@@ -9,8 +9,8 @@ import { CardView } from './resultsViews/CardView';
 
 // Une seule présentation en cartes, sur ordinateur comme sur mobile.
 const GRID_CLASSES = {
-  ebook: 'grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(156px,176px))] justify-between items-stretch',
-  audiobook: 'grid-cols-1 sm:grid-cols-[repeat(auto-fill,minmax(192px,220px))] justify-between items-stretch',
+  ebook: 'grid-cols-[repeat(2,minmax(0,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(156px,176px))] justify-between items-stretch',
+  audiobook: 'grid-cols-[repeat(2,minmax(0,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(192px,220px))] justify-between items-stretch',
 } as const;
 
 interface ResultsSectionProps {
@@ -125,7 +125,7 @@ export const ResultsSection = ({
       </div>
       <div
         id="results-grid"
-        className={`grid gap-8 ${cardGridClass}`}
+        className={`grid gap-4 sm:gap-8 ${cardGridClass}`}
       >
         {books.map((book, index) => {
           const animationDelay = index * 50;
