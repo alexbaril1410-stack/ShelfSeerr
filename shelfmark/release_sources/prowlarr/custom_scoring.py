@@ -340,6 +340,8 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
     # Language is a hard relevance signal for a French request. Indexers often
     # omit Torznab language metadata, so inspect explicit release tags such as
     # [VO], [ENG], [FR] and [VFF] as well. Do not assume an untagged release is VO.
+    # French bonuses remain configurable through the ordinary rules below; this
+    # avoids silently adding a second bonus when a user has configured one.
     if _requested_language_is_french(book):
         language_signal = _first(
             release.language,
@@ -353,14 +355,6 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
                 "name": "Version originale (non française)",
                 "field": "language",
                 "score": -300,
-                "matched_value": str(language_signal),
-            })
-        elif normalized_language in {"fr", "fra", "fre", "french", "français", "francais"}:
-            total += 120
-            breakdown.append({
-                "name": "Version française identifiée",
-                "field": "language",
-                "score": 120,
                 "matched_value": str(language_signal),
             })
     for rule in config.get(rules_key, []) or []:
@@ -394,5 +388,11 @@ def score_release(release: Release, book: Any, content_type: str) -> int:
 
 
 def minimum_score(content_type: str) -> int:
-    key = "CUSTOM_SCORES_AUDIOBOOK_MINIMUM" if content_type == "audiobook" else "CUSTOM_SCORES_EBOOK_MINIMUM"
+    """Return the active score threshold, or zero when scoring is disabled."""
+    is_audio = content_type == "audiobook"
+    enabled_key = "CUSTOM_SCORES_AUDIOBOOKS_ENABLED" if is_audio else "CUSTOM_SCORES_EBOOKS_ENABLED"
+    if not config.get(enabled_key, True):
+        return 0
+
+    key = "CUSTOM_SCORES_AUDIOBOOK_MINIMUM" if is_audio else "CUSTOM_SCORES_EBOOK_MINIMUM"
     return int(_num(config.get(key, 0)) or 0)
