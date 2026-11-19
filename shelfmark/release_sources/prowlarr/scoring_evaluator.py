@@ -44,7 +44,7 @@ class EvaluationResult:
     required_unknown: tuple[str, ...] = ()
 
 
-_PLACEHOLDER = re.compile(r"^{{\\s*([a-z_][a-z0-9_]*)\\s*}}$", re.IGNORECASE)
+_PLACEHOLDER = re.compile(r"^{{\s*([a-z_][a-z0-9_]*)\s*}}$", re.IGNORECASE)
 _NUMERIC_OPERATORS = {
     "greater_than", "greater_or_equal", "less_than", "less_or_equal",
 }
