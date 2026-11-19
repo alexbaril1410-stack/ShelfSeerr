@@ -104,9 +104,13 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
   const activeSearchRef = useRef(false);
   const loadingMoreRef = useRef(false);
   const loadedPagesRef = useRef<Set<number>>(new Set());
+  const searchAbortControllerRef = useRef<AbortController | null>(null);
+  const loadMoreAbortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => () => {
     searchGenerationRef.current += 1;
+    searchAbortControllerRef.current?.abort();
+    loadMoreAbortControllerRef.current?.abort();
   }, []);
 
   const getBookIdentity = useCallback((book: Book): string => {
@@ -209,9 +213,14 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       sort?: string;
     }) => {
       const generation = ++searchGenerationRef.current;
+      searchAbortControllerRef.current?.abort();
+      loadMoreAbortControllerRef.current?.abort();
+      const abortController = new AbortController();
+      searchAbortControllerRef.current = abortController;
       activeSearchRef.current = true;
       loadedPagesRef.current = new Set();
       loadingMoreRef.current = false;
+      setIsSearching(true);
       const effectiveContentType = contentTypeOverride ?? contentType;
       const searchMode = (searchModeOverride ?? config?.search_mode) || 'universal';
 
@@ -240,7 +249,6 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           return;
         }
 
-        setIsSearching(true);
         setLastSearchQuery(query);
         // Reset pagination for new search. directTotalResults belongs to direct mode
         // and is never written here, so without clearing it a count from an earlier
@@ -259,8 +267,9 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
             1,
             effectiveContentType,
             providerOverride,
+            { signal: abortController.signal },
           );
-          if (generation !== searchGenerationRef.current) return;
+          if (generation !== searchGenerationRef.current || abortController.signal.aborted) return;
           if (result.books.length > 0) {
             setBooks(result.books);
             setHasMore(result.hasMore);
@@ -281,6 +290,8 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
             };
             loadedPagesRef.current.add(1);
           } else {
+            // An empty response is a valid result set; preserve the prior cards while
+            // the replacement request is pending, then show the empty state on success.
             setBooks([]);
             setHasMore(false);
             setTotalFound(0);
@@ -289,11 +300,12 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
             showToast('No results found', 'error');
           }
         } catch (error) {
-          if (generation !== searchGenerationRef.current) return;
+          if (generation !== searchGenerationRef.current || abortController.signal.aborted) return;
           handleSearchError(error, 'Search failed');
         } finally {
           if (generation === searchGenerationRef.current) {
             activeSearchRef.current = false;
+            searchAbortControllerRef.current = null;
             setIsSearching(false);
           }
         }
@@ -302,16 +314,17 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
 
       // Direct mode: require a query
       if (!query) {
+        activeSearchRef.current = false;
+        setIsSearching(false);
         setBooks([]);
         setLastSearchQuery('');
         return;
       }
-      setIsSearching(true);
       setLastSearchQuery(query);
 
       try {
-        const { books: results, totalResults } = await searchBooks(query);
-        if (generation !== searchGenerationRef.current) return;
+        const { books: results, totalResults } = await searchBooks(query, abortController.signal);
+        if (generation !== searchGenerationRef.current || abortController.signal.aborted) return;
 
         if (results.length > 0) {
           // When no explicit server-side sort is selected (empty or "downloads"),
@@ -327,7 +340,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           setDirectTotalResults(null);
         }
       } catch (error) {
-        if (generation !== searchGenerationRef.current) return;
+        if (generation !== searchGenerationRef.current || abortController.signal.aborted) return;
         if (error instanceof AuthenticationError) {
           handleSearchError(error, 'Search failed');
         } else {
@@ -354,6 +367,10 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
   const handleResetSearch = useCallback(
     (config: AppConfig | null) => {
       searchGenerationRef.current += 1;
+      searchAbortControllerRef.current?.abort();
+      loadMoreAbortControllerRef.current?.abort();
+      searchAbortControllerRef.current = null;
+      loadMoreAbortControllerRef.current = null;
       activeSearchRef.current = false;
       loadingMoreRef.current = false;
       loadedPagesRef.current.clear();
@@ -410,6 +427,9 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       if (loadedPagesRef.current.has(nextPage)) return;
 
       const generation = searchGenerationRef.current;
+      const abortController = new AbortController();
+      loadMoreAbortControllerRef.current?.abort();
+      loadMoreAbortControllerRef.current = abortController;
       loadingMoreRef.current = true;
       setIsLoadingMore(true);
 
@@ -422,8 +442,9 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           nextPage,
           searchContentType,
           providerOverride,
+          { signal: abortController.signal },
         );
-        if (generation !== searchGenerationRef.current) return;
+        if (generation !== searchGenerationRef.current || abortController.signal.aborted) return;
         if (result.books.length > 0) {
           setBooks((prev) => {
             const identities = new Set(prev.map(getBookIdentity));
@@ -442,12 +463,13 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           setHasMore(false);
         }
       } catch (error) {
-        if (generation === searchGenerationRef.current) {
+        if (generation === searchGenerationRef.current && !abortController.signal.aborted) {
           handleSearchError(error, 'Failed to load more results');
         }
       } finally {
         if (generation === searchGenerationRef.current) {
           loadingMoreRef.current = false;
+          loadMoreAbortControllerRef.current = null;
           setIsLoadingMore(false);
         }
       }
