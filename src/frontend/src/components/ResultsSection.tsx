@@ -146,6 +146,8 @@ export const ResultsSection = ({
               buttonState={buttonState}
               animationDelay={animationDelay}
               showSeriesPosition={book.series_position != null}
+              activeTouchCardId={activeTouchCardId}
+              onActivateTouchCard={setActiveTouchCardId}
             />
           );
         })}
