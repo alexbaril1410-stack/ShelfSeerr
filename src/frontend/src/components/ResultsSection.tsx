@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLatestCallback } from '../hooks/useLatestCallback';
 
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSearchMode } from '../contexts/SearchModeContext';
@@ -62,6 +63,9 @@ export const ResultsSection = ({
     : GRID_CLASSES.ebook;
   const loadMoreSentinelRef = useRef<HTMLDivElement | null>(null);
   const [activeTouchCardId, setActiveTouchCardId] = useState<string | null>(null);
+  const onDetailsLatest = useLatestCallback(onDetails);
+  const onDownloadLatest = useLatestCallback(onDownload);
+  const onGetReleasesLatest = useLatestCallback(onGetReleases);
 
   useEffect(() => {
     if (searchMode !== 'universal' || !hasMore || !onLoadMore || isLoadingMore) return;
@@ -144,9 +148,9 @@ export const ResultsSection = ({
               key={book.id}
               book={book}
               contentType={contentType}
-              onDetails={onDetails}
-              onDownload={onDownload}
-              onGetReleases={onGetReleases}
+              onDetails={onDetailsLatest}
+              onDownload={onDownloadLatest}
+              onGetReleases={onGetReleasesLatest}
               buttonState={buttonState}
               animationDelay={animationDelay}
               imageLoading={imageLoading}
