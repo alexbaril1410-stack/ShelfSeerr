@@ -134,13 +134,6 @@ export const SearchSection = ({
     };
   }, [isAdmin, showDiscoveryShelves]);
 
-  const scrollRecentRequests = (direction: -1 | 1) => {
-    requestsRailRef.current?.scrollBy({
-      left: direction * Math.max(320, requestsRailRef.current.clientWidth * 0.8),
-      behavior: 'smooth',
-    });
-  };
-
   const onDiscoveryBookSelectLatest = useLatestCallback(onDiscoveryBookSelect);
   const onDiscoveryGetReleasesLatest = useLatestCallback(onDiscoveryGetReleases);
 
