@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useSearchMode } from '../../contexts/SearchModeContext';
@@ -26,7 +26,25 @@ interface CardViewProps {
   onActivateTouchCard: (id: string) => void;
 }
 
-export const CardView = ({
+const sameButtonState = (left: ButtonStateInfo, right: ButtonStateInfo): boolean =>
+  left === right ||
+  (left.state === right.state && left.text === right.text && left.progress === right.progress);
+
+const areCardViewPropsEqual = (previous: CardViewProps, next: CardViewProps): boolean =>
+  previous.book === next.book &&
+  previous.contentType === next.contentType &&
+  previous.onDetails === next.onDetails &&
+  previous.onDownload === next.onDownload &&
+  previous.onGetReleases === next.onGetReleases &&
+  sameButtonState(previous.buttonState, next.buttonState) &&
+  previous.animationDelay === next.animationDelay &&
+  previous.imageLoading === next.imageLoading &&
+  previous.imagePriority === next.imagePriority &&
+  previous.showSeriesPosition === next.showSeriesPosition &&
+  previous.activeTouchCardId === next.activeTouchCardId &&
+  previous.onActivateTouchCard === next.onActivateTouchCard;
+
+export const CardView = memo(({
   book,
   contentType,
   onDetails,
@@ -277,5 +295,5 @@ export const CardView = ({
 
     </article>
   );
-};
+}, areCardViewPropsEqual);
 
