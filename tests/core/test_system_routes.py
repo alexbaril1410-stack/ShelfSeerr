@@ -30,7 +30,7 @@ def client(main_module):
 def dist(main_module, tmp_path: Path):
     """A throwaway frontend build in place of the real `frontend-dist`."""
     (tmp_path / "assets").mkdir()
-    (tmp_path / "assets" / "app.js").write_text("console.log(1)")
+    (tmp_path / "assets" / "app-a1b2c3d4.js").write_text("console.log(1)")
     (tmp_path / "index.html").write_text(_INDEX)
     (tmp_path / "logo.png").write_bytes(b"\x89PNG")
     (tmp_path / "favicon.ico").write_bytes(b"ico")
@@ -50,6 +50,7 @@ def test_index_serves_the_app_with_the_default_base_tag(client, dist):
     assert resp.status_code == 200
     assert resp.mimetype == "text/html"
     assert resp.get_data(as_text=True) == _INDEX
+    assert resp.headers["Cache-Control"] == "no-store"
 
 
 def test_index_rewrites_the_base_tag_for_a_subpath(main_module, client, dist):
@@ -81,10 +82,11 @@ def test_catch_all_keeps_unknown_api_paths_a_404(client, dist, path):
 
 
 def test_assets_are_served_from_the_build(client, dist):
-    resp = client.get("/assets/app.js")
+    resp = client.get("/assets/app-a1b2c3d4.js")
 
     assert resp.status_code == 200
     assert resp.get_data(as_text=True) == "console.log(1)"
+    assert resp.headers["Cache-Control"] == "public, max-age=31536000"
 
 
 def test_a_missing_asset_is_a_404_not_the_app(client, dist):
