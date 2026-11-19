@@ -102,6 +102,7 @@ export const SearchSection = ({
   const [recentRequests, setRecentRequests] = useState<RequestRecord[]>([]);
   const [requestsLoading, setRequestsLoading] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [activeDiscoveryCardId, setActiveDiscoveryCardId] = useState<string | null>(null);
   const requestsRailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -309,6 +310,8 @@ export const SearchSection = ({
             books={shelf.books}
             isLoading={isDiscoveryLoading}
             isTouchDevice={isTouchDevice}
+            activeDiscoveryCardId={activeDiscoveryCardId}
+            onActivateCard={setActiveDiscoveryCardId}
             getButtonState={getDiscoveryButtonStateLatest}
             onBookSelect={onDiscoveryBookSelectLatest}
             onGetReleases={onDiscoveryGetReleasesLatest}
