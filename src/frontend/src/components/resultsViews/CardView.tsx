@@ -41,7 +41,8 @@ const areCardViewPropsEqual = (previous: CardViewProps, next: CardViewProps): bo
   previous.imageLoading === next.imageLoading &&
   previous.imagePriority === next.imagePriority &&
   previous.showSeriesPosition === next.showSeriesPosition &&
-  previous.activeTouchCardId === next.activeTouchCardId &&
+  (previous.activeTouchCardId === previous.book.id) ===
+    (next.activeTouchCardId === next.book.id) &&
   previous.onActivateTouchCard === next.onActivateTouchCard;
 
 export const CardView = memo(({
