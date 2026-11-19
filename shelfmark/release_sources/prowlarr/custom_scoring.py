@@ -176,14 +176,27 @@ def release_title_matches_book(release: Release, book: Any) -> bool:
 
 
 def _is_multi_volume_bundle(release: Release, book: Any) -> str | None:
-    """Return the volume range for a bundle in the requested series."""
+    """Return the volume range for a bundle in the requested series.
+
+    Release names use several separators, including T01-T04, T01 à T04
+    and tracker-normalized forms such as T01.a.T04. Accept punctuation around
+    the range connector, but require explicit volume markers to avoid interpreting
+    years or unrelated numeric ranges as a compilation.
+    """
     series_name = getattr(book, "series_name", None)
     if not series_name:
         return None
     title = str(release.title or "")
     if not _contains_title(_title_tokens(title), _title_tokens(series_name)):
         return None
-    match = re.search(r"\b(?:t|tome|vol(?:ume)?)\.?\s*0*\d{1,2}\s*[-–—à]\s*(?:t|tome|vol(?:ume)?)?\.?\s*0*\d{1,2}\b", title, re.I)
+
+    volume_range = re.compile(
+        r"\b(?:tome|tom[eé]|t|vol(?:ume)?)\.?[\s._-]*0*\d{1,2}"
+        r"[\s._-]*(?:à|a|to|[-–—])[\s._-]*"
+        r"(?:tome|tom[eé]|t|vol(?:ume)?)?\.?[\s._-]*0*\d{1,2}\b",
+        re.I,
+    )
+    match = volume_range.search(title)
     return match.group(0) if match else None
 
 def _release_language_signal(release: Release) -> str | None:
@@ -215,6 +228,10 @@ def _actual(release: Release, field: str, book: Any) -> object | None:
     if field == "series":
         return _first(extra.get("series_name"), extra.get("series"))
     if field == "volume":
+        # A compilation is not an individual volume, even when its first volume
+        # matches the requested one (for example T01-T04 while requesting T01).
+        if _is_multi_volume_bundle(release, book):
+            return None
         value = _first(extra.get("series_position"), extra.get("volume"))
         if value is not None:
             return value
