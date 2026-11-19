@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { DEFAULT_SUPPORTED_FORMATS } from '../data/languages';
@@ -99,6 +99,23 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
   const [resultsSourceUrl, setResultsSourceUrl] = useState<string | undefined>();
   const [resultsSourceTitle, setResultsSourceTitle] = useState<string | undefined>();
 
+  // Guard UI state against out-of-order search responses and overlapping pagination.
+  const searchGenerationRef = useRef(0);
+  const activeSearchRef = useRef(false);
+  const loadingMoreRef = useRef(false);
+  const loadedPagesRef = useRef<Set<number>>(new Set());
+
+  useEffect(() => () => {
+    searchGenerationRef.current += 1;
+  }, []);
+
+  const getBookIdentity = useCallback((book: Book): string => {
+    const provider = book.provider ?? '';
+    const providerId = book.provider_id ?? '';
+    if (provider && providerId) return `${provider}:${providerId}`;
+    return `${provider}:${book.title}:${book.author ?? ''}:${book.language ?? ''}`;
+  }, []);
+
   // Store last search params for loadMore
   const lastSearchParamsRef = useRef<{
     query: string;
@@ -191,6 +208,10 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       providerOverride?: string;
       sort?: string;
     }) => {
+      const generation = ++searchGenerationRef.current;
+      activeSearchRef.current = true;
+      loadedPagesRef.current = new Set();
+      loadingMoreRef.current = false;
       const effectiveContentType = contentTypeOverride ?? contentType;
       const searchMode = (searchModeOverride ?? config?.search_mode) || 'universal';
 
@@ -215,6 +236,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           setResultsSourceUrl(undefined);
           setResultsSourceTitle(undefined);
           lastSearchParamsRef.current = null;
+          activeSearchRef.current = false;
           return;
         }
 
@@ -238,6 +260,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
             effectiveContentType,
             providerOverride,
           );
+          if (generation !== searchGenerationRef.current) return;
           if (result.books.length > 0) {
             setBooks(result.books);
             setHasMore(result.hasMore);
@@ -256,6 +279,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
               providerOverride,
               contentType: effectiveContentType,
             };
+            loadedPagesRef.current.add(1);
           } else {
             setBooks([]);
             setHasMore(false);
@@ -265,9 +289,13 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
             showToast('No results found', 'error');
           }
         } catch (error) {
+          if (generation !== searchGenerationRef.current) return;
           handleSearchError(error, 'Search failed');
         } finally {
-          setIsSearching(false);
+          if (generation === searchGenerationRef.current) {
+            activeSearchRef.current = false;
+            setIsSearching(false);
+          }
         }
         return;
       }
@@ -283,6 +311,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
 
       try {
         const { books: results, totalResults } = await searchBooks(query);
+        if (generation !== searchGenerationRef.current) return;
 
         if (results.length > 0) {
           // When no explicit server-side sort is selected (empty or "downloads"),
@@ -298,6 +327,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           setDirectTotalResults(null);
         }
       } catch (error) {
+        if (generation !== searchGenerationRef.current) return;
         if (error instanceof AuthenticationError) {
           handleSearchError(error, 'Search failed');
         } else {
@@ -305,7 +335,10 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           showToast(describeSearchFailure(error), 'error');
         }
       } finally {
-        setIsSearching(false);
+        if (generation === searchGenerationRef.current) {
+          activeSearchRef.current = false;
+          setIsSearching(false);
+        }
       }
     },
     [
@@ -320,6 +353,11 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
 
   const handleResetSearch = useCallback(
     (config: AppConfig | null) => {
+      searchGenerationRef.current += 1;
+      activeSearchRef.current = false;
+      loadingMoreRef.current = false;
+      loadedPagesRef.current.clear();
+      setIsSearching(false);
       setBooks([]);
       setSearchInput('');
       setShowAdvanced(false);
@@ -359,7 +397,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       const searchMode = (searchModeOverride ?? config?.search_mode) || 'universal';
       if (searchMode !== 'universal') return;
       if (!lastSearchParamsRef.current) return;
-      if (isLoadingMore || !hasMore) return;
+      if (loadingMoreRef.current || isLoadingMore || activeSearchRef.current || !hasMore) return;
 
       const {
         query,
@@ -369,7 +407,10 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
         contentType: searchContentType,
       } = lastSearchParamsRef.current;
       const nextPage = currentPage + 1;
+      if (loadedPagesRef.current.has(nextPage)) return;
 
+      const generation = searchGenerationRef.current;
+      loadingMoreRef.current = true;
       setIsLoadingMore(true);
 
       try {
@@ -382,20 +423,36 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
           searchContentType,
           providerOverride,
         );
+        if (generation !== searchGenerationRef.current) return;
         if (result.books.length > 0) {
-          setBooks((prev) => [...prev, ...result.books]);
+          setBooks((prev) => {
+            const identities = new Set(prev.map(getBookIdentity));
+            const additions = result.books.filter((book) => {
+              const identity = getBookIdentity(book);
+              if (identities.has(identity)) return false;
+              identities.add(identity);
+              return true;
+            });
+            return additions.length > 0 ? [...prev, ...additions] : prev;
+          });
           setHasMore(result.hasMore);
           setCurrentPage(nextPage);
+          loadedPagesRef.current.add(nextPage);
         } else {
           setHasMore(false);
         }
       } catch (error) {
-        handleSearchError(error, 'Failed to load more results');
+        if (generation === searchGenerationRef.current) {
+          handleSearchError(error, 'Failed to load more results');
+        }
       } finally {
-        setIsLoadingMore(false);
+        if (generation === searchGenerationRef.current) {
+          loadingMoreRef.current = false;
+          setIsLoadingMore(false);
+        }
       }
     },
-    [currentPage, hasMore, isLoadingMore, handleSearchError],
+    [currentPage, hasMore, isLoadingMore, handleSearchError, getBookIdentity],
   );
 
   return {
