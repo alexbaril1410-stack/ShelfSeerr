@@ -152,7 +152,7 @@ def test_string_operators_are_case_insensitive_and_regex_works():
         {"codec": "flac"},
     ).state == MatchState.MATCH
     assert evaluate_conditions(
-        Condition(field="title", operator="regex", value=r"tome\\s+0?2"),
+        Condition(field="title", operator="regex", value=r"tome\s+0?2"),
         {"title": "Saga - Tome 02"},
     ).state == MatchState.MATCH
     assert evaluate_conditions(
