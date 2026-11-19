@@ -80,7 +80,7 @@ export const CardView = ({
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- mouse handlers drive a decorative hover shadow only; no interactive behavior requiring keyboard support
     <article
-      className={`book-card space-between animate-pop-up relative flex h-full w-full flex-col transition-shadow duration-300 max-sm:h-[180px] max-sm:flex-row sm:flex-col ${isAudiobook ? 'sm:max-w-[220px]' : 'sm:max-w-[176px]'}`}
+      className={`book-card space-between animate-pop-up relative flex h-full w-full flex-col transition-shadow duration-300 ${isAudiobook ? 'max-w-[220px]' : 'max-w-[176px]'}`}
       style={{
         background: 'var(--bg-soft)',
         borderRadius: '.75rem',
@@ -93,7 +93,7 @@ export const CardView = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`relative w-full max-sm:h-full max-sm:shrink-0 sm:w-full ${isAudiobook ? 'max-sm:w-[160px]' : 'max-sm:w-[120px]'}`}
+        className="relative w-full"
         style={{ aspectRatio: book.cover_aspect === 'square' ? '1/1' : '2/3' }}
         onClick={() => {
           const isTouchLayout =
@@ -118,7 +118,7 @@ export const CardView = ({
         tabIndex={0}
         aria-label={detailsLabel}
       >
-        <div className="absolute inset-0 overflow-hidden max-sm:rounded-l-[.75rem] sm:rounded-t-[.75rem]">
+        <div className="absolute inset-0 overflow-hidden rounded-t-[.75rem]">
           {/* Series position badge: shown with the card information */}
           {showSeriesPosition && book.series_position != null && (
             <div
@@ -211,7 +211,7 @@ export const CardView = ({
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 p-4 max-sm:min-w-0 max-sm:flex-1 max-sm:justify-between max-sm:gap-2 max-sm:p-3 max-sm:py-2 sm:hidden">
+      <div className="hidden">
         <div className="space-y-1 max-sm:min-w-0 max-sm:space-y-0.5">
           <h3
             className="line-clamp-2 text-base leading-tight font-semibold max-sm:line-clamp-3 max-sm:min-w-0"
