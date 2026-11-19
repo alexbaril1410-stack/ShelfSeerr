@@ -206,3 +206,58 @@ def evaluate_conditions(
         required_failures=tuple(failures),
         required_unknown=tuple(unknown),
     )
+
+
+def build_release_metadata(release: Any) -> dict[str, Any]:
+    """Project known Release fields into the stable custom-format field vocabulary.
+
+    Unknown/unavailable fields are omitted so the evaluator can preserve UNKNOWN.
+    This adapter intentionally does not infer a volume from a title or guess audio
+    properties from a filename.
+    """
+    extra = getattr(release, "extra", None)
+    extra = extra if isinstance(extra, Mapping) else {}
+    metadata: dict[str, Any] = {}
+
+    direct_fields = {
+        "title": getattr(release, "title", None),
+        "format": getattr(release, "format", None),
+        "language": getattr(release, "language", None),
+        "indexer": getattr(release, "indexer", None),
+    }
+    extra_fields = {
+        "series": extra.get("series_name") or extra.get("series"),
+        "author": extra.get("author"),
+        "volume": extra.get("volume") or extra.get("series_position"),
+        "multi_volume_bundle": extra.get("multi_volume_bundle"),
+        "codec": extra.get("codec"),
+        "sample_rate": extra.get("sample_rate"),
+        "channels": extra.get("channels"),
+        "duration": extra.get("duration"),
+    }
+
+    bitrate = extra.get("bitrate_value")
+    if bitrate is None:
+        bitrate = extra.get("bitrate")
+    if bitrate is not None:
+        extra_fields["bitrate"] = bitrate
+
+    for field_name, value in (direct_fields | extra_fields).items():
+        if value is not None and not (isinstance(value, str) and not value.strip()):
+            metadata[field_name] = value
+
+    return metadata
+
+
+def build_book_context(book: Any, requested_volume: Any = None) -> dict[str, Any]:
+    """Build the supported dynamic values used by custom-format placeholders."""
+    context: dict[str, Any] = {}
+    author = getattr(book, "search_author", None)
+    if not author:
+        authors = getattr(book, "authors", None) or []
+        author = ", ".join(str(item) for item in authors if item)
+    if author:
+        context["book_author"] = author
+    if requested_volume is not None:
+        context["requested_volume"] = requested_volume
+    return context
