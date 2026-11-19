@@ -2760,6 +2760,7 @@ class HardcoverProvider(MetadataProvider):
             has_more=False,
         )
 
+    @cacheable(ttl_key="METADATA_CACHE_SEARCH_TTL", ttl_default=300, key_prefix="hardcover:catalogue:v1")
     def _search_catalogue(self, options: MetadataSearchOptions) -> SearchResult:
         """Fetch a sorted public catalogue page using Hardcover's GraphQL API."""
         page = max(1, options.page)
