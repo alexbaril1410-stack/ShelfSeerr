@@ -161,19 +161,37 @@ def test_multi_volume_bundle_remains_visible_but_receives_large_penalty(monkeypa
 
     values = {
         "CUSTOM_SCORES_EBOOKS_ENABLED": True,
-        "CUSTOM_SCORES_EBOOK_RULES": [{"enabled": True, "name": "Compilation de plusieurs tomes", "field": "multi_volume_bundle", "operator": "equals", "value": "true", "score": -500}],
+        "CUSTOM_SCORES_EBOOK_RULES": [
+            {"enabled": True, "name": "Tome demandé", "field": "volume", "operator": "equals", "value": "{{requested_volume}}", "score": 300},
+            {"enabled": True, "name": "Compilation de plusieurs tomes", "field": "multi_volume_bundle", "operator": "equals", "value": "true", "score": -500},
+        ],
     }
     monkeypatch.setattr(scoring.config, "get", lambda key, default=None: values.get(key, default))
 
     book = _book("L'Ogive du jugement dernier", "Matt Dinniman")
     book.series_name = "Dungeon Crawler Carl"
-    book.series_position = 2
-    release = _release("Matt.Dinniman.Dungeon.Crawler.Carl.T01-T04.FRENCH.EPUB-NoTAG")
+    book.series_position = 1
 
-    assert score_release(release, book, "ebook") == -500
-    assert release.extra["custom_score_breakdown"][0]["name"] == "Compilation de plusieurs tomes"
-    values["CUSTOM_SCORES_EBOOK_RULES"][0]["enabled"] = False
-    assert score_release(release, book, "ebook") == 0
-    values["CUSTOM_SCORES_EBOOK_RULES"][0]["enabled"] = True
-    values["CUSTOM_SCORES_EBOOK_RULES"][0]["score"] = -250
-    assert score_release(release, book, "ebook") == -250
+    # Cover the common separators used by trackers, including the dotted
+    # normalization visible in the reported T01.a.T04 release.
+    for title in (
+        "Matt.Dinniman.Dungeon.Crawler.Carl.T01-T04.FRENCH.EPUB-NoTAG",
+        "Matt.Dinniman.Dungeon.Crawler.Carl.T01.a.T04.FRENCH.EPUB-NoTAG",
+        "Matt.Dinniman.Dungeon.Crawler.Carl.T01 à T04.FRENCH.EPUB-NoTAG",
+        "Matt.Dinniman.Dungeon.Crawler.Carl.T01.to.T04.FRENCH.EPUB-NoTAG",
+    ):
+        release = _release(title)
+        assert score_release(release, book, "ebook") == -500
+        assert release.extra["custom_score_breakdown"] == [
+            {
+                "name": "Compilation de plusieurs tomes",
+                "field": "multi_volume_bundle",
+                "score": -500,
+                "matched_value": "true",
+            }
+        ]
+
+    # Disabling the bundle rule removes only its penalty; the compilation
+    # still must not receive the +300 points for an individual requested tome.
+    values["CUSTOM_SCORES_EBOOK_RULES"][1]["enabled"] = False
+    assert score_release(_release("Dungeon.Crawler.Carl.T01.a.T04.FR.EPUB"), book, "ebook") == 0
