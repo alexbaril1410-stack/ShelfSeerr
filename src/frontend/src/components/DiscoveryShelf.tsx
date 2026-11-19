@@ -21,7 +21,7 @@ interface DiscoveryShelfProps {
   isTouchDevice: boolean;
   activeDiscoveryCardId: string | null;
   onActivateCard: (id: string | null) => void;
-  getButtonState: (book: Book) => ButtonStateInfo;
+  getButtonState: (bookId: string) => ButtonStateInfo;
   onBookSelect: (book: Book) => void;
   onGetReleases: (book: Book) => Promise<void>;
 }
@@ -254,7 +254,7 @@ export const DiscoveryShelf = memo(({
                 isAudiobook={isAudiobook}
                 isTouchDevice={isTouchDevice}
                 isActive={activeDiscoveryCardId === shelfKey + ':' + book.id}
-                buttonState={getButtonStateLatest(book)}
+                buttonState={getButtonStateLatest(book.id)}
                 onActivate={activateCard}
                 onSelect={onBookSelectLatest}
                 onGetReleases={onGetReleasesLatest}
