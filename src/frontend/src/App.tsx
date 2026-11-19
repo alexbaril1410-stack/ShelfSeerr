@@ -2853,7 +2853,7 @@ function App() {
             isDiscoveryLoading={isDiscoveryLoading}
             onDiscoveryBookSelect={handleDiscoveryBookSelect}
             onDiscoveryGetReleases={handleGetReleases}
-            getDiscoveryButtonState={(book) => getUniversalActionButtonState(book.id)}
+            getDiscoveryButtonState={getUniversalActionButtonState}
             searchPageTitle={config?.search_page_title || 'ShelfSeerr'}
             bookLanguages={bookLanguages}
             defaultLanguage={defaultLanguageCodes}
