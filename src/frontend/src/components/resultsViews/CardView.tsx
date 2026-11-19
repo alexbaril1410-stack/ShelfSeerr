@@ -93,7 +93,11 @@ export const CardView = ({
         animationDelay: `${animationDelay}ms`,
         animationFillMode: 'both',
       }}
-      onMouseEnter={() => setIsHovered(true)}
+      onMouseEnter={() => {
+        if (typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+          setIsHovered(true);
+        }
+      }}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
