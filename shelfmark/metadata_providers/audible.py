@@ -14,6 +14,7 @@ from urllib.parse import quote
 import requests
 import re
 
+from shelfmark.core.cache import cacheable
 from shelfmark.core.config import config as app_config
 from shelfmark.core.logger import setup_logger
 from shelfmark.core.settings_registry import (
@@ -537,9 +538,32 @@ class AudibleProvider(MetadataProvider):
         page: int = 1,
         user_id: int | None = None,
     ) -> SearchResult:
-        """Load one page of Audible's native French popularity/bestseller charts."""
-        safe_limit = max(1, min(limit, 40))
-        safe_page = max(1, page)
+        """Load a cached page of Audible's native popularity/bestseller charts."""
+        return self._discover_cached(
+            self.marketplace, self.french_only, section, max(1, min(limit, 40)), max(1, page)
+        )
+
+    @cacheable(ttl_key="METADATA_CACHE_SEARCH_TTL", ttl_default=300, key_prefix="audible:charts:v1")
+    def _discover_cached(
+        self,
+        marketplace: str,
+        french_only: bool,
+        section: str,
+        limit: int,
+        page: int,
+    ) -> SearchResult:
+        """Cache chart pages by marketplace and language-filter configuration."""
+        return self._discover_uncached(marketplace, french_only, section, limit, page)
+
+    def _discover_uncached(
+        self,
+        marketplace: str,
+        french_only: bool,
+        section: str,
+        safe_limit: int,
+        safe_page: int,
+    ) -> SearchResult:
+        """Fetch one page of Audible's native French popularity/bestseller charts."""
         chart_paths = {
             "popular": "/charts?scoringSystem=popular&searchLanguage=french",
             "trending": "/charts/best?scoringSystem=bestSeller&searchLanguage=french",
@@ -548,7 +572,7 @@ class AudibleProvider(MetadataProvider):
         if not chart_path:
             return SearchResult(books=[], page=safe_page, total_found=0, has_more=False)
 
-        chart_url = f"https://www.audible.{self.marketplace}{chart_path}"
+        chart_url = f"https://www.audible.{marketplace}{chart_path}"
         try:
             response = requests.get(
                 chart_url,
@@ -564,7 +588,7 @@ class AudibleProvider(MetadataProvider):
             parser.feed(response.text)
             parser.close()
         except (requests.RequestException, ValueError) as exc:
-            logger.warning("Audible %s chart request failed (%s): %s", section, self.marketplace, exc)
+            logger.warning("Audible %s chart request failed (%s): %s", section, marketplace, exc)
             return SearchResult(books=[], page=safe_page, total_found=0, has_more=False)
 
         # The same first 20 ASINs are used by the homepage shelf and the Tendances
@@ -587,10 +611,10 @@ class AudibleProvider(MetadataProvider):
             product = products_by_asin.get(asin.upper())
             if not product:
                 continue
-            book = _parse_product(product, self.marketplace)
+            book = _parse_product(product, marketplace)
             if not book:
                 continue
-            if self.french_only and not _is_french_language(book.language):
+            if french_only and not _is_french_language(book.language):
                 continue
             books.append(book)
 
@@ -613,11 +637,19 @@ class AudibleProvider(MetadataProvider):
 
 
     def get_search_field_options(self, field_key: str, query: str | None = None) -> list[dict[str, str]]:
-        """Return Audible series suggestions without changing the existing series workflow."""
-        if field_key != "series" or len((query or "").strip()) < 2:
+        """Return cached Audible series suggestions."""
+        normalized_query = (query or "").strip()
+        if field_key != "series" or len(normalized_query) < 2:
             return []
+        return self._series_options_cached(self.marketplace, normalized_query)
+
+    @cacheable(ttl=120, key_prefix="audible:series:options:v1")
+    def _series_options_cached(
+        self, marketplace: str, query: str
+    ) -> list[dict[str, str]]:
+        """Cache series typeahead by marketplace and normalized query."""
         payload = self._request("catalog/products", {
-            "keywords": (query or "").strip(),
+            "keywords": query,
             "num_results": 50,
             "response_groups": "series,product_attrs",
         })
@@ -641,7 +673,34 @@ class AudibleProvider(MetadataProvider):
         return options[:15]
 
     def _fetch_series_books(self, series_asin: str, page: int, limit: int) -> SearchResult:
-        """Load one French-preferred edition per numbered Audible series volume."""
+        """Load a cached page of one French-preferred edition per series volume."""
+        return self._fetch_series_books_cached(
+            self.marketplace, self.french_only, series_asin, page, limit
+        )
+
+    @cacheable(ttl_key="METADATA_CACHE_SEARCH_TTL", ttl_default=300, key_prefix="audible:series:books:v1")
+    def _fetch_series_books_cached(
+        self,
+        marketplace: str,
+        french_only: bool,
+        series_asin: str,
+        page: int,
+        limit: int,
+    ) -> SearchResult:
+        """Cache series pages independently for each marketplace and language setting."""
+        return self._fetch_series_books_uncached(
+            marketplace, french_only, series_asin, page, limit
+        )
+
+    def _fetch_series_books_uncached(
+        self,
+        marketplace: str,
+        french_only: bool,
+        series_asin: str,
+        page: int,
+        limit: int,
+    ) -> SearchResult:
+        """Fetch one French-preferred edition per series volume."""
         empty = SearchResult(books=[], page=page, total_found=0, has_more=False)
         payload = self._request("catalog/products", {
             "asins": series_asin,
@@ -709,7 +768,7 @@ class AudibleProvider(MetadataProvider):
                 product = products.get(asin.upper())
                 if not product:
                     continue
-                book = _parse_product(product, self.marketplace)
+                book = _parse_product(product, marketplace)
                 if not book:
                     continue
                 release = _release_date(product)
@@ -724,7 +783,7 @@ class AudibleProvider(MetadataProvider):
             if not candidates:
                 continue
             _rank, chosen = max(candidates, key=lambda item: item[0])
-            if self.french_only and not _is_french_language(chosen.language):
+            if french_only and not _is_french_language(chosen.language):
                 continue
             selected.append((position, chosen))
 
