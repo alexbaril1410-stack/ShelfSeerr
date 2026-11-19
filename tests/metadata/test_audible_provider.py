@@ -716,3 +716,25 @@ def test_audible_series_suggestions_are_cached_by_marketplace(monkeypatch):
     ]
     assert len(calls) == 1
     cache.clear()
+
+
+def test_audible_book_details_are_cached_by_marketplace(monkeypatch):
+    cache = get_metadata_cache()
+    cache.clear()
+    provider = AudibleProvider(marketplace="fr")
+    calls = []
+
+    def fake_request(path, params):
+        calls.append((path, dict(params)))
+        return {"products": [
+            {"asin": "B0BOOKCACHE1", "title": "Livre audio", "language": "French"}
+        ]}
+
+    monkeypatch.setattr(provider, "_request", fake_request)
+    first = provider.get_book("b0bookcache1")
+    second = provider.get_book("B0BOOKCACHE1")
+
+    assert first is not None and second is not None
+    assert first.provider_id == second.provider_id == "B0BOOKCACHE1"
+    assert len(calls) == 1
+    cache.clear()
