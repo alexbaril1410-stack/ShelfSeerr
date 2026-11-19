@@ -220,6 +220,7 @@ export function useSearch(options: UseSearchOptions): UseSearchReturn {
       activeSearchRef.current = true;
       loadedPagesRef.current = new Set();
       loadingMoreRef.current = false;
+      setIsLoadingMore(false);
       setIsSearching(true);
       const effectiveContentType = contentTypeOverride ?? contentType;
       const searchMode = (searchModeOverride ?? config?.search_mode) || 'universal';
