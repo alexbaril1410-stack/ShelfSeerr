@@ -54,7 +54,6 @@ export const ResultsSection = ({
   isLoadingMore,
   onLoadMore,
   directTotalResults,
-  onShowToast,
 }: ResultsSectionProps) => {
   const { t } = useLanguage();
   const { searchMode } = useSearchMode();
