@@ -195,9 +195,18 @@ async function fetchJSON<T>(
   opts: RequestInit = {},
   timeoutMs: number | null = DEFAULT_TIMEOUT_MS,
 ): Promise<T> {
-  const controller = new AbortController();
+  const timeoutController = new AbortController();
+  const externalSignal = opts.signal;
+  const abortFromExternal = () => timeoutController.abort(externalSignal?.reason);
+  if (externalSignal?.aborted) {
+    abortFromExternal();
+  } else {
+    externalSignal?.addEventListener('abort', abortFromExternal, { once: true });
+  }
   const timeoutId =
-    timeoutMs && timeoutMs > 0 ? setTimeout(() => controller.abort(), timeoutMs) : null;
+    timeoutMs && timeoutMs > 0
+      ? setTimeout(() => timeoutController.abort(new DOMException('Request timed out', 'TimeoutError')), timeoutMs)
+      : null;
   const headers = new Headers(opts.headers);
   if (!headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json');
@@ -207,7 +216,7 @@ async function fetchJSON<T>(
     const res = await fetch(url, {
       ...opts,
       credentials: 'include', // Enable cookies for session
-      signal: controller.signal,
+      signal: timeoutController.signal,
       headers,
     });
 
@@ -265,8 +274,11 @@ async function fetchJSON<T>(
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- fetch() returns untyped JSON; callers provide the expected response shape at the boundary
     return res.json();
   } catch (error) {
-    // Handle abort/timeout errors
-    if (error instanceof Error && error.name === 'AbortError') {
+    // Preserve caller cancellation as cancellation, distinct from a request timeout.
+    if (externalSignal?.aborted) {
+      throw error;
+    }
+    if (timeoutController.signal.aborted) {
       throw new TimeoutError(
         'Request timed out. Check your network connection or proxy configuration.',
       );
@@ -276,6 +288,7 @@ async function fetchJSON<T>(
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
+    externalSignal?.removeEventListener('abort', abortFromExternal);
   }
 }
 
@@ -357,6 +370,61 @@ export const discoverMetadata = async (
   return (response.books || []).map(transformMetadataToBook);
 };
 
+export interface MetadataSearchOptions {
+  signal?: AbortSignal;
+  cacheTtlMs?: number;
+}
+
+const METADATA_SEARCH_CACHE_TTL_MS = 60 * 1000;
+const METADATA_SEARCH_CACHE_MAX_ENTRIES = 100;
+const metadataSearchCache = new Map<string, { value: MetadataSearchResult; expiresAt: number }>();
+
+const buildMetadataSearchCacheKey = (
+  query: string,
+  limit: number,
+  sort: string,
+  fields: Record<string, string | number | boolean>,
+  page: number,
+  contentType: string,
+  provider?: string,
+): string => JSON.stringify([
+  query.trim(),
+  limit,
+  sort,
+  Object.entries(fields).sort(([a], [b]) => a.localeCompare(b)),
+  page,
+  contentType,
+  provider ?? '',
+]);
+
+const getMetadataSearchCache = (key: string): MetadataSearchResult | null => {
+  const entry = metadataSearchCache.get(key);
+  if (!entry) return null;
+  if (entry.expiresAt <= Date.now()) {
+    metadataSearchCache.delete(key);
+    return null;
+  }
+  // Refresh insertion order so the Map behaves as a small LRU cache.
+  metadataSearchCache.delete(key);
+  metadataSearchCache.set(key, entry);
+  return entry.value;
+};
+
+const setMetadataSearchCache = (key: string, value: MetadataSearchResult, ttlMs: number): void => {
+  if (ttlMs <= 0 || value.books.length === 0) return;
+  metadataSearchCache.delete(key);
+  metadataSearchCache.set(key, { value, expiresAt: Date.now() + ttlMs });
+  while (metadataSearchCache.size > METADATA_SEARCH_CACHE_MAX_ENTRIES) {
+    const oldestKey = metadataSearchCache.keys().next().value;
+    if (oldestKey === undefined) break;
+    metadataSearchCache.delete(oldestKey);
+  }
+};
+
+export const clearMetadataSearchCache = (): void => {
+  metadataSearchCache.clear();
+};
+
 export const searchMetadata = async (
   query: string,
   limit: number = 40,
@@ -365,12 +433,21 @@ export const searchMetadata = async (
   page: number = 1,
   contentType: string = 'ebook',
   provider?: string,
+  options: MetadataSearchOptions = {},
 ): Promise<MetadataSearchResult> => {
   const hasFields = Object.values(fields).some((v) => v !== '' && v !== false);
 
   if (!query && !hasFields && provider !== 'hardcover' && provider !== 'audible') {
     return { books: [], page: 1, totalFound: 0, hasMore: false };
   }
+
+  if (options.signal?.aborted) {
+    throw new DOMException('The search was aborted', 'AbortError');
+  }
+
+  const cacheKey = buildMetadataSearchCacheKey(query, limit, sort, fields, page, contentType, provider);
+  const cached = getMetadataSearchCache(cacheKey);
+  if (cached) return cached;
 
   const params = new URLSearchParams();
   if (query) {
@@ -393,9 +470,10 @@ export const searchMetadata = async (
 
   const response = await fetchJSON<MetadataSearchResponse>(
     `${API.metadataSearch}?${params.toString()}`,
+    { signal: options.signal },
   );
 
-  return {
+  const result: MetadataSearchResult = {
     books: response.books.map(transformMetadataToBook),
     page: response.page || page,
     totalFound: response.total_found || 0,
@@ -403,6 +481,10 @@ export const searchMetadata = async (
     sourceUrl: response.source_url,
     sourceTitle: response.source_title,
   };
+  if (!options.signal?.aborted) {
+    setMetadataSearchCache(cacheKey, result, options.cacheTtlMs ?? METADATA_SEARCH_CACHE_TTL_MS);
+  }
+  return result;
 };
 
 export const getMetadataProviders = async (): Promise<MetadataProvidersResponse> => {
