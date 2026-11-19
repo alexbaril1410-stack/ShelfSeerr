@@ -7,9 +7,9 @@ evaluation and migration are introduced in later steps.
 
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass, field
 from typing import Any, Literal
-import re
 
 
 SCHEMA_VERSION = 1
