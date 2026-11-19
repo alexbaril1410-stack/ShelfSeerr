@@ -129,7 +129,11 @@ export const ResultsSection = ({
         className={`grid gap-4 sm:gap-8 ${cardGridClass}`}
       >
         {books.map((book, index) => {
-          const animationDelay = index * 50;
+          // Keep the entrance stagger short; large result sets must not leave later cards hidden.
+          const animationDelay = Math.min(index * 35, 210);
+          // Fetch the first row eagerly so visible covers are not delayed behind off-screen images.
+          const imageLoading = index < 4 ? 'eager' : 'lazy';
+          const imagePriority = index < 2;
           const buttonState =
             searchMode === 'universal'
               ? getUniversalButtonState(book.id)
@@ -145,6 +149,8 @@ export const ResultsSection = ({
               onGetReleases={onGetReleases}
               buttonState={buttonState}
               animationDelay={animationDelay}
+              imageLoading={imageLoading}
+              imagePriority={imagePriority}
               showSeriesPosition={book.series_position != null}
               activeTouchCardId={activeTouchCardId}
               onActivateTouchCard={setActiveTouchCardId}
